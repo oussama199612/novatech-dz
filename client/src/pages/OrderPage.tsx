@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Check, ArrowRight, Wallet } from 'lucide-react';
 import api from '../api';
-import { Product, PaymentMethod } from '../types';
+import type { Product, PaymentMethod } from '../types';
 
 const OrderPage = () => {
     const { productId } = useParams();
@@ -155,8 +155,8 @@ Merci de confirmer ma commande !
                                     type="button"
                                     onClick={() => setSelectedMethodId(method._id)}
                                     className={`p-3 rounded-lg border text-left text-sm transition-all ${selectedMethodId === method._id
-                                            ? 'bg-novatech-blue/20 border-novatech-blue text-white'
-                                            : 'bg-white/5 border-white/10 hover:border-white/30 text-gray-400'
+                                        ? 'bg-novatech-blue/20 border-novatech-blue text-white'
+                                        : 'bg-white/5 border-white/10 hover:border-white/30 text-gray-400'
                                         }`}
                                 >
                                     <div className="font-semibold">{method.name}</div>
