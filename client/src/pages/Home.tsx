@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import type { Product, Category } from '../types';
+import { type Product, type Category } from '../types';
 
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Check, ArrowRight, Wallet } from 'lucide-react';
 import api from '../api';
-import type { Product, PaymentMethod } from '../types';
+import { type Product, type PaymentMethod } from '../types';
 
 const OrderPage = () => {
     const { productId } = useParams();
