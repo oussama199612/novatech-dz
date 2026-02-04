@@ -22,7 +22,8 @@ body {
   }
 
   .glass-btn:hover {
-    @apply shadow-[0_0_20px_rgba(6, 182, 212, 0.5)] brightness-110;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+    filter: brightness(1.1);
   }
 
   .nav-link {
