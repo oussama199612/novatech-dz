@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ToggleLeft, ToggleRight, Edit2 } from 'lucide-react';
+import { ToggleLeft, ToggleRight, Edit2, Plus } from 'lucide-react';
 import api from '../api';
 
 const Payments = () => {
