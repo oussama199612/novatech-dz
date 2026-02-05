@@ -32,8 +32,6 @@ const Products = () => {
         }
     };
 
-
-
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
 
     return (
@@ -43,7 +41,10 @@ const Products = () => {
                     <h1 className="text-3xl font-bold text-white mb-2">Produits</h1>
                     <p className="text-slate-400">Gérez votre catalogue</p>
                 </div>
-                <button className="btn-primary flex items-center gap-2">
+                <button
+                    onClick={() => alert("Fonctionnalité 'Ajout' à venir: Utilisez Postman pour l'instant ou demandez le formulaire complet.")}
+                    className="btn-primary flex items-center gap-2"
+                >
                     <Plus size={20} />
                     Nouveau Produit
                 </button>
