@@ -1,7 +1,13 @@
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
 const router = express.Router();
+
+const uploadDir = 'uploads/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
     destination(req, file, cb) {
@@ -34,11 +40,22 @@ const upload = multer({
     },
 });
 
-router.post('/', upload.single('image'), (req, res) => {
-    // If we are in production (Render), we need to return the full URL if possible, or relative.
-    // Ideally, the frontend should prepend the base URL.
-    // For now, let's return the relative path.
-    res.send(`/${req.file.path.replace(/\\/g, '/')}`);
+router.post('/', (req, res) => {
+    upload.single('image')(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return res.status(500).json({ message: `Multer Error: ${err.message}` });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return res.status(500).json({ message: `Upload Error: ${err}` });
+        }
+
+        // Everything went fine.
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+        res.send(`/${req.file.path.replace(/\\/g, '/')}`);
+    });
 });
 
 module.exports = router;
