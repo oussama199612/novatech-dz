@@ -228,16 +228,52 @@ const Products = () => {
 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="label">Image URL</label>
-                                        <input
-                                            value={formData.image}
-                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                            className="input-field w-full"
-                                            placeholder="https://..."
-                                        />
+                                        <label className="label">Image du produit</label>
+                                        <div className="flex gap-2 mb-2">
+                                            <input
+                                                type="text"
+                                                value={formData.image}
+                                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                                className="input-field flex-1"
+                                                placeholder="URL ou Upload..."
+                                                readOnly
+                                            />
+                                            <input
+                                                type="file"
+                                                id="image-file"
+                                                className="hidden"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const data = new FormData();
+                                                        data.append('image', file);
+                                                        try {
+                                                            const res = await api.post('/upload', data, {
+                                                                headers: { 'Content-Type': 'multipart/form-data' }
+                                                            });
+                                                            setFormData({ ...formData, image: res.data });
+                                                        } catch (error) {
+                                                            console.error(error);
+                                                            alert('Erreur upload');
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                            <label
+                                                htmlFor="image-file"
+                                                className="btn bg-slate-800 hover:bg-slate-700 text-white cursor-pointer px-4 py-2 rounded border border-slate-600 flex items-center gap-2"
+                                            >
+                                                <ImageIcon size={18} /> Upload
+                                            </label>
+                                        </div>
+
                                         <div className="mt-2 h-32 bg-slate-950 rounded border border-slate-800 flex items-center justify-center overflow-hidden">
                                             {formData.image ? (
-                                                <img src={formData.image} className="h-full w-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                                                <img
+                                                    src={formData.image.startsWith('http') ? formData.image : `${import.meta.env.VITE_API_URL}${formData.image}`}
+                                                    className="h-full w-full object-cover"
+                                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                />
                                             ) : (
                                                 <span className="text-slate-600 text-xs">Aperçu image</span>
                                             )}
