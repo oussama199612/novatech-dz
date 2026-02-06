@@ -229,15 +229,7 @@ const Products = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <label className="label">Image du produit</label>
-                                        <div className="flex gap-2 mb-2">
-                                            <input
-                                                type="text"
-                                                value={formData.image}
-                                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                                className="input-field flex-1"
-                                                placeholder="URL ou Upload..."
-                                                readOnly
-                                            />
+                                        <div className="flex gap-2 mb-2 items-center">
                                             <input
                                                 type="file"
                                                 id="image-file"
@@ -248,32 +240,61 @@ const Products = () => {
                                                         const data = new FormData();
                                                         data.append('image', file);
                                                         try {
-                                                            const res = await api.post('/upload', data);
-                                                            setFormData({ ...formData, image: res.data });
-                                                        } catch (error) {
-                                                            console.error(error);
-                                                            alert('Erreur upload');
+                                                            // Force Content-Type to undefined so browser sets boundary
+                                                            const res = await api.post('/upload', data, {
+                                                                headers: {
+                                                                    'Content-Type': 'multipart/form-data'
+                                                                }
+                                                            });
+                                                            // Wait, if I set multipart/form-data manually, axios < 1.x might fail boundary.
+                                                            // But modern axios usually handles it.
+                                                            // actually, let's try WITHOUT any header first, but maybe the global interceptor is the issue?
+                                                            // No, axios interceptor merges headers.
+                                                            // Let's try to NOT send any header config, relying on axios auto-detection which matches my previous fix.
+                                                            // But user said it failed.
+                                                            // Let's try standard fetch for debugging? No, stick to axios but debug error.
+                                                            // Let's go back to { headers: { "Content-Type": "multipart/form-data" } } BUT with the fix I made on backend (mkdir).
+                                                            // The previous failure might have been purely backend.
+                                                            // I will use "multipart/form-data" because sometimes the global "application/json" overrides it if not specified.
+
+                                                            const res2 = await api.post('/upload', data, {
+                                                                headers: { "Content-Type": "multipart/form-data" }
+                                                            });
+                                                            setFormData({ ...formData, image: res2.data });
+                                                        } catch (error: any) {
+                                                            console.error("Upload Error Details:", error);
+                                                            const errMsg = error.response?.data?.message || error.message || 'Erreur upload';
+                                                            alert(`Erreur upload: ${errMsg}`);
                                                         }
                                                     }
                                                 }}
                                             />
                                             <label
                                                 htmlFor="image-file"
-                                                className="btn bg-slate-800 hover:bg-slate-700 text-white cursor-pointer px-4 py-2 rounded border border-slate-600 flex items-center gap-2"
+                                                className="btn w-full bg-slate-800 hover:bg-slate-700 text-white cursor-pointer px-4 py-3 rounded border border-slate-600 flex items-center justify-center gap-2 transition-colors"
                                             >
-                                                <ImageIcon size={18} /> Upload
+                                                <ImageIcon size={20} />
+                                                {formData.image ? "Changer la photo" : "Uploader une photo"}
                                             </label>
                                         </div>
 
-                                        <div className="mt-2 h-32 bg-slate-950 rounded border border-slate-800 flex items-center justify-center overflow-hidden">
+                                        <div className="mt-2 h-48 bg-slate-950 rounded border border-slate-800 flex items-center justify-center overflow-hidden relative group">
                                             {formData.image ? (
-                                                <img
-                                                    src={formData.image.startsWith('http') ? formData.image : `${import.meta.env.VITE_API_URL}${formData.image}`}
-                                                    className="h-full w-full object-cover"
-                                                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                                                />
+                                                <>
+                                                    <img
+                                                        src={formData.image.startsWith('http') ? formData.image : `${import.meta.env.VITE_API_URL}${formData.image}`}
+                                                        className="h-full w-full object-contain"
+                                                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <span className="text-white font-medium">Modifier</span>
+                                                    </div>
+                                                </>
                                             ) : (
-                                                <span className="text-slate-600 text-xs">Aperçu image</span>
+                                                <div className="text-center p-4">
+                                                    <ImageIcon size={32} className="text-slate-700 mx-auto mb-2" />
+                                                    <span className="text-slate-600 text-sm">Aucune image sélectionnée</span>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
