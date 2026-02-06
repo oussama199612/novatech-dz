@@ -38,7 +38,7 @@ app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 
 const __dirname1 = path.resolve();
-app.use('/uploads', express.static(path.join(__dirname1, '/uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname1, '/uploads')));
 
 const PORT = process.env.PORT || 5000;
 
