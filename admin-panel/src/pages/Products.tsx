@@ -248,9 +248,7 @@ const Products = () => {
                                                         const data = new FormData();
                                                         data.append('image', file);
                                                         try {
-                                                            const res = await api.post('/upload', data, {
-                                                                headers: { 'Content-Type': 'multipart/form-data' }
-                                                            });
+                                                            const res = await api.post('/upload', data);
                                                             setFormData({ ...formData, image: res.data });
                                                         } catch (error) {
                                                             console.error(error);
