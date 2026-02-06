@@ -132,7 +132,11 @@ const Products = () => {
                                     <td className="p-4">
                                         <div className="h-12 w-12 bg-slate-800 rounded overflow-hidden flex items-center justify-center">
                                             {product.image ? (
-                                                <img src={product.image} alt="" className="w-full h-full object-cover" />
+                                                <img
+                                                    src={product.image.startsWith('http') ? product.image : `${import.meta.env.VITE_API_URL}${product.image}`}
+                                                    alt=""
+                                                    className="w-full h-full object-cover"
+                                                />
                                             ) : (
                                                 <ImageIcon size={20} className="text-slate-600" />
                                             )}

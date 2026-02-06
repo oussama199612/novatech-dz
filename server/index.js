@@ -35,6 +35,10 @@ app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment-methods', require('./routes/paymentMethodRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+const __dirname1 = path.resolve();
+app.use('/uploads', express.static(path.join(__dirname1, '/uploads')));
 
 const PORT = process.env.PORT || 5000;
 
