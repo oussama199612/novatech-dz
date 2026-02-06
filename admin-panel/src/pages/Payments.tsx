@@ -5,7 +5,7 @@ import api from '../api';
 const Payments = () => {
     const [methods, setMethods] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [editing, setEditing] = useState<any>(null);
+    const [editing, setEditing] = useState<any>(null); // null = nothing, object with _id = edit, object without _id = create
 
     const fetchMethods = async () => {
         try {
@@ -31,10 +31,16 @@ const Payments = () => {
         }
     };
 
-    const handleUpdate = async (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.put(`/payment-methods/${editing._id}`, editing);
+            if (editing._id) {
+                // Update
+                await api.put(`/payment-methods/${editing._id}`, editing);
+            } else {
+                // Create
+                await api.post('/payment-methods', editing);
+            }
             setEditing(null);
             fetchMethods();
         } catch (error) {
@@ -42,11 +48,28 @@ const Payments = () => {
         }
     };
 
+    const openCreateModal = () => {
+        setEditing({
+            name: '',
+            slug: '',
+            accountLabel: '',
+            accountValue: '',
+            extraInfo: '',
+            isActive: true,
+            displayOrder: methods.length + 1
+        });
+    };
+
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
 
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Modes de Paiement</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold text-white mb-2">Modes de Paiement</h1>
+                <button onClick={openCreateModal} className="btn-primary flex items-center gap-2">
+                    <Plus size={20} /> Ajouter
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {methods.map((method) => (
@@ -82,12 +105,36 @@ const Payments = () => {
                 ))}
             </div>
 
-            {/* Edit Modal */}
+            {/* Edit/Create Modal */}
             {editing && (
                 <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
                     <div className="bg-slate-900 border border-slate-700 rounded-xl p-8 max-w-lg w-full">
-                        <h2 className="text-2xl font-bold text-white mb-6">Modifier {editing.name}</h2>
-                        <form onSubmit={handleUpdate} className="space-y-4">
+                        <h2 className="text-2xl font-bold text-white mb-6">
+                            {editing._id ? `Modifier ${editing.name}` : 'Nouveau Mode de Paiement'}
+                        </h2>
+                        <form onSubmit={handleSave} className="space-y-4">
+                            {!editing._id && (
+                                <>
+                                    <div>
+                                        <label className="label">Nom (ex: BaridiMob)</label>
+                                        <input
+                                            value={editing.name}
+                                            onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                                            className="input-field w-full"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="label">Slug (ex: baridimob)</label>
+                                        <input
+                                            value={editing.slug}
+                                            onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
+                                            className="input-field w-full"
+                                            required
+                                        />
+                                    </div>
+                                </>
+                            )}
                             <div>
                                 <label className="block text-sm text-slate-400 mb-1">Label du Compte (ex: CCP, Address)</label>
                                 <input
