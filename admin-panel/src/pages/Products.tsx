@@ -79,9 +79,10 @@ const Products = () => {
             }
             setIsModalOpen(false);
             fetchData();
-        } catch (error) {
-            alert('Erreur lors de l\'enregistrement');
+        } catch (error: any) {
             console.error(error);
+            const errMsg = error.response?.data?.message || error.message || 'Erreur lors de l\'enregistrement';
+            alert(`Erreur sauvegarde: ${errMsg}`);
         }
     };
 
