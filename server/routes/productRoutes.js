@@ -73,7 +73,11 @@ router.post('/', protect, asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 router.put('/:id', protect, asyncHandler(async (req, res) => {
-    const { name, price, description, image, category, active, stock, orderIndex, gallery, features, longDescription, accentColor } = req.body;
+    const {
+        name, price, description, image, category, active, stock, orderIndex,
+        gallery, features, longDescription, accentColor,
+        vendor, productType, tags, status, compareAtPrice
+    } = req.body;
 
     const product = await Product.findById(req.params.id);
 
