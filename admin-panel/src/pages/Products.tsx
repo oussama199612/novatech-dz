@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload, ChevronDown } from 'lucide-react';
 import api from '../api';
 
 interface ProductFeature {
@@ -24,6 +24,13 @@ interface ProductVariant {
     trackQuantity: boolean;
     image: string;
 }
+
+const PREDEFINED_COLORS: Record<string, string> = {
+    'Noir': '#000000', 'Blanc': '#FFFFFF', 'Rouge': '#FF0000', 'Bleu': '#0000FF',
+    'Vert': '#008000', 'Jaune': '#FFFF00', 'Orange': '#FFA500', 'Violet': '#800080',
+    'Rose': '#FFC0CB', 'Gris': '#808080', 'Marron': '#A52A2A', 'Beige': '#F5F5DC',
+    'Marine': '#000080', 'Kaki': '#F0E68C', 'Bordeaux': '#800000', 'Turquoise': '#40E0D0'
+};
 
 const Products = () => {
     const [products, setProducts] = useState<any[]>([]);
@@ -414,12 +421,6 @@ const Products = () => {
                                                         {/* Options List */}
                                                         {formData.options.map((option, idx) => {
                                                             const isColorOption = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
-                                                            const PREDEFINED_COLORS: Record<string, string> = {
-                                                                'Noir': '#000000', 'Blanc': '#FFFFFF', 'Rouge': '#FF0000', 'Bleu': '#0000FF',
-                                                                'Vert': '#008000', 'Jaune': '#FFFF00', 'Orange': '#FFA500', 'Violet': '#800080',
-                                                                'Rose': '#FFC0CB', 'Gris': '#808080', 'Marron': '#A52A2A', 'Beige': '#F5F5DC',
-                                                                'Marine': '#000080', 'Kaki': '#F0E68C', 'Bordeaux': '#800000', 'Turquoise': '#40E0D0'
-                                                            };
 
                                                             return (
                                                                 <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 space-y-3 relative">
