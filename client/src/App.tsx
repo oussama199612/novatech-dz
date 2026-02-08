@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import OrderPage from './pages/OrderPage'; // Keep for safety if linked elsewhere, but usage is removed from main route
+import OrderPage from './pages/OrderPage';
 import ProductLanding from './pages/ProductLanding';
 import SuccessPage from './pages/SuccessPage';
 
@@ -13,13 +13,8 @@ function App() {
         <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <Routes>
             <Route path="/" element={<Home />} />
-            import ProductLanding from './pages/ProductLanding';
-            // ...
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/product/:productId" element={<ProductLanding />} />
-              <Route path="/success" element={<SuccessPage />} />
-            </Routes>
+            <Route path="/product/:productId" element={<ProductLanding />} />
+            <Route path="/success" element={<SuccessPage />} />
           </Routes>
         </main>
 
