@@ -27,6 +27,24 @@ const productSchema = mongoose.Schema({
     weight: { type: Number, default: 0 },
     weightUnit: { type: String, default: 'kg' },
 
+    // Phase 3: Variants
+    hasVariants: { type: Boolean, default: false },
+    options: [{
+        name: { type: String }, // e.g., "Size", "Color"
+        values: [{ type: String }] // e.g., ["S", "M"], ["Red", "Blue"]
+    }],
+    variants: [{
+        title: { type: String }, // e.g., "S / Red"
+        price: { type: Number, default: 0 },
+        compareAtPrice: { type: Number, default: 0 },
+        costPerItem: { type: Number, default: 0 },
+        sku: { type: String },
+        barcode: { type: String },
+        stock: { type: Number, default: 0 },
+        trackQuantity: { type: Boolean, default: true },
+        image: { type: String } // Variant specific image
+    }],
+
     gallery: [{ type: String }],
     features: [{
         icon: { type: String },

@@ -45,7 +45,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         name, price, description, image, category, stock,
         gallery, features, longDescription, accentColor,
         vendor, productType, tags, status, compareAtPrice,
-        costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit
+        costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
+        hasVariants, options, variants
     } = req.body;
 
     const product = new Product({
@@ -70,7 +71,10 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         trackQuantity,
         continueSellingWhenOutOfStock,
         weight,
-        weightUnit
+        weightUnit,
+        hasVariants,
+        options,
+        variants
     });
 
     const createdProduct = await product.save();
@@ -85,7 +89,8 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         name, price, description, image, category, active, stock, orderIndex,
         gallery, features, longDescription, accentColor,
         vendor, productType, tags, status, compareAtPrice,
-        costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit
+        costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
+        hasVariants, options, variants
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -106,7 +111,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         if (longDescription !== undefined) product.longDescription = longDescription;
         if (accentColor !== undefined) product.accentColor = accentColor;
 
-        // Phase 1 & 2 Updates
+        // Phase 1, 2, 3 Updates
         if (vendor !== undefined) product.vendor = vendor;
         if (productType !== undefined) product.productType = productType;
         if (tags !== undefined) product.tags = tags;
@@ -120,6 +125,10 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         if (continueSellingWhenOutOfStock !== undefined) product.continueSellingWhenOutOfStock = continueSellingWhenOutOfStock;
         if (weight !== undefined) product.weight = weight;
         if (weightUnit !== undefined) product.weightUnit = weightUnit;
+
+        if (hasVariants !== undefined) product.hasVariants = hasVariants;
+        if (options !== undefined) product.options = options;
+        if (variants !== undefined) product.variants = variants;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);
