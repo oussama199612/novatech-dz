@@ -21,6 +21,7 @@ const Products = () => {
         name: '',
         price: 0,
         compareAtPrice: 0,
+        costPerItem: 0,
         description: '',
         image: '',
         category: '',
@@ -31,6 +32,13 @@ const Products = () => {
         productType: '',
         tags: [] as string[],
         status: 'active',
+        // Phase 2: Inventory & Shipping
+        sku: '',
+        barcode: '',
+        trackQuantity: true,
+        continueSellingWhenOutOfStock: false,
+        weight: 0,
+        weightUnit: 'kg',
         // Media & Landing
         gallery: [] as string[],
         features: [] as ProductFeature[],
@@ -66,6 +74,7 @@ const Products = () => {
             name: '',
             price: 0,
             compareAtPrice: 0,
+            costPerItem: 0,
             description: '',
             image: '',
             category: categories.length > 0 ? categories[0]._id : '',
@@ -75,6 +84,12 @@ const Products = () => {
             productType: '',
             tags: [],
             status: 'active',
+            sku: '',
+            barcode: '',
+            trackQuantity: true,
+            continueSellingWhenOutOfStock: false,
+            weight: 0,
+            weightUnit: 'kg',
             gallery: [],
             features: [],
             longDescription: '',
@@ -95,6 +110,7 @@ const Products = () => {
             name: product.name,
             price: product.price,
             compareAtPrice: product.compareAtPrice || 0,
+            costPerItem: product.costPerItem || 0,
             description: product.description || '',
             image: product.image || '',
             category: product.category?._id || (categories.length > 0 ? categories[0]._id : ''),
@@ -104,6 +120,12 @@ const Products = () => {
             productType: product.productType || '',
             tags: product.tags || [],
             status: product.status || 'active',
+            sku: product.sku || '',
+            barcode: product.barcode || '',
+            trackQuantity: product.trackQuantity !== undefined ? product.trackQuantity : true,
+            continueSellingWhenOutOfStock: product.continueSellingWhenOutOfStock || false,
+            weight: product.weight || 0,
+            weightUnit: product.weightUnit || 'kg',
             gallery: product.gallery || [],
             features: product.features || [],
             longDescription: product.longDescription || '',
@@ -193,6 +215,10 @@ const Products = () => {
         if (path.startsWith('http')) return path;
         return `${import.meta.env.VITE_API_URL}${path}`;
     };
+
+    // Calculate Profit & Margin
+    const profit = formData.price - formData.costPerItem;
+    const margin = formData.price > 0 ? ((profit / formData.price) * 100).toFixed(1) : 0;
 
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
 
@@ -309,6 +335,7 @@ const Products = () => {
                                                 </div>
                                             </div>
 
+                                            {/* PRICING CARD */}
                                             <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
                                                 <h3 className="font-bold text-white mb-2">Prix</h3>
                                                 <div className="grid grid-cols-2 gap-4">
@@ -319,17 +346,73 @@ const Products = () => {
                                                     <div>
                                                         <label className="label">Prix comparé (Promo)</label>
                                                         <input type="number" value={formData.compareAtPrice} onChange={e => setFormData({ ...formData, compareAtPrice: Number(e.target.value) })} className="input-field w-full" placeholder="0" />
-                                                        <p className="text-xs text-slate-500 mt-1">Affiché barré si supérieur au prix.</p>
+                                                    </div>
+                                                </div>
+                                                <div className="pt-4 border-t border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                        <label className="label">Coût par article</label>
+                                                        <input type="number" value={formData.costPerItem} onChange={e => setFormData({ ...formData, costPerItem: Number(e.target.value) })} className="input-field w-full" placeholder="0" />
+                                                        <p className="text-xs text-slate-500 mt-1">Non visible par les clients.</p>
+                                                    </div>
+                                                    <div className="col-span-2 flex items-center gap-8 px-4">
+                                                        <div>
+                                                            <div className="text-xs text-slate-500 uppercase">Marge</div>
+                                                            <div className="text-white font-mono">{margin}%</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs text-slate-500 uppercase">Profit</div>
+                                                            <div className="text-white font-mono">{profit.toLocaleString()} DA</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
 
+                                            {/* INVENTORY CARD */}
                                             <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
                                                 <h3 className="font-bold text-white mb-2">Inventaire</h3>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div>
-                                                        <label className="label">Stock</label>
-                                                        <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: Number(e.target.value) })} className="input-field w-full" />
+                                                        <label className="label">SKU (Réf. Stock)</label>
+                                                        <input value={formData.sku} onChange={e => setFormData({ ...formData, sku: e.target.value })} className="input-field w-full" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="label">Code-barres (ISBN, UPC...)</label>
+                                                        <input value={formData.barcode} onChange={e => setFormData({ ...formData, barcode: e.target.value })} className="input-field w-full" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.trackQuantity}
+                                                        onChange={e => setFormData({ ...formData, trackQuantity: e.target.checked })}
+                                                        className="w-4 h-4 rounded bg-slate-800 border-slate-600"
+                                                    />
+                                                    <label className="text-sm text-slate-300">Suivre la quantité</label>
+                                                </div>
+                                                {formData.trackQuantity && (
+                                                    <div className="pt-2 border-t border-slate-800">
+                                                        <label className="label">Quantité en stock</label>
+                                                        <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: Number(e.target.value) })} className="input-field w-full md:w-1/3" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* SHIPPING CARD */}
+                                            <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+                                                <h3 className="font-bold text-white mb-2">Expédition</h3>
+                                                <div className="flex gap-4">
+                                                    <div className="flex-1">
+                                                        <label className="label">Poids</label>
+                                                        <input type="number" value={formData.weight} onChange={e => setFormData({ ...formData, weight: Number(e.target.value) })} className="input-field w-full" />
+                                                    </div>
+                                                    <div className="w-1/3">
+                                                        <label className="label">Unité</label>
+                                                        <select value={formData.weightUnit} onChange={e => setFormData({ ...formData, weightUnit: e.target.value })} className="input-field w-full">
+                                                            <option value="kg">kg</option>
+                                                            <option value="g">g</option>
+                                                            <option value="lb">lb</option>
+                                                            <option value="oz">oz</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
