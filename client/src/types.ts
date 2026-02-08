@@ -14,6 +14,10 @@ export interface Product {
         label?: string;
         isBestValue?: boolean;
     }[];
+    compareAtPrice: number;
+    hasVariants: boolean;
+    options: { name: string; values: string[] }[];
+    // New Fields
     gallery: string[];
     features?: { icon: string; title: string; description: string }[];
     longDescription?: string;
