@@ -22,6 +22,7 @@ const ProductLanding = () => {
         customerPhone: '',
         gameId: '',
     });
+    const [settings, setSettings] = useState<any>({});
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'desc' | 'features'>('desc');
 
@@ -32,13 +33,15 @@ const ProductLanding = () => {
         window.scrollTo(0, 0);
         const fetchData = async () => {
             try {
-                const [prodRes, methodsRes] = await Promise.all([
+                const [prodRes, methodsRes, settingsRes] = await Promise.all([
                     api.get(`/products/${productId}`),
-                    api.get('/payment-methods')
+                    api.get('/payment-methods'),
+                    api.get('/settings')
                 ]);
                 const prod = prodRes.data;
                 setProduct(prod);
                 setMethods(methodsRes.data);
+                setSettings(settingsRes.data || {});
 
                 // Init Variants
                 if (prod.hasVariants && prod.options?.length > 0) {
@@ -123,7 +126,11 @@ ${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Prix:* ${(curre
 Merci de confirmer ma commande !
 `.trim();
 
-            const whatsappUrl = `https://wa.me/213550000000?text=${encodeURIComponent(message)}`;
+            const baseUrl = settings.whatsappUrl || 'https://wa.me/213550000000';
+            // Clean url to ensure we can append params
+            const cleanUrl = baseUrl.split('?')[0];
+            const whatsappUrl = `${cleanUrl}?text=${encodeURIComponent(message)}`;
+
             window.open(whatsappUrl, '_blank');
             navigate('/success');
         } catch (error) {
