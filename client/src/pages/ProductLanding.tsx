@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Check, Copy, ShoppingCart, Star, Shield, Zap, Box, ArrowRight, Wallet, Image as ImageIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Copy, ShoppingCart, Star, Shield, Zap, Box, ArrowRight, Truck, CreditCard, Lock, ChevronDown, ChevronUp } from 'lucide-react';
 import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
@@ -15,7 +15,7 @@ const ProductLanding = () => {
     const [selectedMethodId, setSelectedMethodId] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
-    // Order Form State (Integrated)
+    // Order Form State
     const [formData, setFormData] = useState({
         customerName: '',
         customerEmail: '',
@@ -23,6 +23,7 @@ const ProductLanding = () => {
         gameId: '',
     });
     const [copied, setCopied] = useState(false);
+    const [activeTab, setActiveTab] = useState<'desc' | 'features'>('desc');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -76,14 +77,11 @@ const ProductLanding = () => {
 Merci de confirmer ma commande !
 `.trim();
 
-            const encodedMsg = encodeURIComponent(message);
-            // Replace with configurable number if available
-            const whatsappUrl = `https://wa.me/213550000000?text=${encodedMsg}`;
-
+            const whatsappUrl = `https://wa.me/213550000000?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             navigate('/success');
         } catch (error) {
-            alert('Erreur lors de la commande. Veuillez réessayer.');
+            alert('Erreur lors de la commande.');
         }
     };
 
@@ -91,207 +89,212 @@ Merci de confirmer ma commande !
     if (!product) return <div className="min-h-screen flex items-center justify-center text-white">Produit introuvable</div>;
 
     const accentColor = product.accentColor || '#3b82f6';
-
-    // Dynamic Icon component
-    const FeatureIcon = ({ name }: { name: string }) => {
-        const icons: any = { Shield, Zap, Box, Star, Check };
-        const Icon = icons[name] || Star;
-        return <Icon size={24} style={{ color: accentColor }} />;
-    };
+    const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
 
     return (
-        <div className="min-h-screen pb-20 overflow-x-hidden">
-            {/* 1. HERO SECTION */}
-            <div className="relative min-h-[80vh] flex items-center">
-                {/* Background Glow */}
-                <div
-                    className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-20 pointer-events-none"
-                    style={{ backgroundColor: accentColor }}
-                />
+        <div className="min-h-screen pb-20 bg-[#0a0a0f]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
-                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    {/* Left: Text */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-6 z-10"
-                    >
-                        <div
-                            className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border"
-                            style={{ borderColor: `${accentColor}40`, color: accentColor, backgroundColor: `${accentColor}10` }}
-                        >
-                            {product.category?.name || 'Gaming'}
-                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-                        <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
-                            {product.name}
-                        </h1>
-
-                        <p className="text-slate-400 text-lg max-w-lg leading-relaxed">
-                            {product.description}
-                        </p>
-
-                        <div className="flex items-end gap-4 py-4">
-                            <span className="text-5xl font-bold text-white tracking-tight">
-                                {product.price.toLocaleString()} <span className="text-2xl text-slate-500 font-normal">DZD</span>
-                            </span>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => document.getElementById('order-section')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="px-8 py-4 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transform hover:-translate-y-1 transition-all flex items-center gap-3"
-                                style={{ backgroundColor: accentColor }}
+                    {/* LEFT COLUMN: GALLERY (Sticky) */}
+                    <div className="lg:col-span-7">
+                        <div className="sticky top-24 space-y-4">
+                            {/* Main Image */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="aspect-square md:aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 relative group"
                             >
-                                <ShoppingCart size={20} />
-                                Commander Maintenant
-                            </button>
-                        </div>
-                    </motion.div>
+                                <img
+                                    src={getImageUrl(activeImage)}
+                                    alt={product.name}
+                                    className="w-full h-full object-contain p-4"
+                                />
+                                <div className="absolute top-4 right-4 bg-slate-950/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-white border border-slate-800">
+                                    {product.category?.name}
+                                </div>
+                            </motion.div>
 
-                    {/* Right: Immersive Image */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="relative z-0"
-                    >
-                        <div className="relative aspect-square max-h-[600px] mx-auto">
-                            <img
-                                src={getImageUrl(activeImage)}
-                                className="w-full h-full object-contain drop-shadow-2xl"
-                                alt={product.name}
-                            />
-                            {/* Reflection effect */}
-                            <div
-                                className="absolute -bottom-8 left-0 right-0 h-24 bg-gradient-to-t from-[#020617] to-transparent z-10"
-                            />
-                        </div>
-
-                        {/* Gallery Thumbs */}
-                        {product.gallery && product.gallery.length > 0 && (
-                            <div className="flex gap-3 justify-center mt-8 overflow-x-auto pb-4">
-                                <button
-                                    onClick={() => setActiveImage(product.image)}
-                                    className={`w-20 h-20 rounded-lg border-2 p-1 transition-all ${activeImage === product.image ? 'border-white' : 'border-slate-800 opacity-50 hover:opacity-100'}`}
-                                >
-                                    <img src={getImageUrl(product.image)} className="w-full h-full object-cover rounded" />
-                                </button>
-                                {product.gallery.map((img, idx) => (
+                            {/* Thumbnails */}
+                            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                                {allImages.map((img, idx) => (
                                     <button
                                         key={idx}
-                                        onClick={() => setActiveImage(img)}
-                                        className={`w-20 h-20 rounded-lg border-2 p-1 transition-all ${activeImage === img ? 'border-white' : 'border-slate-800 opacity-50 hover:opacity-100'}`}
+                                        onClick={() => setActiveImage(img!)}
+                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-slate-900 rounded-xl border-2 transition-all p-2 ${activeImage === img ? 'border-blue-500' : 'border-slate-800 hover:border-slate-600'}`}
                                     >
-                                        <img src={getImageUrl(img)} className="w-full h-full object-cover rounded" />
+                                        <img src={getImageUrl(img!)} className="w-full h-full object-contain" />
                                     </button>
                                 ))}
                             </div>
-                        )}
-                    </motion.div>
-                </div>
-            </div>
 
-            {/* 2. FEATURES GRID (If any) */}
-            {product.features && product.features.length > 0 && (
-                <div className="max-w-7xl mx-auto px-4 py-20">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {product.features.map((feat, idx) => (
-                            <motion.div
-                                key={idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="bg-slate-900/50 backdrop-blur border border-slate-800 p-6 rounded-2xl hover:border-slate-600 transition-colors"
-                            >
-                                <div className="mb-4 w-12 h-12 rounded-xl flex items-center justify-center bg-slate-950 border border-slate-800">
-                                    <FeatureIcon name={feat.icon || 'Star'} />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">{feat.title}</h3>
-                                <p className="text-slate-400">{feat.description}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* 3. DETAILED CONTENT & CHECKOUT */}
-            <div className="max-w-7xl mx-auto px-4 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-                {/* Left: Long Description */}
-                <div className="lg:col-span-7 space-y-8">
-                    <h2 className="text-3xl font-bold text-white">À Propos</h2>
-                    <div className="prose prose-invert prose-lg max-w-none text-slate-300">
-                        {product.longDescription ? (
-                            <div className="whitespace-pre-line leading-relaxed">
-                                {product.longDescription}
-                            </div>
-                        ) : (
-                            <p className="text-slate-500 italic">Aucune description détaillée disponible.</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right: Checkout Sticky Card */}
-                <div className="lg:col-span-5 relative" id="order-section">
-                    <div className="sticky top-24">
-                        <div className="bg-slate-900/80 backdrop-blur border border-slate-700 p-6 rounded-3xl shadow-2xl relative overflow-hidden">
-                            {/* Decor */}
-                            <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 pointer-events-none" style={{ backgroundColor: accentColor }} />
-
-                            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Wallet className="text-slate-400" />
-                                Finaliser votre commande
-                            </h3>
-
-                            <form onSubmit={handleSubmitOrder} className="space-y-4 relative z-10">
-                                <div className="space-y-3">
-                                    <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
-                                    <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
-                                    <input required type="tel" placeholder="Téléphone (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
-                                    <input placeholder="ID Joueur (si applicable)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                            {/* Desktop: Details Below Image */}
+                            <div className="hidden lg:block mt-12 bg-slate-900/50 rounded-2xl p-8 border border-slate-800">
+                                <div className="flex gap-8 border-b border-slate-800 mb-6">
+                                    <button
+                                        onClick={() => setActiveTab('desc')}
+                                        className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'desc' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-300'}`}
+                                    >
+                                        Description
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('features')}
+                                        className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'features' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-300'}`}
+                                    >
+                                        Caractéristiques
+                                    </button>
                                 </div>
 
-                                <div className="pt-4">
-                                    <label className="text-sm font-bold text-slate-400 mb-3 block uppercase">Moyen de Paiement</label>
-                                    <div className="space-y-2">
-                                        {methods.map(method => (
-                                            <div key={method._id}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSelectedMethodId(method._id)}
-                                                    className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${selectedMethodId === method._id ? 'bg-blue-600/10 border-blue-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'}`}
-                                                >
-                                                    <span className="font-medium">{method.name}</span>
-                                                    {selectedMethodId === method._id && <Check size={18} style={{ color: accentColor }} />}
-                                                </button>
-                                                {selectedMethodId === method._id && (
-                                                    <div className="mt-2 p-3 bg-slate-950 rounded-lg border border-slate-800 text-sm flex justify-between items-center animate-in slide-in-from-top-2">
-                                                        <span className="font-mono text-slate-300">{method.accountValue}</span>
-                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-slate-500 hover:text-white">
-                                                            {copied ? <Check size={14} /> : <Copy size={14} />}
-                                                        </button>
+                                <div className="prose prose-invert max-w-none text-slate-300">
+                                    {activeTab === 'desc' ? (
+                                        <div className="whitespace-pre-line leading-relaxed">
+                                            {product.longDescription || product.description}
+                                        </div>
+                                    ) : (
+                                        <ul className="grid grid-cols-1 gap-4">
+                                            {product.features?.map((feat, i) => (
+                                                <li key={i} className="flex items-start gap-4">
+                                                    <div className="p-2 bg-slate-800 rounded-lg text-blue-400">
+                                                        <Zap size={16} />
                                                     </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                                                    <div>
+                                                        <strong className="block text-white">{feat.title}</strong>
+                                                        <span className="text-sm text-slate-400">{feat.description}</span>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                            {(!product.features || product.features.length === 0) && <p className="text-slate-500 italic">Aucune caractéristique spécifiée.</p>}
+                                        </ul>
+                                    )}
                                 </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={!selectedMethodId}
-                                    className="w-full py-4 mt-4 rounded-xl font-bold text-white shadow-lg transform active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                                    style={{ backgroundColor: selectedMethodId ? accentColor : '#1e293b' }}
-                                >
-                                    Confirmer la Commande <ArrowRight size={20} />
-                                </button>
-                                <p className="text-center text-xs text-slate-500 mt-4">
-                                    Paiement sécurisé et traitement rapide.
-                                </p>
-                            </form>
+                            </div>
                         </div>
                     </div>
+
+                    {/* RIGHT COLUMN: BUY BOX */}
+                    <div className="lg:col-span-5">
+                        <div className="space-y-8">
+
+                            {/* Header Info */}
+                            <div className="space-y-4 border-b border-slate-800 pb-8">
+                                <h1 className="text-3xl md:text-4xl font-bold text-white">{product.name}</h1>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="text-3xl font-bold text-white">
+                                        {product.price.toLocaleString()} <span className="text-lg text-slate-400 font-medium">DZD</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-1 text-yellow-400">
+                                        <Star fill="currentColor" size={16} />
+                                        <Star fill="currentColor" size={16} />
+                                        <Star fill="currentColor" size={16} />
+                                        <Star fill="currentColor" size={16} />
+                                        <Star fill="currentColor" size={16} />
+                                        <span className="text-slate-500 text-sm ml-2">(4.9/5)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Trust Badges */}
+                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-slate-400">
+                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
+                                    <Truck size={20} className="text-blue-500" />
+                                    <span>Livraison Rapide</span>
+                                </div>
+                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
+                                    <Shield size={20} className="text-blue-500" />
+                                    <span>Garantie 100%</span>
+                                </div>
+                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
+                                    <Lock size={20} className="text-blue-500" />
+                                    <span>Paiement Sécurisé</span>
+                                </div>
+                            </div>
+
+                            {/* Order Form */}
+                            <div className="bg-slate-900 rounded-2xl border border-blue-500/20 shadow-2xl overflow-hidden">
+                                <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                                    <span className="font-bold text-white uppercase tracking-wider text-sm flex items-center gap-2">
+                                        <CreditCard size={16} className="text-blue-500" />
+                                        Commander
+                                    </span>
+                                    <span className="text-xs text-green-400 font-mono animate-pulse">● En Stock</span>
+                                </div>
+
+                                <form onSubmit={handleSubmitOrder} className="p-6 space-y-5">
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Vos Informations</label>
+                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" />
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
+                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
+                                        </div>
+                                        <input placeholder="ID Joueur (Optionnel)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
+                                    </div>
+
+                                    <div className="space-y-3 pt-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Paiement</label>
+                                        <div className="space-y-2">
+                                            {methods.map(method => (
+                                                <div key={method._id} className={`rounded-xl border transition-all ${selectedMethodId === method._id ? 'bg-blue-900/10 border-blue-500' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSelectedMethodId(method._id)}
+                                                        className="w-full p-3 flex items-center gap-3 text-left"
+                                                    >
+                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-blue-500' : 'border-slate-600'}`}>
+                                                            {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+                                                        </div>
+                                                        <span className="font-medium text-white text-sm">{method.name}</span>
+                                                    </button>
+
+                                                    <AnimatePresence>
+                                                        {selectedMethodId === method._id && (
+                                                            <motion.div
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: 'auto', opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                className="overflow-hidden"
+                                                            >
+                                                                <div className="px-4 pb-3 pt-0">
+                                                                    <div className="p-3 bg-slate-900 rounded-lg border border-slate-800/50 flex justify-between items-center text-xs">
+                                                                        <code className="text-blue-200 font-mono">{method.accountValue}</code>
+                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-slate-500 hover:text-white transition-colors">
+                                                                            {copied ? <Check size={14} /> : <Copy size={14} />}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={!selectedMethodId}
+                                        className="w-full py-4 rounded-xl font-bold text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg"
+                                        style={{ backgroundColor: accentColor }}
+                                    >
+                                        Confirmer la commande <ArrowRight size={20} />
+                                    </button>
+                                </form>
+                            </div>
+
+                            {/* Mobile: Details Below Form */}
+                            <div className="lg:hidden mt-12 bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
+                                <h3 className="font-bold text-white mb-4">Description</h3>
+                                <p className="text-slate-300 text-sm whitespace-pre-line leading-relaxed">
+                                    {product.longDescription || product.description}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
