@@ -29,6 +29,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment-methods', require('./routes/paymentMethodRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/health', require('./routes/healthRoutes'));
 
 const __dirname1 = path.resolve();
 app.use('/api/uploads', express.static(path.join(__dirname1, '/uploads')));
