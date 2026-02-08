@@ -358,10 +358,60 @@ Merci de confirmer ma commande !
                                         <input placeholder="ID Joueur (Optionnel)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
                                     </div>
 
-                                    <div className="space-y-3 pt-2">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Quantité</label>
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg">
+                                    <div className="space-y-4 pt-2">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-xs font-bold text-slate-500 uppercase">Quantité & Offres</label>
+                                            {product.offers && product.offers.length > 0 && (
+                                                <span className="text-xs text-blue-400 font-bold animate-pulse">
+                                                    Offres disponibles !
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* OFFERS SELECTION */}
+                                        {product.offers && product.offers.length > 0 && (
+                                            <div className="grid grid-cols-1 gap-3 mb-4">
+                                                {product.offers.sort((a: any, b: any) => a.quantity - b.quantity).map((offer: any, idx: number) => (
+                                                    <button
+                                                        key={idx}
+                                                        type="button"
+                                                        onClick={() => setQuantity(offer.quantity)}
+                                                        className={`relative p-3 rounded-lg border-2 flex items-center justify-between transition-all ${quantity === offer.quantity
+                                                                ? 'bg-blue-600/10 border-blue-500 text-white'
+                                                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                                                            }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${quantity === offer.quantity ? 'bg-blue-500 text-white' : 'bg-slate-800'
+                                                                }`}>
+                                                                {quantity === offer.quantity && <Check size={14} />}
+                                                            </div>
+                                                            <div className="text-left">
+                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-blue-400' : 'text-white'}`}>
+                                                                    Achetez {offer.quantity}
+                                                                </div>
+                                                                <div className="text-xs opacity-70">{offer.label || 'Offre Spéciale'}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="font-bold text-emerald-400">{offer.price.toLocaleString()} DA</div>
+                                                            <div className="text-xs text-slate-500 line-through">
+                                                                {(offer.quantity * (currentVariant?.price || product.price)).toLocaleString()} DA
+                                                            </div>
+                                                        </div>
+                                                        {offer.isBestValue && (
+                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                                                Meilleure Offre
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* STANDARD QUANTITY SELECTOR */}
+                                        <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-1">
+                                            <div className="flex items-center">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -378,8 +428,29 @@ Merci de confirmer ma commande !
                                                     +
                                                 </button>
                                             </div>
-                                            <div className="text-sm text-slate-400">
-                                                Total: <span className="text-white font-bold">{((currentVariant?.price || product.price) * quantity).toLocaleString()} DZD</span>
+                                            <div className="px-4 text-right">
+                                                <div className="text-xs text-slate-500 uppercase">Total à payer</div>
+                                                <div className="text-xl font-bold text-emerald-400">
+                                                    {(() => {
+                                                        const basePrice = currentVariant?.price || product.price;
+                                                        let finalPrice = 0;
+                                                        let remaining = quantity;
+
+                                                        // Calculate Best Price (Greedy Algorithm matching Backend)
+                                                        if (product.offers && product.offers.length > 0) {
+                                                            const sortedOffers = [...product.offers].sort((a: any, b: any) => b.quantity - a.quantity);
+                                                            for (const offer of sortedOffers) {
+                                                                while (remaining >= offer.quantity) {
+                                                                    finalPrice += offer.price;
+                                                                    remaining -= offer.quantity;
+                                                                }
+                                                            }
+                                                        }
+                                                        finalPrice += remaining * basePrice;
+
+                                                        return finalPrice.toLocaleString();
+                                                    })()} <span className="text-sm text-emerald-600">DZD</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

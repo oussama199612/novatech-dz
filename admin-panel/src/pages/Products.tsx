@@ -132,6 +132,7 @@ const Products = () => {
             hasVariants: false,
             options: [],
             variants: [],
+            offers: [], // Phase 5
             gallery: [],
             features: [],
             longDescription: '',
@@ -171,6 +172,7 @@ const Products = () => {
             hasVariants: product.hasVariants || false,
             options: product.options || [],
             variants: product.variants || [],
+            offers: product.offers || [],
             gallery: product.gallery || [],
             features: product.features || [],
             longDescription: product.longDescription || '',

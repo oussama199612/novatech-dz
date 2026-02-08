@@ -42,7 +42,33 @@ router.post('/', asyncHandler(async (req, res) => {
                 quantity: item.qty,
                 image: product.image
             });
-            totalPrice += product.price * item.qty;
+            let itemPrice = 0;
+            let remainingQty = item.qty;
+
+            // Sort offers by quantity descending to apply best value (largest volume) first
+            if (product.offers && product.offers.length > 0) {
+                const sortedOffers = product.offers.sort((a, b) => b.quantity - a.quantity);
+
+                for (const offer of sortedOffers) {
+                    while (remainingQty >= offer.quantity) {
+                        itemPrice += offer.price;
+                        remainingQty -= offer.quantity;
+                    }
+                }
+            }
+
+            // Add remaining items at standard unit price
+            itemPrice += remainingQty * product.price;
+
+            dbOrderItems.push({
+                product: product._id,
+                name: product.name,
+                price: product.price, // Unit price stored for reference
+                quantity: item.qty,
+                image: product.image,
+                totalItemPrice: itemPrice // Store the total price for this line item (including discounts)
+            });
+            totalPrice += itemPrice;
         }
 
         const paymentMethod = await PaymentMethod.findById(paymentMethodId);
