@@ -73,10 +73,17 @@ const Login = () => {
                         SOS: Réinitialiser Admin (Si échec login)
                     </button>
 
-                    <div className="text-xs text-slate-600 text-center mt-4 break-all">
-                        API: {api.defaults.baseURL}
+                    <div className="text-xs text-slate-500 text-center mt-4">
+                        v1.0.2 - Protected Area
                     </div>
                 </form>
+
+                <div className="mt-6 p-4 bg-black/30 rounded border border-slate-700 text-center">
+                    <p className="text-slate-400 text-xs mb-1">Status Connexion:</p>
+                    <code className="text-xs text-green-400 block break-all font-mono">
+                        {api.defaults.baseURL}
+                    </code>
+                </div>
             </div>
         </div>
     );
