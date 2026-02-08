@@ -15,7 +15,25 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 connectDB();
 
 const app = express();
-// ... (existing code) ...
+
+// Middleware
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(helmet({
+    crossOriginResourcePolicy: false, // Allow loading images from different origins/same site
+}));
+
+// CORS Configuration
+app.use(cors({
+    origin: '*', // Allow all origins for simplicity in this crisis
+    credentials: false // Must be false if origin is *
+}));
+
+// Debug Middleware for logging requests
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -31,10 +49,12 @@ app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
 
+// Static Folder for Uploads
 const __dirname1 = path.resolve();
 app.use('/api/uploads', express.static(path.join(__dirname1, '/uploads')));
 app.use('/uploads', express.static(path.join(__dirname1, '/uploads')));
 
+// Error Handling
 app.use(notFound);
 app.use(errorHandler);
 
