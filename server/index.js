@@ -8,21 +8,9 @@ const path = require('path');
 
 dotenv.config();
 
-const connectDB = require('./config/db');
-
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(morgan('dev'));
-app.use(helmet());
-app.use(cors({
-    origin: '*',
-    credentials: true
-}));
-
-// Connect to Database
-connectDB();
+// ... (existing code) ...
 
 // Routes
 app.get('/', (req, res) => {
@@ -40,6 +28,9 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 const __dirname1 = path.resolve();
 app.use('/api/uploads', express.static(path.join(__dirname1, '/uploads')));
 app.use('/uploads', express.static(path.join(__dirname1, '/uploads')));
+
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
