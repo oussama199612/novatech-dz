@@ -49,7 +49,6 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         image,
         category,
         stock,
-        user: req.user._id,
     });
 
     const createdProduct = await product.save();
