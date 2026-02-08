@@ -57,6 +57,25 @@ const Login = () => {
                     <button type="submit" className="w-full btn-primary py-3">
                         Login
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            try {
+                                const res = await api.get('/auth/rescue-admin');
+                                alert(`Succès: ${res.data.message}\n\nEmail: admin@novatech.com\nPass: password123`);
+                            } catch (e: any) {
+                                alert(`Erreur SOS: ${e.message}`);
+                            }
+                        }}
+                        className="w-full bg-red-900/50 hover:bg-red-900 text-red-200 py-2 rounded border border-red-800 text-sm"
+                    >
+                        SOS: Réinitialiser Admin (Si échec login)
+                    </button>
+
+                    <div className="text-xs text-slate-600 text-center mt-4 break-all">
+                        API: {api.defaults.baseURL}
+                    </div>
                 </form>
             </div>
         </div>
