@@ -113,7 +113,7 @@ const Home = () => {
                                 <div className="mt-auto flex items-center justify-between">
                                     <span className="text-xl font-bold text-novatech-gold">{product.price.toLocaleString()} DZD</span>
                                     <Link
-                                        to={`/order/${product._id}`}
+                                        to={`/product/${product._id}`}
                                         className="p-2 bg-white/10 rounded-lg hover:bg-novatech-blue transition-colors"
                                     >
                                         <ShoppingCart size={20} />

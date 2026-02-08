@@ -7,6 +7,11 @@ export interface Product {
     category: Category;
     stock: number;
     orderIndex: number;
+    // New Fields
+    gallery?: string[];
+    features?: { icon: string; title: string; description: string }[];
+    longDescription?: string;
+    accentColor?: string;
 }
 
 export interface Category {
