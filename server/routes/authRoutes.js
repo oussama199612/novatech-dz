@@ -48,4 +48,29 @@ router.get('/me', protect, asyncHandler(async (req, res) => {
     }
 }));
 
+// @desc    Rescue default admin (Use for first setup if seeder fails)
+// @route   GET /api/auth/rescue-admin
+// @access  Public
+router.get('/rescue-admin', asyncHandler(async (req, res) => {
+    const adminExists = await Admin.findOne({ email: 'admin@novatech.com' });
+
+    if (adminExists) {
+        adminExists.password = 'password123'; // Reset password to default
+        await adminExists.save();
+        res.json({ message: 'Admin exists. Password reset to: password123' });
+    } else {
+        const admin = await Admin.create({
+            email: 'admin@novatech.com',
+            password: 'password123'
+        });
+        res.status(201).json({
+            message: 'Admin created successfully',
+            credentials: {
+                email: 'admin@novatech.com',
+                password: 'password123'
+            }
+        });
+    }
+}));
+
 module.exports = router;
