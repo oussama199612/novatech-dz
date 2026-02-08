@@ -341,7 +341,15 @@ const Products = () => {
                                             {/* Status Card */}
                                             <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
                                                 <h3 className="font-bold text-white text-sm uppercase">Statut du produit</h3>
-                                                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="input-field w-full">
+                                                <select
+                                                    value={formData.status}
+                                                    onChange={e => setFormData({
+                                                        ...formData,
+                                                        status: e.target.value,
+                                                        active: e.target.value === 'active'
+                                                    })}
+                                                    className="input-field w-full"
+                                                >
                                                     <option value="active">Actif</option>
                                                     <option value="draft">Brouillon</option>
                                                     <option value="archived">Archivé</option>
