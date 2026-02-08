@@ -25,6 +25,13 @@ interface ProductVariant {
     image: string;
 }
 
+interface ProductOffer {
+    quantity: number;
+    price: number;
+    label: string;
+    isBestValue: boolean;
+}
+
 const PREDEFINED_COLORS: Record<string, string> = {
     'Noir': '#000000', 'Blanc': '#FFFFFF', 'Rouge': '#FF0000', 'Bleu': '#0000FF',
     'Vert': '#008000', 'Jaune': '#FFFF00', 'Orange': '#FFA500', 'Violet': '#800080',
@@ -67,6 +74,8 @@ const Products = () => {
         hasVariants: false,
         options: [] as ProductOption[],
         variants: [] as ProductVariant[],
+        // Phase 5: Offers
+        offers: [] as ProductOffer[],
         // Media & Landing
         gallery: [] as string[],
         features: [] as ProductFeature[],
@@ -77,6 +86,8 @@ const Products = () => {
     const [tagInput, setTagInput] = useState('');
     // Temp state for new feature
     const [newFeature, setNewFeature] = useState({ icon: 'Zap', title: '', description: '' });
+    // Temp state for new offer
+    const [newOffer, setNewOffer] = useState({ quantity: 2, price: 0, label: '', isBestValue: false });
 
     const fetchData = async () => {
         try {
@@ -752,6 +763,105 @@ const Products = () => {
                                                         </div>
                                                     </div>
                                                 )}
+                                            </div>
+
+                                            {/* OFFERS / MULTI-BUY CARD */}
+                                            <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+                                                <div className="flex justify-between items-center">
+                                                    <h3 className="font-bold text-white">Offres Spéciales (Multi-Achat)</h3>
+                                                    <span className="text-xs text-slate-500">Encouragez l'achat en volume</span>
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    {formData.offers.map((offer, idx) => (
+                                                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-900 rounded-lg border border-slate-800">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-sm">
+                                                                    x{offer.quantity}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-white font-bold">{offer.price.toLocaleString()} DZD</div>
+                                                                    {offer.label && <div className="text-xs text-slate-400">{offer.label}</div>}
+                                                                </div>
+                                                                {offer.isBestValue && (
+                                                                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-[10px] font-bold uppercase rounded-full">
+                                                                        Best Value
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newOffers = formData.offers.filter((_, i) => i !== idx);
+                                                                    setFormData({ ...formData, offers: newOffers });
+                                                                }}
+                                                                className="text-slate-500 hover:text-red-400 p-2"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    {formData.offers.length === 0 && (
+                                                        <p className="text-sm text-slate-500 italic text-center py-2">Aucune offre configurée.</p>
+                                                    )}
+                                                </div>
+
+                                                <div className="grid grid-cols-12 gap-3 items-end pt-4 border-t border-slate-800">
+                                                    <div className="col-span-2">
+                                                        <label className="text-xs text-slate-400 block mb-1">Qté</label>
+                                                        <input
+                                                            type="number"
+                                                            value={newOffer.quantity}
+                                                            onChange={e => setNewOffer({ ...newOffer, quantity: Number(e.target.value) })}
+                                                            className="input-field w-full text-center"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-3">
+                                                        <label className="text-xs text-slate-400 block mb-1">Prix (DZD)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={newOffer.price}
+                                                            onChange={e => setNewOffer({ ...newOffer, price: Number(e.target.value) })}
+                                                            className="input-field w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-4">
+                                                        <label className="text-xs text-slate-400 block mb-1">Label (ex: Pack Eco)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={newOffer.label}
+                                                            onChange={e => setNewOffer({ ...newOffer, label: e.target.value })}
+                                                            className="input-field w-full"
+                                                            placeholder="Optionnel"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (newOffer.quantity > 1 && newOffer.price > 0) {
+                                                                    setFormData({
+                                                                        ...formData,
+                                                                        offers: [...formData.offers, newOffer].sort((a, b) => a.quantity - b.quantity)
+                                                                    });
+                                                                    setNewOffer({ quantity: newOffer.quantity + 1, price: 0, label: '', isBestValue: false });
+                                                                }
+                                                            }}
+                                                            className="btn bg-blue-600 hover:bg-blue-500 text-white w-full py-2.5 text-sm font-bold flex justify-center items-center gap-1"
+                                                        >
+                                                            <Plus size={16} /> Ajouter
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={newOffer.isBestValue}
+                                                        onChange={e => setNewOffer({ ...newOffer, isBestValue: e.target.checked })}
+                                                        className="w-4 h-4 rounded bg-slate-800 border-slate-600"
+                                                    />
+                                                    <label className="text-xs text-slate-400">Marquer comme "Meilleure Valeur"</label>
+                                                </div>
                                             </div>
 
                                             {/* INVENTORY CARD */}

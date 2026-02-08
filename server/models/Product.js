@@ -51,6 +51,12 @@ const productSchema = mongoose.Schema({
         title: { type: String },
         description: { type: String }
     }],
+    offers: [{
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        label: { type: String },
+        isBestValue: { type: Boolean, default: false }
+    }],
     longDescription: { type: String },
     accentColor: { type: String, default: '#3b82f6' },
 }, {

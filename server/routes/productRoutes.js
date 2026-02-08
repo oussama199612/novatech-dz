@@ -46,7 +46,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         gallery, features, longDescription, accentColor,
         vendor, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
-        hasVariants, options, variants
+        hasVariants, options, variants,
+        offers
     } = req.body;
 
     const product = new Product({
@@ -74,7 +75,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         weightUnit,
         hasVariants,
         options,
-        variants
+        variants,
+        offers
     });
 
     const createdProduct = await product.save();
@@ -90,7 +92,8 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         gallery, features, longDescription, accentColor,
         vendor, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
-        hasVariants, options, variants
+        hasVariants, options, variants,
+        offers
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -129,6 +132,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         if (hasVariants !== undefined) product.hasVariants = hasVariants;
         if (options !== undefined) product.options = options;
         if (variants !== undefined) product.variants = variants;
+        if (offers !== undefined) product.offers = offers;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);
