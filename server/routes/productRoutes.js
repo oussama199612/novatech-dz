@@ -41,7 +41,12 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 router.post('/', protect, asyncHandler(async (req, res) => {
-    const { name, price, description, image, category, stock, gallery, features, longDescription, accentColor } = req.body;
+    const {
+        name, price, description, image, category, stock,
+        gallery, features, longDescription, accentColor,
+        vendor, productType, tags, status, compareAtPrice
+    } = req.body;
+
     const product = new Product({
         name,
         price,
@@ -52,7 +57,12 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         gallery,
         features,
         longDescription,
-        accentColor
+        accentColor,
+        vendor,
+        productType,
+        tags,
+        status,
+        compareAtPrice
     });
 
     const createdProduct = await product.save();
@@ -82,6 +92,13 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         if (features !== undefined) product.features = features;
         if (longDescription !== undefined) product.longDescription = longDescription;
         if (accentColor !== undefined) product.accentColor = accentColor;
+
+        // Phase 1 & 2 Updates
+        if (vendor !== undefined) product.vendor = vendor;
+        if (productType !== undefined) product.productType = productType;
+        if (tags !== undefined) product.tags = tags;
+        if (status !== undefined) product.status = status;
+        if (compareAtPrice !== undefined) product.compareAtPrice = compareAtPrice;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);

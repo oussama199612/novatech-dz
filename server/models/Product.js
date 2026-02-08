@@ -9,6 +9,15 @@ const productSchema = mongoose.Schema({
     active: { type: Boolean, default: true },
     orderIndex: { type: Number, default: 0 }, // For manual sorting
     stock: { type: Number, default: 0 },
+    // Phase 1: Core & Organization
+    vendor: { type: String },
+    productType: { type: String },
+    tags: [{ type: String }],
+    status: { type: String, enum: ['active', 'draft', 'archived'], default: 'active' },
+
+    // Phase 2 (Early): Pricing
+    compareAtPrice: { type: Number, default: 0 }, // For promos
+
     gallery: [{ type: String }],
     features: [{
         icon: { type: String },
