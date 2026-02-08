@@ -28,6 +28,7 @@ const ProductLanding = () => {
 
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
     const [currentVariant, setCurrentVariant] = useState<any>(null);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -100,7 +101,7 @@ const ProductLanding = () => {
             const orderData = {
                 orderItems: [{
                     product: product._id,
-                    qty: 1,
+                    qty: quantity,
                     variant: currentVariant ? {
                         title: currentVariant.title,
                         price: currentVariant.price,
@@ -114,11 +115,16 @@ const ProductLanding = () => {
             const { data: order } = await api.post('/orders', orderData);
 
             const method = methods.find(m => m._id === selectedMethodId);
+            const price = currentVariant?.price || product.price;
+            const total = price * quantity;
+
             const message = `
 *NOUVELLE COMMANDE* 🛍️
 ------------------
 *Produit:* ${product.name}
-${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Prix:* ${(currentVariant?.price || product.price).toLocaleString()} DZD
+${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Qté:* ${quantity}
+*Prix:* ${price.toLocaleString()} DZD
+*Total:* ${total.toLocaleString()} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
 ------------------
@@ -353,6 +359,32 @@ Merci de confirmer ma commande !
                                     </div>
 
                                     <div className="space-y-3 pt-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Quantité</label>
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-10 text-center font-bold text-white">{quantity}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setQuantity(quantity + 1)}
+                                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className="text-sm text-slate-400">
+                                                Total: <span className="text-white font-bold">{((currentVariant?.price || product.price) * quantity).toLocaleString()} DZD</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3 pt-2">
                                         <label className="text-xs font-bold text-slate-500 uppercase">Paiement</label>
                                         <div className="space-y-2">
                                             {methods.map(method => (
@@ -398,7 +430,7 @@ Merci de confirmer ma commande !
                                         className="w-full py-4 rounded-xl font-bold text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg"
                                         style={{ backgroundColor: accentColor }}
                                     >
-                                        Confirmer la commande <ArrowRight size={20} />
+                                        Commander <ArrowRight size={20} />
                                     </button>
                                 </form>
                             </div>
