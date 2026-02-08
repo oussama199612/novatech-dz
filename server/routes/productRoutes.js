@@ -41,7 +41,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 router.post('/', protect, asyncHandler(async (req, res) => {
-    const { name, price, description, image, category, stock } = req.body;
+    const { name, price, description, image, category, stock, gallery, features, longDescription, accentColor } = req.body;
     const product = new Product({
         name,
         price,
@@ -49,6 +49,10 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         image,
         category,
         stock,
+        gallery,
+        features,
+        longDescription,
+        accentColor
     });
 
     const createdProduct = await product.save();
@@ -59,7 +63,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 router.put('/:id', protect, asyncHandler(async (req, res) => {
-    const { name, price, description, image, category, active, stock, orderIndex } = req.body;
+    const { name, price, description, image, category, active, stock, orderIndex, gallery, features, longDescription, accentColor } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -72,6 +76,12 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         product.active = active !== undefined ? active : product.active;
         product.stock = stock !== undefined ? stock : product.stock;
         product.orderIndex = orderIndex !== undefined ? orderIndex : product.orderIndex;
+
+        // New fields (can be empty arrays/strings so we check strictly if passed or overwrite if intended)
+        if (gallery !== undefined) product.gallery = gallery;
+        if (features !== undefined) product.features = features;
+        if (longDescription !== undefined) product.longDescription = longDescription;
+        if (accentColor !== undefined) product.accentColor = accentColor;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);

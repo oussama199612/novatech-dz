@@ -9,6 +9,14 @@ const productSchema = mongoose.Schema({
     active: { type: Boolean, default: true },
     orderIndex: { type: Number, default: 0 }, // For manual sorting
     stock: { type: Number, default: 0 },
+    gallery: [{ type: String }],
+    features: [{
+        icon: { type: String },
+        title: { type: String },
+        description: { type: String }
+    }],
+    longDescription: { type: String },
+    accentColor: { type: String, default: '#3b82f6' },
 }, {
     timestamps: true
 });
