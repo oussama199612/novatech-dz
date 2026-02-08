@@ -25,6 +25,9 @@ const ProductLanding = () => {
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'desc' | 'features'>('desc');
 
+    const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+    const [currentVariant, setCurrentVariant] = useState<any>(null);
+
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchData = async () => {
@@ -33,9 +36,21 @@ const ProductLanding = () => {
                     api.get(`/products/${productId}`),
                     api.get('/payment-methods')
                 ]);
-                setProduct(prodRes.data);
-                if (prodRes.data.image) setActiveImage(prodRes.data.image);
+                const prod = prodRes.data;
+                setProduct(prod);
                 setMethods(methodsRes.data);
+
+                // Init Variants
+                if (prod.hasVariants && prod.options?.length > 0) {
+                    const defaults: Record<string, string> = {};
+                    prod.options.forEach((opt: any) => {
+                        defaults[opt.name] = opt.values[0];
+                    });
+                    setSelectedOptions(defaults);
+                } else if (prod.image) {
+                    setActiveImage(prod.image);
+                }
+
             } catch (error) {
                 console.error(error);
             } finally {
@@ -44,6 +59,29 @@ const ProductLanding = () => {
         };
         fetchData();
     }, [productId]);
+
+    // Update Current Variant when options change
+    useEffect(() => {
+        if (!product || !product.hasVariants) return;
+
+        // Find variant matching all selected options
+        // Variant title format: "Value1 / Value2" or just "Value1"
+        // We need to match the combination.
+        // Simplest way: Construct the title from selected options in order of product.options
+        const variantTitle = product.options.map(opt => selectedOptions[opt.name]).join(' / ');
+        const variant = product.variants.find((v: any) => v.title === variantTitle);
+
+        setCurrentVariant(variant || null);
+        if (variant && variant.image) {
+            setActiveImage(variant.image);
+        } else if (product.image) {
+            setActiveImage(product.image);
+        }
+    }, [selectedOptions, product]);
+
+    const handleOptionChange = (option: string, value: string) => {
+        setSelectedOptions(prev => ({ ...prev, [option]: value }));
+    };
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -57,7 +95,15 @@ const ProductLanding = () => {
 
         try {
             const orderData = {
-                orderItems: [{ product: product._id, qty: 1 }],
+                orderItems: [{
+                    product: product._id,
+                    qty: 1,
+                    variant: currentVariant ? {
+                        title: currentVariant.title,
+                        price: currentVariant.price,
+                        sku: currentVariant.sku
+                    } : undefined
+                }],
                 ...formData,
                 paymentMethodId: selectedMethodId
             };
@@ -69,7 +115,7 @@ const ProductLanding = () => {
 *NOUVELLE COMMANDE* 🛍️
 ------------------
 *Produit:* ${product.name}
-*Prix:* ${product.price} DZD
+${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Prix:* ${(currentVariant?.price || product.price).toLocaleString()} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
 ------------------
@@ -182,7 +228,12 @@ Merci de confirmer ma commande !
 
                                 <div className="flex items-center justify-between">
                                     <div className="text-3xl font-bold text-white">
-                                        {product.price.toLocaleString()} <span className="text-lg text-slate-400 font-medium">DZD</span>
+                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-slate-400 font-medium">DZD</span>
+                                        {product.compareAtPrice > (currentVariant?.price || product.price) && (
+                                            <span className="text-lg text-slate-500 line-through ml-3">
+                                                {product.compareAtPrice.toLocaleString()} DZD
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="flex items-center gap-1 text-yellow-400">
@@ -194,6 +245,63 @@ Merci de confirmer ma commande !
                                         <span className="text-slate-500 text-sm ml-2">(4.9/5)</span>
                                     </div>
                                 </div>
+
+                                {/* VARIANTS SELECTOR */}
+                                {product.hasVariants && product.options && (
+                                    <div className="space-y-4 pt-4">
+                                        {product.options.map((option, idx) => {
+                                            const isColor = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
+                                            return (
+                                                <div key={idx} className="space-y-2">
+                                                    <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                                                        {option.name}: <span className="text-white normal-case">{selectedOptions[option.name]}</span>
+                                                    </label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {option.values.map(val => {
+                                                            const isSelected = selectedOptions[option.name] === val;
+
+                                                            if (isColor) {
+                                                                const PREDEFINED_COLORS: Record<string, string> = {
+                                                                    'Noir': '#000000', 'Blanc': '#FFFFFF', 'Rouge': '#FF0000', 'Bleu': '#0000FF',
+                                                                    'Vert': '#008000', 'Jaune': '#FFFF00', 'Orange': '#FFA500', 'Violet': '#800080',
+                                                                    'Rose': '#FFC0CB', 'Gris': '#808080', 'Marron': '#A52A2A', 'Beige': '#F5F5DC',
+                                                                    'Marine': '#000080', 'Kaki': '#F0E68C', 'Bordeaux': '#800000', 'Turquoise': '#40E0D0'
+                                                                };
+                                                                const colorHex = PREDEFINED_COLORS[val] || val;
+                                                                const isValidHex = /^#([0-9A-F]{3}){1,2}$/i.test(colorHex);
+
+                                                                return (
+                                                                    <button
+                                                                        key={val}
+                                                                        onClick={() => handleOptionChange(option.name, val)}
+                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-blue-500 scale-110' : 'border-slate-700 hover:border-slate-500'}`}
+                                                                        title={val}
+                                                                        style={{ backgroundColor: isValidHex ? colorHex : '#333' }}
+                                                                    >
+                                                                        {!isValidHex && <span className="text-xs text-white">{val.charAt(0)}</span>}
+                                                                    </button>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <button
+                                                                    key={val}
+                                                                    onClick={() => handleOptionChange(option.name, val)}
+                                                                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${isSelected
+                                                                        ? 'bg-blue-600 text-white border-blue-500'
+                                                                        : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500'
+                                                                        }`}
+                                                                >
+                                                                    {val}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Trust Badges */}
@@ -219,7 +327,11 @@ Merci de confirmer ma commande !
                                         <CreditCard size={16} className="text-blue-500" />
                                         Commander
                                     </span>
-                                    <span className="text-xs text-green-400 font-mono animate-pulse">● En Stock</span>
+                                    {currentVariant?.stock === 0 ? (
+                                        <span className="text-xs text-red-400 font-mono">● Rupture de stock</span>
+                                    ) : (
+                                        <span className="text-xs text-green-400 font-mono animate-pulse">● En Stock</span>
+                                    )}
                                 </div>
 
                                 <form onSubmit={handleSubmitOrder} className="p-6 space-y-5">
@@ -275,7 +387,7 @@ Merci de confirmer ma commande !
 
                                     <button
                                         type="submit"
-                                        disabled={!selectedMethodId}
+                                        disabled={!selectedMethodId || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
                                         className="w-full py-4 rounded-xl font-bold text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg"
                                         style={{ backgroundColor: accentColor }}
                                     >
