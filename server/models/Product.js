@@ -15,8 +15,17 @@ const productSchema = mongoose.Schema({
     tags: [{ type: String }],
     status: { type: String, enum: ['active', 'draft', 'archived'], default: 'active' },
 
-    // Phase 2 (Early): Pricing
+    // Phase 2: Pricing & Inventory
     compareAtPrice: { type: Number, default: 0 }, // For promos
+    costPerItem: { type: Number, default: 0 }, // For profit calc
+
+    sku: { type: String },
+    barcode: { type: String },
+    trackQuantity: { type: Boolean, default: true },
+    continueSellingWhenOutOfStock: { type: Boolean, default: false },
+
+    weight: { type: Number, default: 0 },
+    weightUnit: { type: String, default: 'kg' },
 
     gallery: [{ type: String }],
     features: [{
