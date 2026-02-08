@@ -8,7 +8,12 @@ const path = require('path');
 
 dotenv.config();
 
+const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+// Connect to Database
+connectDB();
+
 const app = express();
 // ... (existing code) ...
 
