@@ -4,6 +4,7 @@ import { Search, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { type Product, type Category } from '../types';
+import { getImageUrl } from '../utils';
 
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -95,8 +96,13 @@ const Home = () => {
                             className="glass-panel group relative overflow-hidden flex flex-col"
                         >
                             <div className="aspect-video w-full overflow-hidden bg-[#0a0a0f]">
+                                import {getImageUrl} from '../utils';
+
+                                // ... (keep existing imports)
+
+                                // In the component:
                                 <img
-                                    src={product.image}
+                                    src={getImageUrl(product.image)}
                                     alt={product.name}
                                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                                 />

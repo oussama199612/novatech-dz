@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Check, ArrowRight, Wallet } from 'lucide-react';
 import api from '../api';
 import { type Product, type PaymentMethod } from '../types';
+import { getImageUrl } from '../utils';
 
 const OrderPage = () => {
     const { productId } = useParams();
@@ -94,8 +95,12 @@ Merci de confirmer ma commande !
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Product Info */}
             <div className="space-y-6">
+                import {getImageUrl} from '../utils';
+
+                // ...
+
                 <div className="glass-panel p-2">
-                    <img src={product.image} alt={product.name} className="w-full rounded-xl" />
+                    <img src={getImageUrl(product.image)} alt={product.name} className="w-full rounded-xl" />
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
