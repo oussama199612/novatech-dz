@@ -401,7 +401,7 @@ const Products = () => {
                                                     {!formData.hasVariants && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => setFormData({ ...formData, hasVariants: true, options: [{ name: 'Taille', values: [] }] })}
+                                                            onClick={() => setFormData({ ...formData, hasVariants: true, options: [{ name: 'Couleur', values: [] }] })}
                                                             className="text-blue-400 text-sm hover:underline"
                                                         >
                                                             + Ajouter des options (taille ou couleur)
@@ -412,240 +412,303 @@ const Products = () => {
                                                 {formData.hasVariants && (
                                                     <div className="space-y-6">
                                                         {/* Options List */}
-                                                        {formData.options.map((option, idx) => (
-                                                            <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 space-y-3">
-                                                                <div className="flex justify-between items-center">
-                                                                    <label className="text-sm font-bold text-slate-300">Nom de l'option</label>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            const newOptions = formData.options.filter((_, i) => i !== idx);
-                                                                            setFormData({
-                                                                                ...formData,
-                                                                                options: newOptions,
-                                                                                hasVariants: newOptions.length > 0
-                                                                            });
-                                                                        }}
-                                                                        className="text-red-400 hover:text-red-300 text-xs"
-                                                                    >
-                                                                        Supprimer
-                                                                    </button>
-                                                                </div>
-                                                                <input
-                                                                    value={option.name}
-                                                                    onChange={e => {
-                                                                        const newOptions = [...formData.options];
-                                                                        newOptions[idx].name = e.target.value;
-                                                                        setFormData({ ...formData, options: newOptions });
-                                                                    }}
-                                                                    className="input-field w-full mb-2"
-                                                                    placeholder="Ex: Taille, Couleur..."
-                                                                />
+                                                        {formData.options.map((option, idx) => {
+                                                            const isColorOption = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
+                                                            const PREDEFINED_COLORS: Record<string, string> = {
+                                                                'Noir': '#000000', 'Blanc': '#FFFFFF', 'Rouge': '#FF0000', 'Bleu': '#0000FF',
+                                                                'Vert': '#008000', 'Jaune': '#FFFF00', 'Orange': '#FFA500', 'Violet': '#800080',
+                                                                'Rose': '#FFC0CB', 'Gris': '#808080', 'Marron': '#A52A2A', 'Beige': '#F5F5DC',
+                                                                'Marine': '#000080', 'Kaki': '#F0E68C', 'Bordeaux': '#800000', 'Turquoise': '#40E0D0'
+                                                            };
 
-                                                                <label className="text-sm font-bold text-slate-300">Valeurs de l'option</label>
-                                                                <input
-                                                                    onKeyDown={e => {
-                                                                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                                                                            e.preventDefault();
-                                                                            const val = e.currentTarget.value.trim();
-                                                                            const newOptions = [...formData.options];
-                                                                            if (!newOptions[idx].values.includes(val)) {
-                                                                                newOptions[idx].values.push(val);
-                                                                                // Auto-generate variants
-                                                                            }
-                                                                            setFormData({ ...formData, options: newOptions });
-                                                                            e.currentTarget.value = '';
-                                                                        }
-                                                                    }}
-                                                                    className="input-field w-full"
-                                                                    placeholder="Entrée pour ajouter (ex: S, M, L)..."
-                                                                />
-                                                                <div className="flex flex-wrap gap-2 mt-2">
-                                                                    {option.values.map(val => {
-                                                                        const isColor = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
-                                                                        return (
-                                                                            <span key={val} className="bg-slate-800 text-white px-2 py-1 rounded text-sm flex items-center gap-2 border border-slate-700">
-                                                                                {isColor && (
-                                                                                    <span
-                                                                                        className="w-3 h-3 rounded-full border border-slate-600"
-                                                                                        style={{ backgroundColor: val }}
-                                                                                        title={val}
-                                                                                    />
-                                                                                )}
-                                                                                {val}
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() => {
-                                                                                        const newOptions = [...formData.options];
-                                                                                        newOptions[idx].values = newOptions[idx].values.filter(v => v !== val);
-                                                                                        setFormData({ ...formData, options: newOptions });
-                                                                                    }}
-                                                                                    className="hover:text-red-400 ml-1"
-                                                                                >
-                                                                                    <X size={12} />
-                                                                                </button>
-                                                                            </span>
-                                                                        );
-                                                                    })}
+                                                            return (
+                                                                <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 space-y-3 relative">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <label className="text-sm font-bold text-slate-300">Nom de l'option</label>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const newOptions = formData.options.filter((_, i) => i !== idx);
+                                                                                setFormData({
+                                                                                    ...formData,
+                                                                                    options: newOptions,
+                                                                                    hasVariants: newOptions.length > 0
+                                                                                });
+                                                                            }}
+                                                                            className="text-red-400 hover:text-red-300 text-xs"
+                                                                        >
+                                                                            Supprimer
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="relative">
+                                                                        <input
+                                                                            value={option.name}
+                                                                            onChange={e => {
+                                                                                const newOptions = [...formData.options];
+                                                                                newOptions[idx].name = e.target.value;
+                                                                                setFormData({ ...formData, options: newOptions });
+                                                                            }}
+                                                                            className="input-field w-full mb-2"
+                                                                            placeholder="Ex: Taille, Couleur..."
+                                                                            list={`option-suggestions-${idx}`}
+                                                                        />
+                                                                        <datalist id={`option-suggestions-${idx}`}>
+                                                                            <option value="Taille" />
+                                                                            <option value="Couleur" />
+                                                                            <option value="Matière" />
+                                                                            <option value="Style" />
+                                                                        </datalist>
+                                                                    </div>
+
+                                                                    <label className="text-sm font-bold text-slate-300">Valeurs de l'option</label>
+                                                                    <div className="relative">
+                                                                        <input
+                                                                            onKeyDown={e => {
+                                                                                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                                                                    e.preventDefault();
+                                                                                    const val = e.currentTarget.value.trim();
+                                                                                    const newOptions = [...formData.options];
+                                                                                    if (!newOptions[idx].values.includes(val)) {
+                                                                                        newOptions[idx].values.push(val);
+                                                                                    }
+                                                                                    setFormData({ ...formData, options: newOptions });
+                                                                                    e.currentTarget.value = '';
+                                                                                }
+                                                                            }}
+                                                                            className="input-field w-full"
+                                                                            placeholder={isColorOption ? "Ex: Noir, Rouge... (Entrée)" : "Entrée pour ajouter (ex: S, M, L)..."}
+                                                                            list={isColorOption ? `color-suggestions-${idx}` : undefined}
+                                                                        />
+                                                                        {isColorOption && (
+                                                                            <datalist id={`color-suggestions-${idx}`}>
+                                                                                {Object.keys(PREDEFINED_COLORS).map(color => (
+                                                                                    <option key={color} value={color} />
+                                                                                ))}
+                                                                            </datalist>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <div className="flex flex-wrap gap-2 mt-2">
+                                                                        {option.values.map(val => {
+                                                                            const colorHex = isColorOption ? (PREDEFINED_COLORS[val] || val) : null;
+                                                                            const isValidColor = /^#([0-9A-F]{3}){1,2}$/i.test(colorHex || '');
+
+                                                                            return (
+                                                                                <span key={val} className="bg-slate-800 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 border border-slate-700 transition-all hover:border-blue-500">
+                                                                                    {isColorOption && (
+                                                                                        <span
+                                                                                            className="w-4 h-4 rounded-full border border-slate-600 shadow-sm"
+                                                                                            style={{ backgroundColor: isValidColor ? colorHex! : '#ccc' }}
+                                                                                            title={val}
+                                                                                        />
+                                                                                    )}
+                                                                                    {val}
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            const newOptions = [...formData.options];
+                                                                                            newOptions[idx].values = newOptions[idx].values.filter(v => v !== val);
+                                                                                            setFormData({ ...formData, options: newOptions });
+                                                                                        }}
+                                                                                        className="hover:text-red-400 ml-1 p-0.5 rounded-full hover:bg-slate-700"
+                                                                                    >
+                                                                                        <X size={12} />
+                                                                                    </button>
+                                                                                </span>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
+                                                            );
+                                                        })}
 
                                                         <button
                                                             type="button"
                                                             onClick={() => setFormData({ ...formData, options: [...formData.options, { name: '', values: [] }] })}
-                                                            className="btn bg-slate-800 text-white w-full py-2 text-sm"
+                                                            className="btn bg-slate-800 text-white w-full py-2 text-sm border border-slate-700 hover:bg-slate-700 dashed"
                                                         >
                                                             + Ajouter une autre option
                                                         </button>
 
-                                                        {/* Variants Table Button */}
-                                                        <div className="border-t border-slate-800 pt-4">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    // Simple Cartesian Product Generator
-                                                                    const combinations = (options: ProductOption[], index = 0): string[] => {
-                                                                        if (index === options.length) return [''];
-                                                                        const rest = combinations(options, index + 1);
-                                                                        const current = options[index].values;
-                                                                        if (current.length === 0) return rest;
+                                                        {/* Variants Generation & List */}
+                                                        <div className="border-t border-slate-800 pt-4 space-y-4">
+                                                            <div className="flex justify-between items-center">
+                                                                <h4 className="font-bold text-white">Aperçu des Variantes</h4>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        // Cartesian Product Generator
+                                                                        const combinations = (options: ProductOption[], index = 0): string[] => {
+                                                                            if (index === options.length) return [''];
+                                                                            const rest = combinations(options, index + 1);
+                                                                            const current = options[index].values;
+                                                                            if (current.length === 0) return rest;
 
-                                                                        const result: string[] = [];
-                                                                        current.forEach(val => {
-                                                                            rest.forEach(r => {
-                                                                                result.push(val + (r ? ' / ' + r : ''));
+                                                                            const result: string[] = [];
+                                                                            current.forEach(val => {
+                                                                                rest.forEach(r => {
+                                                                                    result.push(val + (r ? ' / ' + r : ''));
+                                                                                });
                                                                             });
-                                                                        });
-                                                                        return result;
-                                                                    };
-
-                                                                    const variantTitles = combinations(formData.options);
-                                                                    const newVariants = variantTitles.map(title => {
-                                                                        // Try to preserve existing variant data if title matches
-                                                                        const existing = formData.variants.find(v => v.title === title);
-                                                                        if (existing) return existing;
-
-                                                                        return {
-                                                                            title,
-                                                                            price: formData.price,
-                                                                            compareAtPrice: formData.compareAtPrice,
-                                                                            costPerItem: formData.costPerItem,
-                                                                            sku: formData.sku ? `${formData.sku}-${title.replace(/\s/g, '').replace(/\//g, '-')}`.toUpperCase() : '',
-                                                                            barcode: '',
-                                                                            stock: 0,
-                                                                            trackQuantity: true,
-                                                                            image: ''
+                                                                            return result;
                                                                         };
-                                                                    });
 
-                                                                    setFormData({ ...formData, variants: newVariants });
-                                                                }}
-                                                                className="btn-primary w-full"
-                                                            >
-                                                                Générer les variantes
-                                                            </button>
-                                                        </div>
+                                                                        const variantTitles = combinations(formData.options);
+                                                                        const newVariants = variantTitles.map(title => {
+                                                                            const existing = formData.variants.find(v => v.title === title);
+                                                                            if (existing) return existing;
+                                                                            return {
+                                                                                title,
+                                                                                price: formData.price,
+                                                                                compareAtPrice: formData.compareAtPrice,
+                                                                                costPerItem: formData.costPerItem,
+                                                                                sku: formData.sku ? `${formData.sku}-${title.replace(/\s/g, '').replace(/\//g, '-')}`.toUpperCase() : '',
+                                                                                barcode: '',
+                                                                                stock: 0,
+                                                                                trackQuantity: true,
+                                                                                image: ''
+                                                                            };
+                                                                        });
+                                                                        setFormData({ ...formData, variants: newVariants });
+                                                                    }}
+                                                                    className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                                                                >
+                                                                    Actualiser les variantes
+                                                                </button>
+                                                            </div>
 
-                                                        {/* Variants Table */}
-                                                        {formData.variants.length > 0 && (
-                                                            <div className="overflow-x-auto border border-slate-800 rounded-lg">
-                                                                <table className="w-full text-left text-sm text-slate-300">
-                                                                    <thead className="bg-slate-900 font-bold">
-                                                                        <tr>
-                                                                            <th className="p-3 w-16">Image</th>
-                                                                            <th className="p-3">Variante</th>
-                                                                            <th className="p-3 w-24">Prix</th>
-                                                                            <th className="p-3 w-24">Stock</th>
-                                                                            <th className="p-3 w-32">SKU</th>
-                                                                            <th className="p-3 w-10"></th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody className="divide-y divide-slate-800">
-                                                                        {formData.variants.map((variant, idx) => (
-                                                                            <tr key={idx} className="group hover:bg-slate-900/50">
-                                                                                <td className="p-3">
-                                                                                    <div className="relative w-10 h-10 bg-slate-800 rounded border border-slate-700 hover:border-blue-500 cursor-pointer overflow-hidden transition-colors group/img">
-                                                                                        {variant.image ? (
-                                                                                            <img src={getImageUrl(variant.image)} className="w-full h-full object-cover" />
-                                                                                        ) : (
-                                                                                            <ImageIcon className="text-slate-600 m-auto mt-2" size={16} />
-                                                                                        )}
-
-                                                                                        {formData.gallery.length > 0 && (
-                                                                                            <select
-                                                                                                value={variant.image}
-                                                                                                onChange={e => {
-                                                                                                    const newVariants = [...formData.variants];
-                                                                                                    newVariants[idx].image = e.target.value;
-                                                                                                    setFormData({ ...formData, variants: newVariants });
+                                                            {/* Grouped Variants View */}
+                                                            {formData.variants.length > 0 && (
+                                                                <div className="border border-slate-800 rounded-lg overflow-hidden bg-slate-900/50">
+                                                                    {Object.entries(
+                                                                        formData.variants.reduce((acc, variant) => {
+                                                                            const groupName = variant.title.split(' / ')[0]; // Group by first option value (e.g., Color)
+                                                                            if (!acc[groupName]) acc[groupName] = [];
+                                                                            acc[groupName].push(variant);
+                                                                            return acc;
+                                                                        }, {} as Record<string, ProductVariant[]>)
+                                                                    ).map(([groupName, variants], groupIdx) => (
+                                                                        <details key={groupIdx} className="group border-b border-slate-800 last:border-0" open>
+                                                                            <summary className="flex items-center justify-between p-4 cursor-pointer bg-slate-900 hover:bg-slate-800 transition-colors select-none">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <div className="w-8 h-8 rounded bg-slate-800 border border-slate-700 flex items-center justify-center">
+                                                                                        {/* Show color swatch if valid */}
+                                                                                        {formData.options[0]?.name.match(/couleur|color/i) ? (
+                                                                                            <div
+                                                                                                className="w-full h-full rounded"
+                                                                                                style={{
+                                                                                                    backgroundColor:
+                                                                                                        PREDEFINED_COLORS[groupName] || groupName // Use predefined or raw value
                                                                                                 }}
-                                                                                                className="absolute inset-0 opacity-0 cursor-pointer"
-                                                                                            >
-                                                                                                <option value="">Aucune</option>
-                                                                                                {formData.gallery.map((img, i) => (
-                                                                                                    <option key={i} value={img}>Image {i + 1}</option>
-                                                                                                ))}
-                                                                                            </select>
+                                                                                            />
+                                                                                        ) : (
+                                                                                            <span className="text-xs font-bold text-slate-500">{variants.length}</span>
                                                                                         )}
                                                                                     </div>
-                                                                                </td>
-                                                                                <td className="p-3 font-medium text-white">
-                                                                                    {variant.title}
-                                                                                </td>
-                                                                                <td className="p-3">
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        value={variant.price}
-                                                                                        onChange={e => {
-                                                                                            const newVariants = [...formData.variants];
-                                                                                            newVariants[idx].price = Number(e.target.value);
-                                                                                            setFormData({ ...formData, variants: newVariants });
-                                                                                        }}
-                                                                                        className="input-field w-full py-1 text-xs"
-                                                                                    />
-                                                                                </td>
-                                                                                <td className="p-3">
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        value={variant.stock}
-                                                                                        onChange={e => {
-                                                                                            const newVariants = [...formData.variants];
-                                                                                            newVariants[idx].stock = Number(e.target.value);
-                                                                                            setFormData({ ...formData, variants: newVariants });
-                                                                                        }}
-                                                                                        className="input-field w-full py-1 text-xs"
-                                                                                    />
-                                                                                </td>
-                                                                                <td className="p-3">
-                                                                                    <input
-                                                                                        value={variant.sku}
-                                                                                        onChange={e => {
-                                                                                            const newVariants = [...formData.variants];
-                                                                                            newVariants[idx].sku = e.target.value;
-                                                                                            setFormData({ ...formData, variants: newVariants });
-                                                                                        }}
-                                                                                        className="input-field w-full py-1 text-xs"
-                                                                                    />
-                                                                                </td>
-                                                                                <td className="p-3">
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        onClick={() => {
-                                                                                            const newVariants = formData.variants.filter((_, i) => i !== idx);
-                                                                                            setFormData({ ...formData, variants: newVariants });
-                                                                                        }}
-                                                                                        className="text-red-500 hover:text-white pt-1"
-                                                                                    >
-                                                                                        <Trash2 size={16} />
-                                                                                    </button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        )}
+                                                                                    <div>
+                                                                                        <span className="font-bold text-white">{groupName}</span>
+                                                                                        <span className="text-slate-500 text-sm ml-2">({variants.length} variantes)</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-4">
+                                                                                    {/* Batch Edit Inputs (Optional, can be added here) */}
+                                                                                    <ChevronDown className="text-slate-500 transition-transform group-open:rotate-180" size={20} />
+                                                                                </div>
+                                                                            </summary>
+
+                                                                            <div className="p-0 bg-slate-950/50">
+                                                                                <table className="w-full text-left text-sm text-slate-300">
+                                                                                    <thead className="bg-slate-950 text-xs uppercase text-slate-500 font-medium">
+                                                                                        <tr>
+                                                                                            <th className="p-3 w-16 pl-12">Variante</th> {/* Indented */}
+                                                                                            <th className="p-3 w-28">Prix</th>
+                                                                                            <th className="p-3 w-24">Stock</th>
+                                                                                            <th className="p-3">SKU</th>
+                                                                                            <th className="p-3 w-16">Image</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody className="divide-y divide-slate-800/50">
+                                                                                        {variants.map((variant, vIdx) => {
+                                                                                            // Find true index in main variants array to update correct item
+                                                                                            const realIndex = formData.variants.findIndex(v => v === variant);
+
+                                                                                            return (
+                                                                                                <tr key={vIdx} className="hover:bg-slate-900/50 transition-colors">
+                                                                                                    <td className="p-3 pl-12 font-medium text-white">{variant.title.split(' / ').slice(1).join(' / ') || variant.title}</td>
+                                                                                                    <td className="p-3">
+                                                                                                        <div className="relative">
+                                                                                                            <input
+                                                                                                                type="number"
+                                                                                                                value={variant.price}
+                                                                                                                onChange={e => {
+                                                                                                                    const newVariants = [...formData.variants];
+                                                                                                                    newVariants[realIndex].price = Number(e.target.value);
+                                                                                                                    setFormData({ ...formData, variants: newVariants });
+                                                                                                                }}
+                                                                                                                className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-full text-white text-right focus:border-blue-500 outline-none"
+                                                                                                            />
+                                                                                                            <span className="absolute right-7 top-1 text-slate-500 text-xs hidden">DZD</span>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                    <td className="p-3">
+                                                                                                        <input
+                                                                                                            type="number"
+                                                                                                            value={variant.stock}
+                                                                                                            onChange={e => {
+                                                                                                                const newVariants = [...formData.variants];
+                                                                                                                newVariants[realIndex].stock = Number(e.target.value);
+                                                                                                                setFormData({ ...formData, variants: newVariants });
+                                                                                                            }}
+                                                                                                            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-full text-white text-center focus:border-blue-500 outline-none"
+                                                                                                        />
+                                                                                                    </td>
+                                                                                                    <td className="p-3">
+                                                                                                        <input
+                                                                                                            value={variant.sku}
+                                                                                                            onChange={e => {
+                                                                                                                const newVariants = [...formData.variants];
+                                                                                                                newVariants[realIndex].sku = e.target.value;
+                                                                                                                setFormData({ ...formData, variants: newVariants });
+                                                                                                            }}
+                                                                                                            className="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-blue-500 w-full text-xs text-slate-400 focus:text-white outline-none transition-colors"
+                                                                                                        />
+                                                                                                    </td>
+                                                                                                    <td className="p-3">
+                                                                                                        <div className="relative w-8 h-8 bg-slate-800 rounded border border-slate-700 hover:border-blue-500 cursor-pointer overflow-hidden group/img">
+                                                                                                            {variant.image ? (
+                                                                                                                <img src={getImageUrl(variant.image)} className="w-full h-full object-cover" />
+                                                                                                            ) : (
+                                                                                                                <ImageIcon className="text-slate-600 m-auto mt-2" size={14} />
+                                                                                                            )}
+                                                                                                            {formData.gallery.length > 0 && (
+                                                                                                                <select
+                                                                                                                    value={variant.image}
+                                                                                                                    onChange={e => {
+                                                                                                                        const newVariants = [...formData.variants];
+                                                                                                                        newVariants[realIndex].image = e.target.value;
+                                                                                                                        setFormData({ ...formData, variants: newVariants });
+                                                                                                                    }}
+                                                                                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                                                                >
+                                                                                                                    <option value="">Aucune</option>
+                                                                                                                    {formData.gallery.map((img, i) => (
+                                                                                                                        <option key={i} value={img}>Image {i + 1}</option>
+                                                                                                                    ))}
+                                                                                                                </select>
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            );
+                                                                                        })}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </details>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
