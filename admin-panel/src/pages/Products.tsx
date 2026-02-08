@@ -617,6 +617,46 @@ const Products = () => {
                                                                                 </div>
                                                                             </summary>
 
+                                                                            <div className="p-3 bg-slate-950/30 border-b border-slate-800 flex items-center justify-end gap-3">
+                                                                                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium mr-2">Modifier le groupe :</span>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <span className="text-xs text-slate-400">Prix</span>
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        placeholder="-"
+                                                                                        className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-24 text-xs text-white text-right focus:border-blue-500 outline-none placeholder:text-slate-600"
+                                                                                        onChange={(e) => {
+                                                                                            if (!e.target.value) return;
+                                                                                            const price = Number(e.target.value);
+                                                                                            const newVariants = [...formData.variants];
+                                                                                            variants.forEach(v => {
+                                                                                                const realIndex = newVariants.indexOf(v);
+                                                                                                if (realIndex !== -1) newVariants[realIndex].price = price;
+                                                                                            });
+                                                                                            setFormData({ ...formData, variants: newVariants });
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <span className="text-xs text-slate-400">Stock</span>
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        placeholder="-"
+                                                                                        className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-20 text-xs text-white text-center focus:border-blue-500 outline-none placeholder:text-slate-600"
+                                                                                        onChange={(e) => {
+                                                                                            if (!e.target.value) return;
+                                                                                            const stock = Number(e.target.value);
+                                                                                            const newVariants = [...formData.variants];
+                                                                                            variants.forEach(v => {
+                                                                                                const realIndex = newVariants.indexOf(v);
+                                                                                                if (realIndex !== -1) newVariants[realIndex].stock = stock;
+                                                                                            });
+                                                                                            setFormData({ ...formData, variants: newVariants });
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+
                                                                             <div className="p-0 bg-slate-950/50">
                                                                                 <table className="w-full text-left text-sm text-slate-300">
                                                                                     <thead className="bg-slate-950 text-xs uppercase text-slate-500 font-medium">
