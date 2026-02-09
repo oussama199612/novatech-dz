@@ -102,13 +102,13 @@ const Home = () => {
             </div>
 
             {/* Filters Bar */}
-            <div className="glass-panel p-4 space-y-4">
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div className="bg-luxury-black/50 border-y border-white/5 py-6">
+                <div className="flex flex-col md:flex-row gap-6 justify-between items-center px-4">
                     {/* Category Tabs */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto text-sm no-scrollbar">
+                    <div className="flex gap-4 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto text-sm no-scrollbar justify-center md:justify-start">
                         <button
                             onClick={() => setSelectedCategory('all')}
-                            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${selectedCategory === 'all' ? 'bg-novatech-blue text-white' : 'bg-white/5 text-gray-400 hover:text-white'}`}
+                            className={`px-6 py-2 rounded-none transition-all duration-300 uppercase tracking-widest text-xs font-medium border ${selectedCategory === 'all' ? 'border-luxury-gold text-luxury-gold bg-luxury-gold/5' : 'border-transparent text-gray-400 hover:text-luxury-gold'}`}
                         >
                             Tout
                         </button>
@@ -116,7 +116,7 @@ const Home = () => {
                             <button
                                 key={cat._id}
                                 onClick={() => setSelectedCategory(cat._id)}
-                                className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${selectedCategory === cat._id ? 'bg-novatech-blue text-white' : 'bg-white/5 text-gray-400 hover:text-white'}`}
+                                className={`px-6 py-2 rounded-none transition-all duration-300 uppercase tracking-widest text-xs font-medium border ${selectedCategory === cat._id ? 'border-luxury-gold text-luxury-gold bg-luxury-gold/5' : 'border-transparent text-gray-400 hover:text-luxury-gold'}`}
                             >
                                 {cat.name}
                             </button>
@@ -124,60 +124,19 @@ const Home = () => {
                     </div>
 
                     {/* Search & Advanced Filters */}
-                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-
-                        {/* Vendor Dropdown */}
-                        <div className="relative group">
-                            <select
-                                value={selectedVendor}
-                                onChange={(e) => setSelectedVendor(e.target.value)}
-                                className="appearance-none bg-[#0a0a0f] border border-white/10 rounded-lg pl-3 pr-8 py-2 text-sm text-gray-300 focus:outline-none focus:border-novatech-blue focus:ring-1 focus:ring-novatech-blue cursor-pointer hover:bg-white/5 transition-colors"
-                            >
-                                <option value="">Marque (Tout)</option>
-                                {availableFilters.vendors.map(v => (
-                                    <option key={v} value={v}>{v}</option>
-                                ))}
-                            </select>
-                            <Filter className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-                        </div>
-
-                        {/* Tag Dropdown */}
-                        <div className="relative group">
-                            <select
-                                value={selectedTag}
-                                onChange={(e) => setSelectedTag(e.target.value)}
-                                className="appearance-none bg-[#0a0a0f] border border-white/10 rounded-lg pl-3 pr-8 py-2 text-sm text-gray-300 focus:outline-none focus:border-novatech-blue focus:ring-1 focus:ring-novatech-blue cursor-pointer hover:bg-white/5 transition-colors"
-                            >
-                                <option value="">Tag (Tout)</option>
-                                {availableFilters.tags.map(t => (
-                                    <option key={t} value={t}>{t}</option>
-                                ))}
-                            </select>
-                            <Filter className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
-                        </div>
+                    <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-center md:justify-end">
 
                         {/* Search Input */}
-                        <div className="relative flex-grow md:w-64">
-                            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+                        <div className="relative w-full md:w-64 border-b border-white/10 focus-within:border-luxury-gold transition-colors">
+                            <Search className="absolute left-0 top-2.5 h-4 w-4 text-gray-500" />
                             <input
                                 type="text"
-                                placeholder="Rechercher..."
-                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-novatech-blue focus:ring-1 focus:ring-novatech-blue transition-all"
+                                placeholder="RECHERCHER..."
+                                className="w-full bg-transparent border-none pl-8 pr-4 py-2 text-white placeholder-gray-600 text-xs uppercase tracking-wider focus:ring-0"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-
-                        {/* Clear Filters Button */}
-                        {hasActiveFilters && (
-                            <button
-                                onClick={clearFilters}
-                                className="p-2 text-gray-400 hover:text-white hover:bg-red-500/10 rounded-lg transition-colors"
-                                title="Effacer les filtres"
-                            >
-                                <X size={20} />
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>
@@ -185,64 +144,55 @@ const Home = () => {
             {/* Grid */}
             {loading ? (
                 <div className="flex justify-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-novatech-blue"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-luxury-gold"></div>
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 text-gray-500">
-                    <p className="text-xl">Aucun produit trouvé.</p>
-                    <button onClick={clearFilters} className="text-novatech-blue hover:underline mt-2">
-                        Effacer les filtres
+                <div className="text-center py-20 text-gray-500 font-serif italic">
+                    <p className="text-xl">Aucune pièce d'exception trouvée.</p>
+                    <button onClick={clearFilters} className="text-luxury-gold hover:underline mt-4 text-sm uppercase tracking-widest">
+                        Voir toute la collection
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 px-4">
                     {products.map((product) => (
                         <motion.div
                             key={product._id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="glass-panel group relative overflow-hidden flex flex-col h-full hover:border-novatech-blue/30 transition-colors"
+                            className="group relative flex flex-col h-full"
                         >
-                            <div className="aspect-square w-full overflow-hidden bg-[#0a0a0f] relative">
+                            <Link to={`/product/${product._id}`} className="block overflow-hidden relative aspect-[4/5] bg-neutral-900 mb-6">
                                 <img
                                     src={getImageUrl(product.image)}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
                                 />
                                 {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                    <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                                        PROMO
+                                    <div className="absolute top-4 left-4 bg-luxury-gold text-luxury-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
+                                        Privilège
                                     </div>
                                 )}
-                            </div>
-                            <div className="p-4 flex-1 flex flex-col">
-                                <div className="text-xs text-novatech-cyan mb-1 font-medium tracking-wide uppercase">{product.category.name}</div>
-                                <h3 className="font-bold text-lg mb-2 leading-tight text-white group-hover:text-novatech-blue transition-colors">{product.name}</h3>
+                                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/80 to-transparent">
+                                    <button className="w-full py-3 bg-white text-black uppercase tracking-widest text-xs font-bold hover:bg-luxury-gold transition-colors">
+                                        Voir les détails
+                                    </button>
+                                </div>
+                            </Link>
 
-                                {/* Vendor/Tag preview if available */}
-                                {(product.vendor || (product.tags && product.tags.length > 0)) && (
-                                    <div className="flex flex-wrap gap-1 mb-3">
-                                        {product.vendor && (
-                                            <span className="text-[10px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded border border-white/5">
-                                                {product.vendor}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-
-                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-                                    <div className="flex flex-col">
-                                        <span className="text-xl font-bold text-novatech-gold">{product.price.toLocaleString()} DA</span>
-                                        {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                            <span className="text-xs text-gray-500 line-through">{product.compareAtPrice.toLocaleString()} DA</span>
-                                        )}
-                                    </div>
-                                    <Link
-                                        to={`/product/${product._id}`}
-                                        className="p-2 bg-white/10 rounded-lg hover:bg-novatech-blue text-white transition-all transform hover:scale-105 active:scale-95"
-                                    >
-                                        <ShoppingCart size={20} />
+                            <div className="text-center space-y-2">
+                                <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em]">{product.category.name}</div>
+                                <h3 className="font-serif text-xl text-white group-hover:text-luxury-gold transition-colors duration-300">
+                                    <Link to={`/product/${product._id}`}>
+                                        {product.name}
                                     </Link>
+                                </h3>
+
+                                <div className="flex items-center justify-center gap-4 pt-1">
+                                    <span className="text-sm font-medium text-gray-300">{product.price.toLocaleString()} DA</span>
+                                    {product.compareAtPrice && product.compareAtPrice > product.price && (
+                                        <span className="text-xs text-gray-600 line-through">{product.compareAtPrice.toLocaleString()} DA</span>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>
