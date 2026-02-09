@@ -36,9 +36,10 @@ class ErrorBoundary extends Component<{ children: ReactNode, fallback: ReactNode
     }
 }
 
-icon: string;
-title: string;
-description: string;
+interface ProductFeature {
+    icon: string;
+    title: string;
+    description: string;
 }
 
 interface ProductOption {
