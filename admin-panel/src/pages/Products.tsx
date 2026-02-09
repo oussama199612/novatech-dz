@@ -3,11 +3,42 @@ import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Pale
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import api from '../api';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
-interface ProductFeature {
-    icon: string;
-    title: string;
-    description: string;
+class ErrorBoundary extends Component<{ children: ReactNode, fallback: ReactNode }, { hasError: boolean, error: Error | null }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        console.error("Uncaught error:", error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="p-4 bg-red-900/20 border border-red-500 rounded text-red-200">
+                    <h3 className="font-bold">Erreur de chargement de l'éditeur</h3>
+                    <p className="text-sm opacity-80">{this.state.error?.toString()}</p>
+                    <div className="mt-4 text-xs font-mono whitespace-pre-wrap bg-black/50 p-2 rounded">
+                        {this.props.fallback}
+                    </div>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}
+
+icon: string;
+title: string;
+description: string;
 }
 
 interface ProductOption {
@@ -1046,21 +1077,27 @@ const Products = () => {
                                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                                         <div className="space-y-4">
                                             <label className="label">Description Détaillée (Texte Riche)</label>
-                                            <ReactQuill
-                                                theme="snow"
+                                            <ErrorBoundary fallback={<textarea
+                                                className="input-field w-full h-64 font-mono text-sm"
                                                 value={formData.longDescription}
-                                                onChange={(content: string) => setFormData({ ...formData, longDescription: content })}
-                                                className="bg-white text-black h-64 mb-12 rounded-lg overflow-hidden"
-                                                modules={{
-                                                    toolbar: [
-                                                        [{ 'header': [1, 2, 3, false] }],
-                                                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                        ['link', 'image'],
-                                                        ['clean']
-                                                    ],
-                                                }}
-                                            />
+                                                onChange={e => setFormData({ ...formData, longDescription: e.target.value })}
+                                            />}>
+                                                <ReactQuill
+                                                    theme="snow"
+                                                    value={formData.longDescription}
+                                                    onChange={(content: string) => setFormData({ ...formData, longDescription: content })}
+                                                    className="bg-white text-black h-64 mb-12 rounded-lg overflow-hidden"
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, 3, false] }],
+                                                            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            ['link', 'image'],
+                                                            ['clean']
+                                                        ],
+                                                    }}
+                                                />
+                                            </ErrorBoundary>
                                             <p className="text-xs text-slate-500 pt-2">Utilisez la barre d'outils pour mettre en forme votre texte (Titres, Listes, Images...).</p>
                                         </div>
 
