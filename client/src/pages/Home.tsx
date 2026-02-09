@@ -75,13 +75,30 @@ const Home = () => {
     return (
         <div className="space-y-8">
             {/* Hero / Header */}
-            <div className="text-center space-y-4 py-10">
-                <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-gray-400">
-                    La Référence Gaming
-                </h1>
-                <p className="text-gray-400 max-w-2xl mx-auto">
-                    Découvrez notre sélection premium d'équipements et services.
-                </p>
+            {/* Hero / Header */}
+            <div className="relative py-24 md:py-32 text-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-luxury-gold/10 via-transparent to-transparent opacity-50 blur-3xl"></div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="relative z-10 space-y-6 px-4"
+                >
+                    <span className="text-luxury-gold uppercase tracking-[0.3em] text-sm font-medium">Collection Exclusive</span>
+                    <h1 className="text-5xl md:text-7xl font-serif text-white">
+                        L'Art du <span className="italic text-luxury-gold">Gaming</span>
+                    </h1>
+                    <p className="text-gray-400 max-w-xl mx-auto font-light text-lg leading-relaxed">
+                        Une sélection rigoureuse d'équipements haute performance, alliant design d'exception et technologie de pointe.
+                    </p>
+                    <div className="pt-8">
+                        <button className="glass-btn group">
+                            Découvrir la Collection
+                            <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">→</span>
+                        </button>
+                    </div>
+                </motion.div>
             </div>
 
             {/* Filters Bar */}
