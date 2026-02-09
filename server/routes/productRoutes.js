@@ -17,10 +17,46 @@ router.get('/', asyncHandler(async (req, res) => {
         }
         : {};
 
-    const products = await Product.find({ ...keyword }).populate('category').sort({ orderIndex: 1, createdAt: -1 });
-    // You might want to filter active: true for public if not admin, 
-    // but simpler to let frontend filter or add query param ?active=true
+    const filters = { ...keyword };
+
+    if (req.query.vendor) {
+        filters.vendor = req.query.vendor;
+    }
+
+    if (req.query.tags) {
+        const tagsArray = req.query.tags.split(',').map(tag => tag.trim());
+        if (tagsArray.length > 0) {
+            filters.tags = { $in: tagsArray };
+        }
+    }
+
+    if (req.query.category && req.query.category !== 'all') {
+        filters.category = req.query.category;
+    }
+
+    // Handle "active" status for public view if needed, but for now we show all or filter by status if passed
+    if (req.query.status) {
+        filters.status = req.query.status;
+    }
+
+    const products = await Product.find(filters).populate('category').sort({ orderIndex: 1, createdAt: -1 });
     res.json(products);
+}));
+
+// @desc    Get all available filters (vendors, tags)
+// @route   GET /api/products/filters
+// @access  Public
+router.get('/filters', asyncHandler(async (req, res) => {
+    const vendors = await Product.distinct('vendor');
+    const tags = await Product.distinct('tags');
+    // Filter out null/undefined/empty
+    const cleanVendors = vendors.filter(v => v);
+    const cleanTags = tags.filter(t => t);
+
+    res.json({
+        vendors: cleanVendors,
+        tags: cleanTags
+    });
 }));
 
 // @desc    Fetch single product

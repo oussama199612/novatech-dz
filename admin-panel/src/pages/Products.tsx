@@ -1049,7 +1049,7 @@ const Products = () => {
                                             <ReactQuill
                                                 theme="snow"
                                                 value={formData.longDescription}
-                                                onChange={(content) => setFormData({ ...formData, longDescription: content })}
+                                                onChange={(content: string) => setFormData({ ...formData, longDescription: content })}
                                                 className="bg-white text-black h-64 mb-12 rounded-lg overflow-hidden"
                                                 modules={{
                                                     toolbar: [
