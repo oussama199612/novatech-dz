@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload, ChevronDown } from 'lucide-react';
-import ReactQuill from 'react-quill-new/lib/index.js';
-import 'react-quill-new/dist/quill.snow.css';
 import api from '../api';
 import { Component, ErrorInfo, ReactNode } from 'react';
+import RichTextEditor from '../components/RichTextEditor';
 
 class ErrorBoundary extends Component<{ children: ReactNode, fallback: ReactNode }, { hasError: boolean, error: Error | null }> {
     constructor(props: any) {
@@ -1083,20 +1082,9 @@ const Products = () => {
                                                 value={formData.longDescription}
                                                 onChange={e => setFormData({ ...formData, longDescription: e.target.value })}
                                             />}>
-                                                <ReactQuill
-                                                    theme="snow"
+                                                <RichTextEditor
                                                     value={formData.longDescription}
                                                     onChange={(content: string) => setFormData({ ...formData, longDescription: content })}
-                                                    className="bg-white text-black h-64 mb-12 rounded-lg overflow-hidden"
-                                                    modules={{
-                                                        toolbar: [
-                                                            [{ 'header': [1, 2, 3, false] }],
-                                                            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                            ['link', 'image'],
-                                                            ['clean']
-                                                        ],
-                                                    }}
                                                 />
                                             </ErrorBoundary>
                                             <p className="text-xs text-slate-500 pt-2">Utilisez la barre d'outils pour mettre en forme votre texte (Titres, Listes, Images...).</p>
