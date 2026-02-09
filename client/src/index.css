@@ -2,6 +2,24 @@
 
 @import "tailwindcss";
 
+@theme {
+  --color-novatech-dark: #0F172A;
+  --color-novatech-card: rgba(255, 255, 255, 0.03);
+  --color-novatech-blue: #1a56db;
+  --color-novatech-cyan: #06b6d4;
+  --color-novatech-purple: #7c3aed;
+  --color-novatech-gold: #D4AF37;
+
+  --color-luxury-black: #0F172A;
+  --color-luxury-gold: #D4AF37;
+  --color-luxury-gold-light: #FCD34D;
+  --color-luxury-white: #F8FAFC;
+  --color-luxury-gray: #334155;
+
+  --font-sans: "Montserrat", sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
 body {
   @apply bg-luxury-black text-luxury-white font-sans antialiased;
   background-image:
