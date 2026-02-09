@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload, ChevronDown } from 'lucide-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import api from '../api';
 
 interface ProductFeature {
@@ -1044,13 +1046,22 @@ const Products = () => {
                                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                                         <div className="space-y-4">
                                             <label className="label">Description Détaillée (Texte Riche)</label>
-                                            <textarea
+                                            <ReactQuill
+                                                theme="snow"
                                                 value={formData.longDescription}
-                                                onChange={e => setFormData({ ...formData, longDescription: e.target.value })}
-                                                className="input-field w-full h-64 font-mono text-sm leading-relaxed"
-                                                placeholder="# Titre de section...&#10;&#10;Paragraphe de description détaillée..."
+                                                onChange={(content) => setFormData({ ...formData, longDescription: content })}
+                                                className="bg-white text-black h-64 mb-12 rounded-lg overflow-hidden"
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ 'header': [1, 2, 3, false] }],
+                                                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                        ['link', 'image'],
+                                                        ['clean']
+                                                    ],
+                                                }}
                                             />
-                                            <p className="text-xs text-slate-500">Vous pouvez utiliser du texte simple pour l'instant. Le front-end le mettra en forme.</p>
+                                            <p className="text-xs text-slate-500 pt-2">Utilisez la barre d'outils pour mettre en forme votre texte (Titres, Listes, Images...).</p>
                                         </div>
 
                                         <div className="border-t border-slate-800 pt-6">

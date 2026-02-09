@@ -207,9 +207,10 @@ Merci de confirmer ma commande !
 
                                 <div className="prose prose-invert max-w-none text-slate-300">
                                     {activeTab === 'desc' ? (
-                                        <div className="whitespace-pre-line leading-relaxed">
-                                            {product.longDescription || product.description}
-                                        </div>
+                                        <div
+                                            className="prose prose-invert prose-blue max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-p:text-slate-300 prose-li:text-slate-300"
+                                            dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+                                        />
                                     ) : (
                                         <ul className="grid grid-cols-1 gap-4">
                                             {product.features?.map((feat, i) => (
@@ -377,8 +378,8 @@ Merci de confirmer ma commande !
                                                         type="button"
                                                         onClick={() => setQuantity(offer.quantity)}
                                                         className={`relative p-3 rounded-lg border-2 flex items-center justify-between transition-all ${quantity === offer.quantity
-                                                                ? 'bg-blue-600/10 border-blue-500 text-white'
-                                                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                                                            ? 'bg-blue-600/10 border-blue-500 text-white'
+                                                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
