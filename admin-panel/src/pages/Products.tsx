@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload, ChevronDown } from 'lucide-react';
-import ReactQuill from 'react-quill-new';
+import ReactQuill from 'react-quill-new/lib/index.js';
 import 'react-quill-new/dist/quill.snow.css';
 import api from '../api';
 import { Component, ErrorInfo, ReactNode } from 'react';
