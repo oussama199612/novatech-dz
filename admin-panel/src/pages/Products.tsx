@@ -992,7 +992,7 @@ const Products = () => {
 
                                 {/* TAB: MEDIA */}
                                 {activeTab === 'media' && (
-                                    <div className="space-y-8">
+                                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                                         <div className="space-y-4">
                                             <label className="label text-lg">Image Principale</label>
                                             <div className="flex gap-4 items-start">
@@ -1043,7 +1043,7 @@ const Products = () => {
 
                                 {/* TAB: LANDING PAGE */}
                                 {activeTab === 'landing' && (
-                                    <div className="space-y-8">
+                                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                                         <div className="space-y-4">
                                             <label className="label">Description Détaillée (Texte Riche)</label>
                                             <ReactQuill
