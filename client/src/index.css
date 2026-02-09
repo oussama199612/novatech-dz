@@ -3,18 +3,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-novatech-dark: #0F172A;
-  --color-novatech-card: rgba(255, 255, 255, 0.03);
-  --color-novatech-blue: #1a56db;
-  --color-novatech-cyan: #06b6d4;
-  --color-novatech-purple: #7c3aed;
-  --color-novatech-gold: #D4AF37;
-
-  --color-luxury-black: #0F172A;
+  --color-luxury-black: #ffffff;
   --color-luxury-gold: #D4AF37;
   --color-luxury-gold-light: #FCD34D;
-  --color-luxury-white: #F8FAFC;
-  --color-luxury-gray: #334155;
+  --color-luxury-white: #0F172A;
+  --color-luxury-gray: #F1F5F9;
 
   --font-sans: "Montserrat", sans-serif;
   --font-serif: "Playfair Display", serif;
@@ -23,17 +16,17 @@
 body {
   @apply bg-luxury-black text-luxury-white font-sans antialiased;
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08), transparent 40%);
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05), transparent 40%);
   min-height: 100vh;
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-luxury-black/40 backdrop-blur-md border border-white/5 rounded-none shadow-2xl;
+    @apply bg-white/60 backdrop-blur-md border border-gray-100 shadow-xl;
   }
 
   .glass-btn {
-    @apply px-8 py-3 bg-transparent border border-luxury-gold text-luxury-gold font-medium tracking-widest uppercase text-xs transition-all duration-300 hover:bg-luxury-gold hover:text-luxury-black;
+    @apply px-8 py-3 bg-transparent border border-luxury-gold text-luxury-gold font-medium tracking-widest uppercase text-xs transition-all duration-300 hover:bg-luxury-gold hover:text-white;
   }
 }
 
