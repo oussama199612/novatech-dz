@@ -508,11 +508,32 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Mobile: Details Below Form */}
-                            <div className="lg:hidden mt-12 bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
-                                <h3 className="font-bold text-white mb-4">Description</h3>
-                                <p className="text-slate-300 text-sm whitespace-pre-line leading-relaxed">
-                                    {product.longDescription || product.description}
-                                </p>
+                            <div className="lg:hidden mt-8 space-y-8">
+                                <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
+                                    <h3 className="font-bold text-white mb-4 uppercase tracking-wider text-sm border-b border-slate-800 pb-2">Description</h3>
+                                    <div
+                                        className="prose prose-invert prose-sm max-w-none prose-headings:font-bold prose-p:text-slate-300 prose-li:text-slate-300 prose-img:rounded-lg"
+                                        dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+                                    />
+                                </div>
+
+                                <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
+                                    <h3 className="font-bold text-white mb-4 uppercase tracking-wider text-sm border-b border-slate-800 pb-2">Caractéristiques</h3>
+                                    <ul className="grid grid-cols-1 gap-4">
+                                        {product.features?.map((feat, i) => (
+                                            <li key={i} className="flex items-start gap-4">
+                                                <div className="p-2 bg-slate-800 rounded-lg text-blue-400 shrink-0">
+                                                    <Zap size={16} />
+                                                </div>
+                                                <div>
+                                                    <strong className="block text-white text-sm">{feat.title}</strong>
+                                                    <span className="text-xs text-slate-400">{feat.description}</span>
+                                                </div>
+                                            </li>
+                                        ))}
+                                        {(!product.features || product.features.length === 0) && <p className="text-slate-500 italic text-xs">Aucune caractéristique.</p>}
+                                    </ul>
+                                </div>
                             </div>
 
                         </div>
