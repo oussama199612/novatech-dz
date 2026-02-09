@@ -158,21 +158,23 @@ Merci de confirmer ma commande !
 
                     {/* LEFT COLUMN: GALLERY (Sticky) */}
                     <div className="lg:col-span-7">
-                        <div className="sticky top-24 space-y-4">
+                        <div className="sticky top-24 space-y-8">
                             {/* Main Image */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="aspect-square md:aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 relative group"
+                                className="aspect-square md:aspect-[4/3] relative group overflow-hidden"
                             >
                                 <img
                                     src={getImageUrl(activeImage)}
                                     alt={product.name}
-                                    className="w-full h-full object-contain p-4"
+                                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-700"
                                 />
-                                <div className="absolute top-4 right-4 bg-slate-950/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-white border border-slate-800">
-                                    {product.category?.name}
-                                </div>
+                                {product.compareAtPrice > (currentVariant?.price || product.price) && (
+                                    <div className="absolute top-0 left-0 bg-luxury-gold text-luxury-black text-xs font-bold px-3 py-1 uppercase tracking-widest">
+                                        Privilège
+                                    </div>
+                                )}
                             </motion.div>
 
                             {/* Thumbnails */}
@@ -181,7 +183,7 @@ Merci de confirmer ma commande !
                                     <button
                                         key={idx}
                                         onClick={() => setActiveImage(img!)}
-                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-slate-900 rounded-xl border-2 transition-all p-2 ${activeImage === img ? 'border-blue-500' : 'border-slate-800 hover:border-slate-600'}`}
+                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-50 hover:opacity-80'}`}
                                     >
                                         <img src={getImageUrl(img!)} className="w-full h-full object-contain" />
                                     </button>
@@ -189,42 +191,42 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Desktop: Details Below Image */}
-                            <div className="hidden lg:block mt-12 bg-slate-900/50 rounded-2xl p-8 border border-slate-800">
-                                <div className="flex gap-8 border-b border-slate-800 mb-6">
+                            <div className="hidden lg:block mt-16 pt-8 border-t border-white/5">
+                                <div className="flex gap-12 mb-8">
                                     <button
                                         onClick={() => setActiveTab('desc')}
-                                        className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'desc' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-300'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-white'}`}
                                     >
-                                        Description
+                                        L'Expérience
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('features')}
-                                        className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'features' ? 'text-white border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-300'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-white'}`}
                                     >
-                                        Caractéristiques
+                                        Détails Techniques
                                     </button>
                                 </div>
 
-                                <div className="prose prose-invert max-w-none text-slate-300">
+                                <div className="prose prose-invert max-w-none text-gray-300">
                                     {activeTab === 'desc' ? (
                                         <div
-                                            className="prose prose-invert prose-blue max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-p:text-slate-300 prose-li:text-slate-300"
+                                            className="prose prose-invert prose-p:text-gray-300 prose-headings:font-serif prose-headings:text-white"
                                             dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                         />
                                     ) : (
-                                        <ul className="grid grid-cols-1 gap-4">
+                                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                             {product.features?.map((feat, i) => (
                                                 <li key={i} className="flex items-start gap-4">
-                                                    <div className="p-2 bg-slate-800 rounded-lg text-blue-400">
-                                                        <Zap size={16} />
+                                                    <div className="p-1 text-luxury-gold shrink-0 mt-1">
+                                                        <Zap size={14} />
                                                     </div>
                                                     <div>
-                                                        <strong className="block text-white">{feat.title}</strong>
-                                                        <span className="text-sm text-slate-400">{feat.description}</span>
+                                                        <strong className="block text-white uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
+                                                        <span className="text-sm text-gray-400 font-light">{feat.description}</span>
                                                     </div>
                                                 </li>
                                             ))}
-                                            {(!product.features || product.features.length === 0) && <p className="text-slate-500 italic">Aucune caractéristique spécifiée.</p>}
+                                            {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic">Aucune caractéristique spécifiée.</p>}
                                         </ul>
                                     )}
                                 </div>
@@ -508,30 +510,28 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Mobile: Details Below Form */}
-                            <div className="lg:hidden mt-8 space-y-8">
-                                <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
-                                    <h3 className="font-bold text-white mb-4 uppercase tracking-wider text-sm border-b border-slate-800 pb-2">Description</h3>
+                            <div className="lg:hidden mt-12 space-y-12 border-t border-white/5 pt-8">
+                                <div>
+                                    <h3 className="font-serif text-2xl text-white mb-6">L'Expérience</h3>
                                     <div
-                                        className="prose prose-invert prose-sm max-w-none prose-headings:font-bold prose-p:text-slate-300 prose-li:text-slate-300 prose-img:rounded-lg"
+                                        className="prose prose-invert prose-sm max-w-none prose-p:text-gray-300 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-white prose-img:rounded-none prose-img:w-full"
                                         dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                     />
                                 </div>
 
-                                <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
-                                    <h3 className="font-bold text-white mb-4 uppercase tracking-wider text-sm border-b border-slate-800 pb-2">Caractéristiques</h3>
-                                    <ul className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <h3 className="font-serif text-2xl text-white mb-6">Détails Techniques</h3>
+                                    <ul className="space-y-6">
                                         {product.features?.map((feat, i) => (
-                                            <li key={i} className="flex items-start gap-4">
-                                                <div className="p-2 bg-slate-800 rounded-lg text-blue-400 shrink-0">
-                                                    <Zap size={16} />
+                                            <li key={i} className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 text-luxury-gold mb-1">
+                                                    <Zap size={14} />
+                                                    <strong className="uppercase tracking-widest text-xs">{feat.title}</strong>
                                                 </div>
-                                                <div>
-                                                    <strong className="block text-white text-sm">{feat.title}</strong>
-                                                    <span className="text-xs text-slate-400">{feat.description}</span>
-                                                </div>
+                                                <span className="text-sm text-gray-400 font-light pl-6 border-l border-white/10">{feat.description}</span>
                                             </li>
                                         ))}
-                                        {(!product.features || product.features.length === 0) && <p className="text-slate-500 italic text-xs">Aucune caractéristique.</p>}
+                                        {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic text-xs">Aucune caractéristique.</p>}
                                     </ul>
                                 </div>
                             </div>
