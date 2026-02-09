@@ -8,16 +8,24 @@ export default {
         extend: {
             colors: {
                 novatech: {
-                    dark: '#0a0a0f', // Approx from logo background
-                    card: 'rgba(255, 255, 255, 0.05)',
-                    blue: '#1a56db', // Placeholder for logo blue
-                    cyan: '#06b6d4', // Logo cyan
-                    purple: '#7c3aed', // Logo hint
-                    gold: '#fbbf24', // Accent
+                    dark: '#0F172A', // Deep Navy/Black
+                    card: 'rgba(255, 255, 255, 0.03)',
+                    blue: '#1a56db',
+                    cyan: '#06b6d4',
+                    purple: '#7c3aed',
+                    gold: '#D4AF37', // Luxury Gold
+                },
+                luxury: {
+                    black: '#0F172A',
+                    gold: '#D4AF37',
+                    'gold-light': '#FCD34D',
+                    white: '#F8FAFC',
+                    gray: '#334155'
                 }
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'], // Premium feel
+                sans: ['Montserrat', 'sans-serif'],
+                serif: ['"Playfair Display"', 'serif'],
             }
         },
     },
