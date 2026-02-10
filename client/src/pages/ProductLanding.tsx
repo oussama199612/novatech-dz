@@ -151,7 +151,7 @@ Merci de confirmer ma commande !
     const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
 
     return (
-        <div className="min-h-screen pb-20 bg-[#0a0a0f]">
+        <div className="min-h-screen pb-20 bg-luxury-black">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -171,7 +171,7 @@ Merci de confirmer ma commande !
                                     className="w-full h-full object-contain hover:scale-105 transition-transform duration-700"
                                 />
                                 {product.compareAtPrice > (currentVariant?.price || product.price) && (
-                                    <div className="absolute top-0 left-0 bg-luxury-gold text-luxury-black text-xs font-bold px-3 py-1 uppercase tracking-widest">
+                                    <div className="absolute top-0 left-0 bg-luxury-gold text-white text-xs font-bold px-3 py-1 uppercase tracking-widest shadow-lg">
                                         Privilège
                                     </div>
                                 )}
@@ -183,7 +183,7 @@ Merci de confirmer ma commande !
                                     <button
                                         key={idx}
                                         onClick={() => setActiveImage(img!)}
-                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-50 hover:opacity-80'}`}
+                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-40 hover:opacity-80'}`}
                                     >
                                         <img src={getImageUrl(img!)} className="w-full h-full object-contain" />
                                     </button>
@@ -191,26 +191,26 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Desktop: Details Below Image */}
-                            <div className="hidden lg:block mt-16 pt-8 border-t border-white/5">
+                            <div className="hidden lg:block mt-16 pt-8 border-t border-gray-100">
                                 <div className="flex gap-12 mb-8">
                                     <button
                                         onClick={() => setActiveTab('desc')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-white'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-400 hover:text-luxury-white'}`}
                                     >
                                         L'Expérience
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('features')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-white'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-400 hover:text-luxury-white'}`}
                                     >
                                         Détails Techniques
                                     </button>
                                 </div>
 
-                                <div className="prose prose-invert max-w-none text-gray-300">
+                                <div className="prose prose-sm max-w-none text-gray-600">
                                     {activeTab === 'desc' ? (
                                         <div
-                                            className="prose prose-invert prose-p:text-gray-300 prose-headings:font-serif prose-headings:text-white"
+                                            className="prose prose-headings:font-serif prose-headings:text-luxury-white prose-p:text-gray-600 prose-strong:text-luxury-white"
                                             dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                         />
                                     ) : (
@@ -221,12 +221,12 @@ Merci de confirmer ma commande !
                                                         <Zap size={14} />
                                                     </div>
                                                     <div>
-                                                        <strong className="block text-white uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
-                                                        <span className="text-sm text-gray-400 font-light">{feat.description}</span>
+                                                        <strong className="block text-luxury-white uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
+                                                        <span className="text-sm text-gray-500 font-light">{feat.description}</span>
                                                     </div>
                                                 </li>
                                             ))}
-                                            {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic">Aucune caractéristique spécifiée.</p>}
+                                            {(!product.features || product.features.length === 0) && <p className="text-gray-400 italic">Aucune caractéristique spécifiée.</p>}
                                         </ul>
                                     )}
                                 </div>
@@ -239,26 +239,26 @@ Merci de confirmer ma commande !
                         <div className="space-y-8">
 
                             {/* Header Info */}
-                            <div className="space-y-4 border-b border-slate-800 pb-8">
-                                <h1 className="text-3xl md:text-4xl font-bold text-white">{product.name}</h1>
+                            <div className="space-y-4 border-b border-gray-100 pb-8">
+                                <h1 className="text-3xl md:text-4xl font-serif text-luxury-white leading-tight">{product.name}</h1>
 
                                 <div className="flex items-center justify-between">
-                                    <div className="text-3xl font-bold text-white">
-                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-slate-400 font-medium">DZD</span>
+                                    <div className="text-3xl font-bold text-luxury-white">
+                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-gray-400 font-medium">DZD</span>
                                         {product.compareAtPrice > (currentVariant?.price || product.price) && (
-                                            <span className="text-lg text-slate-500 line-through ml-3">
+                                            <span className="text-lg text-gray-400 line-through ml-3">
                                                 {product.compareAtPrice.toLocaleString()} DZD
                                             </span>
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-1 text-yellow-400">
+                                    <div className="flex items-center gap-1 text-luxury-gold">
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
-                                        <span className="text-slate-500 text-sm ml-2">(4.9/5)</span>
+                                        <span className="text-gray-400 text-sm ml-2">(4.9/5)</span>
                                     </div>
                                 </div>
 
@@ -269,8 +269,8 @@ Merci de confirmer ma commande !
                                             const isColor = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
                                             return (
                                                 <div key={idx} className="space-y-2">
-                                                    <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-                                                        {option.name}: <span className="text-white normal-case">{selectedOptions[option.name]}</span>
+                                                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+                                                        {option.name}: <span className="text-luxury-white normal-case">{selectedOptions[option.name]}</span>
                                                     </label>
                                                     <div className="flex flex-wrap gap-2">
                                                         {option.values.map(val => {
@@ -290,11 +290,11 @@ Merci de confirmer ma commande !
                                                                     <button
                                                                         key={val}
                                                                         onClick={() => handleOptionChange(option.name, val)}
-                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-blue-500 scale-110' : 'border-slate-700 hover:border-slate-500'}`}
+                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-sm ${isSelected ? 'border-luxury-gold scale-110' : 'border-gray-200 hover:border-gray-400'}`}
                                                                         title={val}
                                                                         style={{ backgroundColor: isValidHex ? colorHex : '#333' }}
                                                                     >
-                                                                        {!isValidHex && <span className="text-xs text-white">{val.charAt(0)}</span>}
+                                                                        {!isValidHex && <span className="text-xs text-white mix-blend-difference">{val.charAt(0)}</span>}
                                                                     </button>
                                                                 );
                                                             }
@@ -304,8 +304,8 @@ Merci de confirmer ma commande !
                                                                     key={val}
                                                                     onClick={() => handleOptionChange(option.name, val)}
                                                                     className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${isSelected
-                                                                        ? 'bg-blue-600 text-white border-blue-500'
-                                                                        : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500'
+                                                                        ? 'bg-luxury-white text-white border-luxury-white'
+                                                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                                                                         }`}
                                                                 >
                                                                     {val}
@@ -321,51 +321,51 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Trust Badges */}
-                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-slate-400">
-                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
-                                    <Truck size={20} className="text-blue-500" />
+                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-gray-500">
+                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                                    <Truck size={20} className="text-luxury-gold" />
                                     <span>Livraison Rapide</span>
                                 </div>
-                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
-                                    <Shield size={20} className="text-blue-500" />
+                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                                    <Shield size={20} className="text-luxury-gold" />
                                     <span>Garantie 100%</span>
                                 </div>
-                                <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-800 flex flex-col items-center gap-1">
-                                    <Lock size={20} className="text-blue-500" />
+                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                                    <Lock size={20} className="text-luxury-gold" />
                                     <span>Paiement Sécurisé</span>
                                 </div>
                             </div>
 
                             {/* Order Form */}
-                            <div className="bg-slate-900 rounded-2xl border border-blue-500/20 shadow-2xl overflow-hidden">
-                                <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-                                    <span className="font-bold text-white uppercase tracking-wider text-sm flex items-center gap-2">
-                                        <CreditCard size={16} className="text-blue-500" />
+                            <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden">
+                                <div className="p-4 bg-primary-black text-white bg-slate-900 flex items-center justify-between">
+                                    <span className="font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                                        <CreditCard size={16} className="text-luxury-gold" />
                                         Commander
                                     </span>
                                     {currentVariant?.stock === 0 ? (
-                                        <span className="text-xs text-red-400 font-mono">● Rupture de stock</span>
+                                        <span className="text-xs text-red-500 font-mono">● Rupture de stock</span>
                                     ) : (
-                                        <span className="text-xs text-green-400 font-mono animate-pulse">● En Stock</span>
+                                        <span className="text-xs text-emerald-400 font-mono animate-pulse">● En Stock</span>
                                     )}
                                 </div>
 
                                 <form onSubmit={handleSubmitOrder} className="p-6 space-y-5">
                                     <div className="space-y-3">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Vos Informations</label>
-                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" />
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Vos Informations</label>
+                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-all text-sm" />
                                         <div className="grid grid-cols-2 gap-3">
-                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
-                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
+                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
+                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
                                         </div>
-                                        <input placeholder="ID Joueur (Optionnel)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-all" />
+                                        <input placeholder="ID Joueur (Optionnel)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
                                     </div>
 
                                     <div className="space-y-4 pt-2">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-slate-500 uppercase">Quantité & Offres</label>
+                                            <label className="text-xs font-bold text-gray-400 uppercase">Quantité & Offres</label>
                                             {product.offers && product.offers.length > 0 && (
-                                                <span className="text-xs text-blue-400 font-bold animate-pulse">
+                                                <span className="text-xs text-luxury-gold font-bold animate-pulse">
                                                     Offres disponibles !
                                                 </span>
                                             )}
@@ -380,30 +380,30 @@ Merci de confirmer ma commande !
                                                         type="button"
                                                         onClick={() => setQuantity(offer.quantity)}
                                                         className={`relative p-3 rounded-lg border-2 flex items-center justify-between transition-all ${quantity === offer.quantity
-                                                            ? 'bg-blue-600/10 border-blue-500 text-white'
-                                                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                                                            ? 'bg-luxury-gold/10 border-luxury-gold text-luxury-white'
+                                                            : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${quantity === offer.quantity ? 'bg-blue-500 text-white' : 'bg-slate-800'
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${quantity === offer.quantity ? 'bg-luxury-gold text-white' : 'bg-gray-200 text-gray-600'
                                                                 }`}>
                                                                 {quantity === offer.quantity && <Check size={14} />}
                                                             </div>
                                                             <div className="text-left">
-                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-blue-400' : 'text-white'}`}>
+                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-luxury-black' : 'text-gray-700'}`}>
                                                                     Achetez {offer.quantity}
                                                                 </div>
                                                                 <div className="text-xs opacity-70">{offer.label || 'Offre Spéciale'}</div>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="font-bold text-emerald-400">{offer.price.toLocaleString()} DA</div>
-                                                            <div className="text-xs text-slate-500 line-through">
+                                                            <div className="font-bold text-emerald-600">{offer.price.toLocaleString()} DA</div>
+                                                            <div className="text-xs text-gray-400 line-through">
                                                                 {(offer.quantity * (currentVariant?.price || product.price)).toLocaleString()} DA
                                                             </div>
                                                         </div>
                                                         {offer.isBestValue && (
-                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
                                                                 Meilleure Offre
                                                             </div>
                                                         )}
@@ -413,27 +413,27 @@ Merci de confirmer ma commande !
                                         )}
 
                                         {/* STANDARD QUANTITY SELECTOR */}
-                                        <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-1">
+                                        <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-1">
                                             <div className="flex items-center">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-luxury-white transition-colors"
                                                 >
                                                     -
                                                 </button>
-                                                <span className="w-10 text-center font-bold text-white">{quantity}</span>
+                                                <span className="w-10 text-center font-bold text-luxury-white">{quantity}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(quantity + 1)}
-                                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-luxury-white transition-colors"
                                                 >
                                                     +
                                                 </button>
                                             </div>
                                             <div className="px-4 text-right">
-                                                <div className="text-xs text-slate-500 uppercase">Total à payer</div>
-                                                <div className="text-xl font-bold text-emerald-400">
+                                                <div className="text-xs text-gray-500 uppercase">Total à payer</div>
+                                                <div className="text-xl font-bold text-emerald-600">
                                                     {(() => {
                                                         const basePrice = currentVariant?.price || product.price;
                                                         let finalPrice = 0;
@@ -452,26 +452,26 @@ Merci de confirmer ma commande !
                                                         finalPrice += remaining * basePrice;
 
                                                         return finalPrice.toLocaleString();
-                                                    })()} <span className="text-sm text-emerald-600">DZD</span>
+                                                    })()} <span className="text-sm text-emerald-700">DZD</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-3 pt-2">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Paiement</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Paiement</label>
                                         <div className="space-y-2">
                                             {methods.map(method => (
-                                                <div key={method._id} className={`rounded-xl border transition-all ${selectedMethodId === method._id ? 'bg-blue-900/10 border-blue-500' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`}>
+                                                <div key={method._id} className={`rounded-xl border transition-all ${selectedMethodId === method._id ? 'bg-luxury-gold/5 border-luxury-gold' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}>
                                                     <button
                                                         type="button"
                                                         onClick={() => setSelectedMethodId(method._id)}
                                                         className="w-full p-3 flex items-center gap-3 text-left"
                                                     >
-                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-blue-500' : 'border-slate-600'}`}>
-                                                            {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-luxury-gold' : 'border-gray-400'}`}>
+                                                            {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-luxury-gold" />}
                                                         </div>
-                                                        <span className="font-medium text-white text-sm">{method.name}</span>
+                                                        <span className="font-medium text-luxury-white text-sm">{method.name}</span>
                                                     </button>
 
                                                     <AnimatePresence>
@@ -483,9 +483,9 @@ Merci de confirmer ma commande !
                                                                 className="overflow-hidden"
                                                             >
                                                                 <div className="px-4 pb-3 pt-0">
-                                                                    <div className="p-3 bg-slate-900 rounded-lg border border-slate-800/50 flex justify-between items-center text-xs">
-                                                                        <code className="text-blue-200 font-mono">{method.accountValue}</code>
-                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-slate-500 hover:text-white transition-colors">
+                                                                    <div className="p-3 bg-white rounded-lg border border-luxury-gold/30 flex justify-between items-center text-xs">
+                                                                        <code className="text-luxury-white font-mono">{method.accountValue}</code>
+                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-400 hover:text-luxury-gold transition-colors">
                                                                             {copied ? <Check size={14} /> : <Copy size={14} />}
                                                                         </button>
                                                                     </div>
@@ -501,7 +501,7 @@ Merci de confirmer ma commande !
                                     <button
                                         type="submit"
                                         disabled={!selectedMethodId || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
-                                        className="w-full py-4 rounded-xl font-bold text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg"
+                                        className="w-full py-4 rounded-xl font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl"
                                         style={{ backgroundColor: accentColor }}
                                     >
                                         Commander <ArrowRight size={20} />
@@ -510,17 +510,17 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Mobile: Details Below Form */}
-                            <div className="lg:hidden mt-12 space-y-12 border-t border-white/5 pt-8">
+                            <div className="lg:hidden mt-12 space-y-12 border-t border-gray-100 pt-8">
                                 <div>
-                                    <h3 className="font-serif text-2xl text-white mb-6">L'Expérience</h3>
+                                    <h3 className="font-serif text-2xl text-luxury-white mb-6">L'Expérience</h3>
                                     <div
-                                        className="prose prose-invert prose-sm max-w-none prose-p:text-gray-300 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-white prose-img:rounded-none prose-img:w-full"
+                                        className="prose prose-sm max-w-none prose-p:text-gray-600 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-luxury-white prose-img:rounded-none prose-img:w-full"
                                         dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                     />
                                 </div>
 
                                 <div>
-                                    <h3 className="font-serif text-2xl text-white mb-6">Détails Techniques</h3>
+                                    <h3 className="font-serif text-2xl text-luxury-white mb-6">Détails Techniques</h3>
                                     <ul className="space-y-6">
                                         {product.features?.map((feat, i) => (
                                             <li key={i} className="flex flex-col gap-1">
@@ -528,10 +528,10 @@ Merci de confirmer ma commande !
                                                     <Zap size={14} />
                                                     <strong className="uppercase tracking-widest text-xs">{feat.title}</strong>
                                                 </div>
-                                                <span className="text-sm text-gray-400 font-light pl-6 border-l border-white/10">{feat.description}</span>
+                                                <span className="text-sm text-gray-500 font-light pl-6 border-l border-gray-200">{feat.description}</span>
                                             </li>
                                         ))}
-                                        {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic text-xs">Aucune caractéristique.</p>}
+                                        {(!product.features || product.features.length === 0) && <p className="text-gray-400 italic text-xs">Aucune caractéristique.</p>}
                                     </ul>
                                 </div>
                             </div>
