@@ -337,32 +337,32 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Order Form */}
-                            <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                                <div className="p-4 bg-primary-black text-white bg-black flex items-center justify-between">
-                                    <span className="font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                            <div className="overflow-hidden">
+                                <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
+                                    <span className="font-bold uppercase tracking-wider text-sm flex items-center gap-2 text-black">
                                         <CreditCard size={16} className="text-luxury-gold" />
                                         Commander
                                     </span>
                                     {currentVariant?.stock === 0 ? (
                                         <span className="text-xs text-red-500 font-mono">● Rupture de stock</span>
                                     ) : (
-                                        <span className="text-xs text-emerald-400 font-mono animate-pulse">● En Stock</span>
+                                        <span className="text-xs text-emerald-600 font-mono animate-pulse">● En Stock</span>
                                     )}
                                 </div>
 
-                                <form onSubmit={handleSubmitOrder} className="p-6 space-y-5">
-                                    <div className="space-y-3">
-                                        <label className="text-xs font-bold text-gray-600 uppercase">Vos Informations</label>
-                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-all text-sm placeholder-gray-500" />
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-500" />
-                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-500" />
+                                <form onSubmit={handleSubmitOrder} className="space-y-6">
+                                    <div className="space-y-4">
+                                        <label className="text-xs font-bold text-black uppercase tracking-widest">Vos Informations</label>
+                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold focus:outline-none focus:border-luxury-gold transition-all text-sm placeholder-gray-400" />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
+                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 pt-2">
+                                    <div className="space-y-4 pt-4">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-gray-600 uppercase">Quantité & Offres</label>
+                                            <label className="text-xs font-bold text-black uppercase tracking-widest">Quantité & Offres</label>
                                             {product.offers && product.offers.length > 0 && (
                                                 <span className="text-xs text-luxury-gold font-bold animate-pulse">
                                                     Offres disponibles !
@@ -378,31 +378,31 @@ Merci de confirmer ma commande !
                                                         key={idx}
                                                         type="button"
                                                         onClick={() => setQuantity(offer.quantity)}
-                                                        className={`relative p-3 rounded-lg border-2 flex items-center justify-between transition-all ${quantity === offer.quantity
-                                                            ? 'bg-luxury-gold/10 border-luxury-gold text-black'
-                                                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                                                        className={`relative p-4 border flex items-center justify-between transition-all ${quantity === offer.quantity
+                                                            ? 'bg-luxury-gold/5 border-luxury-gold text-black shadow-sm'
+                                                            : 'bg-white border-gray-200 text-gray-800 hover:border-gray-400'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${quantity === offer.quantity ? 'bg-luxury-gold text-white' : 'bg-gray-200 text-gray-600'
+                                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${quantity === offer.quantity ? 'bg-luxury-gold text-white' : 'bg-gray-200 text-gray-600'
                                                                 }`}>
-                                                                {quantity === offer.quantity && <Check size={14} />}
+                                                                {quantity === offer.quantity && <Check size={12} />}
                                                             </div>
                                                             <div className="text-left">
-                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-black' : 'text-gray-700'}`}>
+                                                                <div className={`font-bold text-sm ${quantity === offer.quantity ? 'text-black' : 'text-gray-900'}`}>
                                                                     Achetez {offer.quantity}
                                                                 </div>
-                                                                <div className="text-xs opacity-70">{offer.label || 'Offre Spéciale'}</div>
+                                                                <div className="text-[10px] uppercase tracking-wide opacity-70">{offer.label || 'Offre Spéciale'}</div>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="font-bold text-emerald-600">{offer.price.toLocaleString()} DA</div>
-                                                            <div className="text-xs text-gray-500 line-through">
+                                                            <div className="font-bold text-emerald-600 text-sm">{offer.price.toLocaleString()} DA</div>
+                                                            <div className="text-[10px] text-gray-400 line-through">
                                                                 {(offer.quantity * (currentVariant?.price || product.price)).toLocaleString()} DA
                                                             </div>
                                                         </div>
                                                         {offer.isBestValue && (
-                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-luxury-gold text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] uppercase font-bold px-2 py-0.5 shadow-md">
                                                                 Meilleure Offre
                                                             </div>
                                                         )}
@@ -412,27 +412,27 @@ Merci de confirmer ma commande !
                                         )}
 
                                         {/* STANDARD QUANTITY SELECTOR */}
-                                        <div className="flex items-center justify-between bg-gray-50 border border-gray-300 rounded-lg p-1">
-                                            <div className="flex items-center">
+                                        <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                                            <div className="flex items-center gap-4">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     -
                                                 </button>
-                                                <span className="w-10 text-center font-bold text-black">{quantity}</span>
+                                                <span className="w-8 text-center font-bold text-black text-lg">{quantity}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(quantity + 1)}
-                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     +
                                                 </button>
                                             </div>
-                                            <div className="px-4 text-right">
-                                                <div className="text-xs text-gray-600 uppercase">Total à payer</div>
-                                                <div className="text-xl font-bold text-emerald-600">
+                                            <div className="text-right">
+                                                <div className="text-[10px] text-gray-500 uppercase tracking-widest">Total</div>
+                                                <div className="text-2xl font-serif text-black">
                                                     {(() => {
                                                         const basePrice = currentVariant?.price || product.price;
                                                         let finalPrice = 0;
@@ -451,26 +451,26 @@ Merci de confirmer ma commande !
                                                         finalPrice += remaining * basePrice;
 
                                                         return finalPrice.toLocaleString();
-                                                    })()} <span className="text-sm text-emerald-700">DZD</span>
+                                                    })()} <span className="text-sm font-sans text-gray-500">DZD</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 pt-2">
-                                        <label className="text-xs font-bold text-gray-600 uppercase">Paiement</label>
-                                        <div className="space-y-2">
+                                    <div className="space-y-4 pt-4">
+                                        <label className="text-xs font-bold text-black uppercase tracking-widest">Paiement</label>
+                                        <div className="space-y-3">
                                             {methods.map(method => (
-                                                <div key={method._id} className={`rounded-xl border transition-all ${selectedMethodId === method._id ? 'bg-luxury-gold/5 border-luxury-gold' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}>
+                                                <div key={method._id} className={`border-b transition-all ${selectedMethodId === method._id ? 'border-luxury-gold pb-4' : 'border-gray-100 pb-2'}`}>
                                                     <button
                                                         type="button"
                                                         onClick={() => setSelectedMethodId(method._id)}
-                                                        className="w-full p-3 flex items-center gap-3 text-left"
+                                                        className="w-full flex items-center gap-3 text-left py-2"
                                                     >
-                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-luxury-gold' : 'border-gray-400'}`}>
+                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-luxury-gold' : 'border-gray-300'}`}>
                                                             {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-luxury-gold" />}
                                                         </div>
-                                                        <span className="font-medium text-black text-sm">{method.name}</span>
+                                                        <span className={`font-bold text-sm ${selectedMethodId === method._id ? 'text-black' : 'text-gray-500'}`}>{method.name}</span>
                                                     </button>
 
                                                     <AnimatePresence>
@@ -481,10 +481,10 @@ Merci de confirmer ma commande !
                                                                 exit={{ height: 0, opacity: 0 }}
                                                                 className="overflow-hidden"
                                                             >
-                                                                <div className="px-4 pb-3 pt-0">
-                                                                    <div className="p-3 bg-white rounded-lg border border-luxury-gold/30 flex justify-between items-center text-xs">
+                                                                <div className="pl-7 pt-2">
+                                                                    <div className="p-3 bg-gray-50 flex justify-between items-center text-xs">
                                                                         <code className="text-black font-mono font-bold">{method.accountValue}</code>
-                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-500 hover:text-luxury-gold transition-colors">
+                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-500 hover:text-black transition-colors">
                                                                             {copied ? <Check size={14} /> : <Copy size={14} />}
                                                                         </button>
                                                                     </div>
@@ -500,37 +500,37 @@ Merci de confirmer ma commande !
                                     <button
                                         type="submit"
                                         disabled={!selectedMethodId || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
-                                        className="w-full py-4 rounded-xl font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105"
-                                        style={{ backgroundColor: accentColor }}
+                                        className="w-full py-5 font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
+                                        style={{ backgroundColor: 'black' }}
                                     >
-                                        Commander <ArrowRight size={20} />
+                                        Commander <ArrowRight size={18} />
                                     </button>
                                 </form>
                             </div>
 
                             {/* Mobile: Details Below Form */}
-                            <div className="lg:hidden mt-12 space-y-12 border-t border-gray-200 pt-8">
+                            <div className="lg:hidden mt-16 space-y-16 border-t border-gray-200 pt-12">
                                 <div>
-                                    <h3 className="font-serif text-2xl text-black mb-6">L'Expérience</h3>
+                                    <h3 className="font-serif text-3xl text-black mb-6">L'Expérience</h3>
                                     <div
-                                        className="prose prose-sm max-w-none prose-p:text-gray-800 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-black prose-img:rounded-none prose-img:w-full prose-strong:text-black"
+                                        className="prose prose-base max-w-none text-black prose-p:text-black prose-headings:text-black prose-strong:text-black prose-li:text-black prose-ul:text-black"
                                         dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                     />
                                 </div>
 
                                 <div>
-                                    <h3 className="font-serif text-2xl text-black mb-6">Détails Techniques</h3>
+                                    <h3 className="font-serif text-3xl text-black mb-6">Détails Techniques</h3>
                                     <ul className="space-y-6">
                                         {product.features?.map((feat, i) => (
-                                            <li key={i} className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2 text-luxury-gold mb-1">
-                                                    <Zap size={14} />
-                                                    <strong className="uppercase tracking-widest text-xs font-bold">{feat.title}</strong>
+                                            <li key={i} className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-2 text-luxury-gold">
+                                                    <Zap size={16} />
+                                                    <strong className="uppercase tracking-widest text-sm font-bold text-black">{feat.title}</strong>
                                                 </div>
-                                                <span className="text-sm text-gray-700 pl-6 border-l border-gray-200">{feat.description}</span>
+                                                <span className="text-base text-black pl-7">{feat.description}</span>
                                             </li>
                                         ))}
-                                        {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic text-xs">Aucune caractéristique.</p>}
+                                        {(!product.features || product.features.length === 0) && <p className="text-black italic text-sm">Aucune caractéristique.</p>}
                                     </ul>
                                 </div>
                             </div>
