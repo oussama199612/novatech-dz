@@ -183,7 +183,7 @@ Merci de confirmer ma commande !
                                     <button
                                         key={idx}
                                         onClick={() => setActiveImage(img!)}
-                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-40 hover:opacity-80'}`}
+                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-60 hover:opacity-100'}`}
                                     >
                                         <img src={getImageUrl(img!)} className="w-full h-full object-contain" />
                                     </button>
@@ -191,26 +191,26 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Desktop: Details Below Image */}
-                            <div className="hidden lg:block mt-16 pt-8 border-t border-gray-100">
+                            <div className="hidden lg:block mt-16 pt-8 border-t border-gray-200">
                                 <div className="flex gap-12 mb-8">
                                     <button
                                         onClick={() => setActiveTab('desc')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-400 hover:text-luxury-white'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-black'}`}
                                     >
                                         L'Expérience
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('features')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-400 hover:text-luxury-white'}`}
+                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-black'}`}
                                     >
                                         Détails Techniques
                                     </button>
                                 </div>
 
-                                <div className="prose prose-sm max-w-none text-gray-600">
+                                <div className="prose prose-sm max-w-none text-gray-800">
                                     {activeTab === 'desc' ? (
                                         <div
-                                            className="prose prose-headings:font-serif prose-headings:text-luxury-white prose-p:text-gray-600 prose-strong:text-luxury-white"
+                                            className="prose prose-headings:font-serif prose-headings:text-black prose-p:text-gray-800 prose-strong:text-black"
                                             dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                         />
                                     ) : (
@@ -221,12 +221,12 @@ Merci de confirmer ma commande !
                                                         <Zap size={14} />
                                                     </div>
                                                     <div>
-                                                        <strong className="block text-luxury-white uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
-                                                        <span className="text-sm text-gray-500 font-light">{feat.description}</span>
+                                                        <strong className="block text-black uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
+                                                        <span className="text-sm text-gray-700">{feat.description}</span>
                                                     </div>
                                                 </li>
                                             ))}
-                                            {(!product.features || product.features.length === 0) && <p className="text-gray-400 italic">Aucune caractéristique spécifiée.</p>}
+                                            {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic">Aucune caractéristique spécifiée.</p>}
                                         </ul>
                                     )}
                                 </div>
@@ -239,14 +239,14 @@ Merci de confirmer ma commande !
                         <div className="space-y-8">
 
                             {/* Header Info */}
-                            <div className="space-y-4 border-b border-gray-100 pb-8">
-                                <h1 className="text-3xl md:text-4xl font-serif text-luxury-white leading-tight">{product.name}</h1>
+                            <div className="space-y-4 border-b border-gray-200 pb-8">
+                                <h1 className="text-3xl md:text-4xl font-serif text-black leading-tight">{product.name}</h1>
 
                                 <div className="flex items-center justify-between">
-                                    <div className="text-3xl font-bold text-luxury-white">
-                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-gray-400 font-medium">DZD</span>
+                                    <div className="text-3xl font-bold text-black">
+                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-gray-600 font-medium">DZD</span>
                                         {product.compareAtPrice > (currentVariant?.price || product.price) && (
-                                            <span className="text-lg text-gray-400 line-through ml-3">
+                                            <span className="text-lg text-gray-500 line-through ml-3">
                                                 {product.compareAtPrice.toLocaleString()} DZD
                                             </span>
                                         )}
@@ -258,7 +258,7 @@ Merci de confirmer ma commande !
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
                                         <Star fill="currentColor" size={16} />
-                                        <span className="text-gray-400 text-sm ml-2">(4.9/5)</span>
+                                        <span className="text-gray-500 text-sm ml-2">(4.9/5)</span>
                                     </div>
                                 </div>
 
@@ -269,8 +269,8 @@ Merci de confirmer ma commande !
                                             const isColor = ['couleur', 'color', 'coloris'].includes(option.name.toLowerCase());
                                             return (
                                                 <div key={idx} className="space-y-2">
-                                                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-                                                        {option.name}: <span className="text-luxury-white normal-case">{selectedOptions[option.name]}</span>
+                                                    <label className="text-sm font-bold text-gray-600 uppercase tracking-wider">
+                                                        {option.name}: <span className="text-black normal-case">{selectedOptions[option.name]}</span>
                                                     </label>
                                                     <div className="flex flex-wrap gap-2">
                                                         {option.values.map(val => {
@@ -290,11 +290,11 @@ Merci de confirmer ma commande !
                                                                     <button
                                                                         key={val}
                                                                         onClick={() => handleOptionChange(option.name, val)}
-                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-sm ${isSelected ? 'border-luxury-gold scale-110' : 'border-gray-200 hover:border-gray-400'}`}
+                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-sm ${isSelected ? 'border-luxury-gold scale-110' : 'border-gray-300 hover:border-gray-500'}`}
                                                                         title={val}
                                                                         style={{ backgroundColor: isValidHex ? colorHex : '#333' }}
                                                                     >
-                                                                        {!isValidHex && <span className="text-xs text-white mix-blend-difference">{val.charAt(0)}</span>}
+                                                                        {!isValidHex && <span className="text-xs text-black mix-blend-difference">{val.charAt(0)}</span>}
                                                                     </button>
                                                                 );
                                                             }
@@ -304,8 +304,8 @@ Merci de confirmer ma commande !
                                                                     key={val}
                                                                     onClick={() => handleOptionChange(option.name, val)}
                                                                     className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${isSelected
-                                                                        ? 'bg-luxury-white text-white border-luxury-white'
-                                                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                                                        ? 'bg-black text-white border-black'
+                                                                        : 'bg-white text-gray-800 border-gray-300 hover:border-gray-500'
                                                                         }`}
                                                                 >
                                                                     {val}
@@ -321,24 +321,24 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Trust Badges */}
-                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-gray-500">
-                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-gray-600">
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
                                     <Truck size={20} className="text-luxury-gold" />
-                                    <span>Livraison Rapide</span>
+                                    <span className="font-medium">Livraison Rapide</span>
                                 </div>
-                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
                                     <Shield size={20} className="text-luxury-gold" />
-                                    <span>Garantie 100%</span>
+                                    <span className="font-medium">Garantie 100%</span>
                                 </div>
-                                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center gap-1">
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
                                     <Lock size={20} className="text-luxury-gold" />
-                                    <span>Paiement Sécurisé</span>
+                                    <span className="font-medium">Paiement Sécurisé</span>
                                 </div>
                             </div>
 
                             {/* Order Form */}
-                            <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden">
-                                <div className="p-4 bg-primary-black text-white bg-slate-900 flex items-center justify-between">
+                            <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+                                <div className="p-4 bg-primary-black text-white bg-black flex items-center justify-between">
                                     <span className="font-bold uppercase tracking-wider text-sm flex items-center gap-2">
                                         <CreditCard size={16} className="text-luxury-gold" />
                                         Commander
@@ -352,18 +352,17 @@ Merci de confirmer ma commande !
 
                                 <form onSubmit={handleSubmitOrder} className="p-6 space-y-5">
                                     <div className="space-y-3">
-                                        <label className="text-xs font-bold text-gray-400 uppercase">Vos Informations</label>
-                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-all text-sm" />
+                                        <label className="text-xs font-bold text-gray-600 uppercase">Vos Informations</label>
+                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-all text-sm placeholder-gray-500" />
                                         <div className="grid grid-cols-2 gap-3">
-                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
-                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
+                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-500" />
+                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black font-medium text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-500" />
                                         </div>
-                                        <input placeholder="ID Joueur (Optionnel)" value={formData.gameId} onChange={e => setFormData({ ...formData, gameId: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-luxury-white text-sm focus:outline-none focus:border-luxury-gold transition-all" />
                                     </div>
 
                                     <div className="space-y-4 pt-2">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-gray-400 uppercase">Quantité & Offres</label>
+                                            <label className="text-xs font-bold text-gray-600 uppercase">Quantité & Offres</label>
                                             {product.offers && product.offers.length > 0 && (
                                                 <span className="text-xs text-luxury-gold font-bold animate-pulse">
                                                     Offres disponibles !
@@ -380,8 +379,8 @@ Merci de confirmer ma commande !
                                                         type="button"
                                                         onClick={() => setQuantity(offer.quantity)}
                                                         className={`relative p-3 rounded-lg border-2 flex items-center justify-between transition-all ${quantity === offer.quantity
-                                                            ? 'bg-luxury-gold/10 border-luxury-gold text-luxury-white'
-                                                            : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'
+                                                            ? 'bg-luxury-gold/10 border-luxury-gold text-black'
+                                                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
@@ -390,7 +389,7 @@ Merci de confirmer ma commande !
                                                                 {quantity === offer.quantity && <Check size={14} />}
                                                             </div>
                                                             <div className="text-left">
-                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-luxury-black' : 'text-gray-700'}`}>
+                                                                <div className={`font-bold ${quantity === offer.quantity ? 'text-black' : 'text-gray-700'}`}>
                                                                     Achetez {offer.quantity}
                                                                 </div>
                                                                 <div className="text-xs opacity-70">{offer.label || 'Offre Spéciale'}</div>
@@ -398,12 +397,12 @@ Merci de confirmer ma commande !
                                                         </div>
                                                         <div className="text-right">
                                                             <div className="font-bold text-emerald-600">{offer.price.toLocaleString()} DA</div>
-                                                            <div className="text-xs text-gray-400 line-through">
+                                                            <div className="text-xs text-gray-500 line-through">
                                                                 {(offer.quantity * (currentVariant?.price || product.price)).toLocaleString()} DA
                                                             </div>
                                                         </div>
                                                         {offer.isBestValue && (
-                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-luxury-gold text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-lg">
                                                                 Meilleure Offre
                                                             </div>
                                                         )}
@@ -413,26 +412,26 @@ Merci de confirmer ma commande !
                                         )}
 
                                         {/* STANDARD QUANTITY SELECTOR */}
-                                        <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-1">
+                                        <div className="flex items-center justify-between bg-gray-50 border border-gray-300 rounded-lg p-1">
                                             <div className="flex items-center">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-luxury-white transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     -
                                                 </button>
-                                                <span className="w-10 text-center font-bold text-luxury-white">{quantity}</span>
+                                                <span className="w-10 text-center font-bold text-black">{quantity}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(quantity + 1)}
-                                                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-luxury-white transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     +
                                                 </button>
                                             </div>
                                             <div className="px-4 text-right">
-                                                <div className="text-xs text-gray-500 uppercase">Total à payer</div>
+                                                <div className="text-xs text-gray-600 uppercase">Total à payer</div>
                                                 <div className="text-xl font-bold text-emerald-600">
                                                     {(() => {
                                                         const basePrice = currentVariant?.price || product.price;
@@ -459,7 +458,7 @@ Merci de confirmer ma commande !
                                     </div>
 
                                     <div className="space-y-3 pt-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase">Paiement</label>
+                                        <label className="text-xs font-bold text-gray-600 uppercase">Paiement</label>
                                         <div className="space-y-2">
                                             {methods.map(method => (
                                                 <div key={method._id} className={`rounded-xl border transition-all ${selectedMethodId === method._id ? 'bg-luxury-gold/5 border-luxury-gold' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}>
@@ -471,7 +470,7 @@ Merci de confirmer ma commande !
                                                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-luxury-gold' : 'border-gray-400'}`}>
                                                             {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-luxury-gold" />}
                                                         </div>
-                                                        <span className="font-medium text-luxury-white text-sm">{method.name}</span>
+                                                        <span className="font-medium text-black text-sm">{method.name}</span>
                                                     </button>
 
                                                     <AnimatePresence>
@@ -484,8 +483,8 @@ Merci de confirmer ma commande !
                                                             >
                                                                 <div className="px-4 pb-3 pt-0">
                                                                     <div className="p-3 bg-white rounded-lg border border-luxury-gold/30 flex justify-between items-center text-xs">
-                                                                        <code className="text-luxury-white font-mono">{method.accountValue}</code>
-                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-400 hover:text-luxury-gold transition-colors">
+                                                                        <code className="text-black font-mono font-bold">{method.accountValue}</code>
+                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-500 hover:text-luxury-gold transition-colors">
                                                                             {copied ? <Check size={14} /> : <Copy size={14} />}
                                                                         </button>
                                                                     </div>
@@ -501,7 +500,7 @@ Merci de confirmer ma commande !
                                     <button
                                         type="submit"
                                         disabled={!selectedMethodId || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
-                                        className="w-full py-4 rounded-xl font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl"
+                                        className="w-full py-4 rounded-xl font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105"
                                         style={{ backgroundColor: accentColor }}
                                     >
                                         Commander <ArrowRight size={20} />
@@ -510,28 +509,28 @@ Merci de confirmer ma commande !
                             </div>
 
                             {/* Mobile: Details Below Form */}
-                            <div className="lg:hidden mt-12 space-y-12 border-t border-gray-100 pt-8">
+                            <div className="lg:hidden mt-12 space-y-12 border-t border-gray-200 pt-8">
                                 <div>
-                                    <h3 className="font-serif text-2xl text-luxury-white mb-6">L'Expérience</h3>
+                                    <h3 className="font-serif text-2xl text-black mb-6">L'Expérience</h3>
                                     <div
-                                        className="prose prose-sm max-w-none prose-p:text-gray-600 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-luxury-white prose-img:rounded-none prose-img:w-full"
+                                        className="prose prose-sm max-w-none prose-p:text-gray-800 prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-black prose-img:rounded-none prose-img:w-full prose-strong:text-black"
                                         dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                     />
                                 </div>
 
                                 <div>
-                                    <h3 className="font-serif text-2xl text-luxury-white mb-6">Détails Techniques</h3>
+                                    <h3 className="font-serif text-2xl text-black mb-6">Détails Techniques</h3>
                                     <ul className="space-y-6">
                                         {product.features?.map((feat, i) => (
                                             <li key={i} className="flex flex-col gap-1">
                                                 <div className="flex items-center gap-2 text-luxury-gold mb-1">
                                                     <Zap size={14} />
-                                                    <strong className="uppercase tracking-widest text-xs">{feat.title}</strong>
+                                                    <strong className="uppercase tracking-widest text-xs font-bold">{feat.title}</strong>
                                                 </div>
-                                                <span className="text-sm text-gray-500 font-light pl-6 border-l border-gray-200">{feat.description}</span>
+                                                <span className="text-sm text-gray-700 pl-6 border-l border-gray-200">{feat.description}</span>
                                             </li>
                                         ))}
-                                        {(!product.features || product.features.length === 0) && <p className="text-gray-400 italic text-xs">Aucune caractéristique.</p>}
+                                        {(!product.features || product.features.length === 0) && <p className="text-gray-500 italic text-xs">Aucune caractéristique.</p>}
                                     </ul>
                                 </div>
                             </div>
