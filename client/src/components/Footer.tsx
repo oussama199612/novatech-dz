@@ -2,7 +2,7 @@ import { Facebook, Mail, Camera } from 'lucide-react';
 
 const Footer = () => {
     return (
-        <footer className="bg-white dark:bg-background-dark border-t border-primary/10 pt-20 pb-10">
+        <footer className="bg-white border-t border-primary/10 pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     <div className="space-y-6">
@@ -27,7 +27,7 @@ const Footer = () => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="font-bold mb-6 tracking-wider text-slate-900 dark:text-white">SHOP</h4>
+                        <h4 className="font-bold mb-6 tracking-wider text-slate-900">SHOP</h4>
                         <ul className="space-y-4 text-sm text-slate-500">
                             <li><a href="#" className="hover:text-primary transition-colors">Men's Performance</a></li>
                             <li><a href="#" className="hover:text-primary transition-colors">Women's Collection</a></li>
@@ -36,7 +36,7 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div>
-                        <h4 className="font-bold mb-6 tracking-wider text-slate-900 dark:text-white">SUPPORT</h4>
+                        <h4 className="font-bold mb-6 tracking-wider text-slate-900">SUPPORT</h4>
                         <ul className="space-y-4 text-sm text-slate-500">
                             <li><a href="#" className="hover:text-primary transition-colors">Size Guide</a></li>
                             <li><a href="#" className="hover:text-primary transition-colors">Shipping & Returns</a></li>
@@ -45,13 +45,13 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div>
-                        <h4 className="font-bold mb-6 tracking-wider text-slate-900 dark:text-white">NEWSLETTER</h4>
+                        <h4 className="font-bold mb-6 tracking-wider text-slate-900">NEWSLETTER</h4>
                         <p className="text-sm text-slate-500 mb-4">Subscribe for early access to drops.</p>
                         <div className="flex">
                             <input
                                 type="email"
                                 placeholder="Email Address"
-                                className="bg-background-light dark:bg-slate-900 border-none rounded-l-lg w-full px-4 text-sm focus:ring-1 focus:ring-primary text-slate-900 dark:text-white"
+                                className="bg-background-light border-none rounded-l-lg w-full px-4 text-sm focus:ring-1 focus:ring-primary text-slate-900"
                             />
                             <button className="bg-primary text-white px-4 py-3 rounded-r-lg font-bold text-xs">JOIN</button>
                         </div>

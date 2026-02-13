@@ -3,7 +3,7 @@ import { Search, ShoppingBag, Menu } from 'lucide-react';
 
 const Navbar = () => {
     return (
-        <nav className="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/10">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-8">
                     <Link to="/">
@@ -14,20 +14,20 @@ const Navbar = () => {
                         />
                     </Link>
                     <div className="hidden md:flex gap-6 text-sm font-medium tracking-tight">
-                        <a href="#" className="hover:text-primary transition-colors text-slate-900 dark:text-slate-100">MEN</a>
-                        <a href="#" className="hover:text-primary transition-colors text-slate-900 dark:text-slate-100">WOMEN</a>
+                        <a href="#" className="hover:text-primary transition-colors text-slate-900">MEN</a>
+                        <a href="#" className="hover:text-primary transition-colors text-slate-900">WOMEN</a>
                         <a href="#" className="hover:text-primary transition-colors text-primary font-bold tracking-widest">LIMITED</a>
                     </div>
                 </div>
                 <div className="flex items-center gap-6">
-                    <button className="hover:text-primary transition-colors text-slate-900 dark:text-slate-100">
+                    <button className="hover:text-primary transition-colors text-slate-900">
                         <Search size={24} />
                     </button>
-                    <button className="hover:text-primary transition-colors relative text-slate-900 dark:text-slate-100">
+                    <button className="hover:text-primary transition-colors relative text-slate-900">
                         <ShoppingBag size={24} />
                         <span className="absolute -top-1 -right-1 bg-primary text-[10px] text-white font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
                     </button>
-                    <button className="md:hidden text-slate-900 dark:text-slate-100">
+                    <button className="md:hidden text-slate-900">
                         <Menu size={24} />
                     </button>
                 </div>
