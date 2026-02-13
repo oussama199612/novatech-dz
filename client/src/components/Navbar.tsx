@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Search, ShoppingBag, Menu } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
+    const { cartCount } = useCart();
     return (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/10">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -27,7 +29,11 @@ const Navbar = () => {
                     </button>
                     <Link to="/cart" className="hover:text-primary transition-colors relative text-slate-900">
                         <ShoppingBag size={24} />
-                        <span className="absolute -top-1 -right-1 bg-primary text-[10px] text-white font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-primary text-[10px] text-white font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                {cartCount}
+                            </span>
+                        )}
                     </Link>
                     <button className="md:hidden text-slate-900">
                         <Menu size={24} />

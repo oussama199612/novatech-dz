@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Copy, ShoppingCart, Star, Shield, Zap, Box, ArrowRight, Truck, CreditCard, Lock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Copy, ShoppingCart, Star, Shield, Zap, Box, ArrowRight, Truck, CreditCard, Lock, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
 import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
+import { useCart } from '../context/CartContext';
 
 const ProductLanding = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
+    const { addToCart } = useCart();
     const [product, setProduct] = useState<Product | null>(null);
     const [methods, setMethods] = useState<PaymentMethod[]>([]);
     const [activeImage, setActiveImage] = useState('');
@@ -142,6 +144,16 @@ Merci de confirmer ma commande !
         } catch (error) {
             alert('Erreur lors de la commande.');
         }
+    };
+
+    const handleAddToCart = () => {
+        if (!product) return;
+        addToCart(product, quantity, currentVariant, selectedOptions);
+        // Optional: show toast/notification
+        // For now, maybe just a simple alert or visual feedback?
+        // Let's assume the navbar updates is enough visual feedback for "Add to Cart" usually, 
+        // but a small alert is better.
+        alert('Produit ajouté au panier !');
     };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Chargement...</div>;
@@ -506,6 +518,16 @@ Merci de confirmer ma commande !
                                         Commander <ArrowRight size={18} />
                                     </button>
                                 </form>
+                                <div className="mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={handleAddToCart}
+                                        disabled={currentVariant?.stock === 0 && currentVariant?.trackQuantity}
+                                        className="w-full py-5 font-bold text-black border-2 border-black bg-white shadow-xl shadow-gray-200/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
+                                    >
+                                        Ajouter au panier <ShoppingBag size={18} />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Mobile: Details Below Form */}
