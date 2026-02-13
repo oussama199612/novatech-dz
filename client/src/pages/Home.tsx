@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight, Star, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { type Product } from '../types';
 import { getImageUrl } from '../utils';
@@ -14,6 +14,15 @@ const BRANDS = [
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    // Scroll to products if category/tag is present
+    useEffect(() => {
+        if (searchParams.get('category') || searchParams.get('tag')) {
+            document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [searchParams]);
 
     // Initial Data Fetch
     useEffect(() => {
@@ -66,11 +75,17 @@ const Home = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <button className="btn-primary">
+                            <button
+                                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="btn-primary"
+                            >
                                 Découvrir la Boutique <ArrowRight size={18} />
                             </button>
-                            <button className="btn-outline">
-                                Voir le Lookbook
+                            <button
+                                onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="btn-outline"
+                            >
+                                Voir les Collections
                             </button>
                         </div>
                     </motion.div>
@@ -119,18 +134,23 @@ const Home = () => {
             </section>
 
             {/* 4. TRENDING PRODUCTS */}
-            <section className="py-24 bg-nebula-bg relative">
+            <section className="py-24 bg-nebula-bg relative" id="products">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-nebula-blue opacity-5 blur-[120px] rounded-full pointer-events-none"></div>
 
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <div className="flex justify-between items-end mb-16">
                         <div>
                             <span className="text-nebula-violet font-bold uppercase tracking-wider mb-2 block text-xs">Sélection Premium</span>
-                            <h2 className="text-4xl font-display font-bold">Tendance Cosmique</h2>
+                            <h2 className="text-4xl font-display font-bold">
+                                {searchParams.get('category') ? `Collection ${searchParams.get('category')}` : 'Tendance Cosmique'}
+                            </h2>
                         </div>
-                        <Link to="/" className="hidden md:flex items-center gap-2 text-nebula-muted hover:text-white transition-colors border-b border-transparent hover:border-white pb-1">
+                        <button
+                            onClick={() => navigate('/')}
+                            className="hidden md:flex items-center gap-2 text-nebula-muted hover:text-white transition-colors border-b border-transparent hover:border-white pb-1"
+                        >
                             Voir Tout le Catalogue
-                        </Link>
+                        </button>
                     </div>
 
                     {loading ? (
@@ -139,47 +159,58 @@ const Home = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {products.slice(0, 4).map((product) => (
-                                <div key={product._id} className="card-nebula group overflow-hidden flex flex-col h-full">
-                                    {/* Image */}
-                                    <div className="relative aspect-[4/5] bg-[#0F1218] p-6 overflow-hidden flex items-center justify-center">
-                                        <div className="absolute inset-0 bg-nebula-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
-                                        <img
-                                            src={getImageUrl(product.image)}
-                                            alt={product.name}
-                                            className="w-full h-full object-contain filter brightness-90 contrast-125 group-hover:scale-110 group-hover:brightness-110 transition-all duration-500 drop-shadow-xl"
-                                        />
-                                        {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                            <span className="absolute top-3 left-3 bg-nebula-violet/20 text-nebula-violet border border-nebula-violet/30 text-[10px] font-bold px-2 py-1 rounded uppercase backdrop-blur-md">
-                                                -{(100 - (product.price / product.compareAtPrice * 100)).toFixed(0)}%
-                                            </span>
-                                        )}
-                                        <button className="absolute bottom-4 right-4 bg-white text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-nebula-cyan hover:scale-110 shadow-lg">
-                                            <ShoppingBag size={18} />
-                                        </button>
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="p-5 flex-grow flex flex-col justify-between">
-                                        <div>
-                                            <p className="text-xs text-nebula-muted font-medium mb-1 tracking-wider">{product.category?.name || 'Edition Limitée'}</p>
-                                            <h3 className="font-display font-bold text-lg leading-tight mb-3 text-white group-hover:text-nebula-cyan transition-colors">{product.name}</h3>
-                                        </div>
-                                        <div className="flex items-end justify-between mt-2 border-t border-white/5 pt-4">
-                                            <div className="flex flex-col">
-
-                                                <span className="font-bold text-xl text-white">{product.price.toLocaleString()} DA</span>
-                                                {product.compareAtPrice && (
-                                                    <span className="text-xs text-nebula-muted line-through">{product.compareAtPrice.toLocaleString()} DA</span>
-                                                )}
-                                            </div>
-                                            <div className="flex gap-1">
-                                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={10} className="text-nebula-violet" fill="currentColor" />)}
+                            {products
+                                .filter(p => !searchParams.get('category') || p.category?.name?.toLowerCase().includes(searchParams.get('category') as string))
+                                .slice(0, 8)
+                                .map((product) => (
+                                    <Link to={`/product/${product._id}`} key={product._id} className="card-nebula group overflow-hidden flex flex-col h-full block">
+                                        {/* Image */}
+                                        <div className="relative aspect-[4/5] bg-[#0F1218] p-6 overflow-hidden flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-nebula-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+                                            <img
+                                                src={getImageUrl(product.image)}
+                                                alt={product.name}
+                                                className="w-full h-full object-contain filter brightness-90 contrast-125 group-hover:scale-110 group-hover:brightness-110 transition-all duration-500 drop-shadow-xl"
+                                            />
+                                            {product.compareAtPrice && product.compareAtPrice > product.price && (
+                                                <span className="absolute top-3 left-3 bg-nebula-violet/20 text-nebula-violet border border-nebula-violet/30 text-[10px] font-bold px-2 py-1 rounded uppercase backdrop-blur-md">
+                                                    -{(100 - (product.price / product.compareAtPrice * 100)).toFixed(0)}%
+                                                </span>
+                                            )}
+                                            <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        navigate(`/product/${product._id}`);
+                                                    }}
+                                                    className="bg-white text-black p-3 rounded-full hover:bg-nebula-cyan hover:scale-110 shadow-lg"
+                                                >
+                                                    <ShoppingBag size={18} />
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            ))}
+
+                                        {/* Info */}
+                                        <div className="p-5 flex-grow flex flex-col justify-between">
+                                            <div>
+                                                <p className="text-xs text-nebula-muted font-medium mb-1 tracking-wider">{product.category?.name || 'Edition Limitée'}</p>
+                                                <h3 className="font-display font-bold text-lg leading-tight mb-3 text-white group-hover:text-nebula-cyan transition-colors">{product.name}</h3>
+                                            </div>
+                                            <div className="flex items-end justify-between mt-2 border-t border-white/5 pt-4">
+                                                <div className="flex flex-col">
+
+                                                    <span className="font-bold text-xl text-white">{product.price.toLocaleString()} DA</span>
+                                                    {product.compareAtPrice && (
+                                                        <span className="text-xs text-nebula-muted line-through">{product.compareAtPrice.toLocaleString()} DA</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={10} className="text-nebula-violet" fill="currentColor" />)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
                         </div>
                     )}
                 </div>

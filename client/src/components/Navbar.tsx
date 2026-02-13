@@ -25,8 +25,8 @@ const Navbar = () => {
                                 Boutique
                                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-nebula-gradient transition-all duration-300 group-hover:w-full"></span>
                             </Link>
-                            <a href="#collections" className="text-sm font-medium text-nebula-muted hover:text-white transition-colors duration-300">Collections</a>
-                            <a href="#about" className="text-sm font-medium text-nebula-muted hover:text-white transition-colors duration-300">À propos</a>
+                            <button onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-medium text-nebula-muted hover:text-white transition-colors duration-300">Collections</button>
+                            <button onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-medium text-nebula-muted hover:text-white transition-colors duration-300">Catalogue</button>
                         </div>
                     </div>
 
