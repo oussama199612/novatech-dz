@@ -7,11 +7,16 @@ export default {
     theme: {
         extend: {
             colors: {
-                nebula: {
-                    bg: '#05060A', // Deep Black
-                    surface: '#0B0F1A', // Card BG
-                    text: '#F5F7FF', // Main Text
-                    muted: '#AAB1C5', // Secondary Text
+                // Reformatted to 'solace' palette based on user request
+                primary: '#0dccf2',
+                'background-light': '#f5f8f8',
+                'background-dark': '#101f22',
+
+                nebula: { // Keeping for legacy/safety
+                    bg: '#05060A',
+                    surface: '#0B0F1A',
+                    text: '#F5F7FF',
+                    muted: '#AAB1C5',
                     border: '#1C2438',
                     violet: '#7C3AED',
                     blue: '#3B82F6',

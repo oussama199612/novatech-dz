@@ -1,30 +1,15 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShoppingBag, ArrowRight, Star, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ShoppingBag, ArrowRight, Menu, Search, ArrowUpRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { type Product } from '../types';
 import { getImageUrl } from '../utils';
 
-// Brand Logos (Placeholders - using text for now or simple SVGs)
-const BRANDS = [
-    "NIKE", "ADIDAS", "PUMA", "NEW BALANCE", "ASICS", "JORDAN", "VANS", "CONVERSE"
-];
-
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    // Scroll to products if category/tag is present
-    useEffect(() => {
-        if (searchParams.get('category') || searchParams.get('tag')) {
-            document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [searchParams]);
-
-    // Initial Data Fetch
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -39,219 +24,122 @@ const Home = () => {
         fetchData();
     }, []);
 
-    // Featured Collections Mock
-    const COLLECTIONS = [
-        { id: 1, title: 'MEN RUNNING', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2670&auto=format&fit=crop', link: '/?category=men' },
-        { id: 2, title: 'WOMEN LIFESTYLE', image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=2612&auto=format&fit=crop', link: '/?category=women' },
-        { id: 3, title: 'NEW DROPS', image: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?q=80&w=2525&auto=format&fit=crop', link: '/?tag=new' },
-    ];
-
     return (
-        <div className="bg-nebula-bg min-h-screen text-nebula-text overflow-x-hidden">
+        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
 
-            {/* 1. HERO SECTION (NEBULA) */}
-            <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center">
-                {/* Background - Cosmic Effect */}
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-auto bg-nebula-glow opacity-40 blur-3xl animate-pulse"></div>
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
-                </div>
-
-                <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                    >
-                        <h2 className="text-nebula-blue font-bold tracking-[0.3em] text-sm md:text-base mb-6 uppercase">
-                            Nouvelle Collection 2026
-                        </h2>
-                        <h1 className="text-7xl md:text-9xl font-display font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-                            NEBULA
-                        </h1>
-                        <p className="text-lg md:text-2xl text-nebula-muted max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-                            Chaussures d’exception, style cosmique.<br />
-                            <span className="text-sm opacity-70">Élégance, confort, finitions parfaites.</span>
+            {/* HERO SECTION */}
+            <section className="relative overflow-hidden pt-12 pb-24 lg:py-32">
+                <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 items-center gap-12">
+                    <div className="order-2 lg:order-1">
+                        <span className="text-primary font-bold tracking-[0.2em] text-sm mb-4 block">NEW DROP: VENTUS X</span>
+                        <h1 className="text-6xl md:text-8xl font-bold leading-none mb-6">ELEVATE<br />YOUR PACE.</h1>
+                        <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-md">
+                            Experience the next generation of athletic performance with the ultra-lightweight Ventus X. Engineered for speed, designed for the street.
                         </p>
-
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <button
-                                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="btn-primary"
-                            >
-                                Découvrir la Boutique <ArrowRight size={18} />
+                        <div className="flex flex-wrap gap-4">
+                            <button onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })} className="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105">
+                                SHOP NOW
                             </button>
-                            <button
-                                onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="btn-outline"
-                            >
-                                Voir les Collections
+                            <button className="border border-slate-200 dark:border-slate-800 hover:border-primary text-slate-900 dark:text-white px-10 py-4 rounded-lg font-bold transition-all">
+                                LEARN MORE
                             </button>
                         </div>
-                    </motion.div>
+                    </div>
+                    <div className="order-1 lg:order-2 relative group">
+                        <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl transform scale-75 group-hover:scale-100 transition-transform duration-1000"></div>
+                        <img
+                            alt="Ventus X Sneaker"
+                            className="relative z-10 w-full h-auto drop-shadow-2xl transform rotate-[-15deg] group-hover:rotate-0 transition-transform duration-700"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqkIyjB1L4t7MNj3sLd7I-qz4KijY4zaNaQuc56i7B1VxtmBNvG_DeA2F-z6a_bvh8hzn2d513-qLaBbz5pt5gmfNj_f2VJEXBJDwbJ3T4Fxr6GkJ5WASAo0Mku6ymq_JkIr-Gd-Rpv9GfPlQbVoWSKsf_H2-aKuJXEkf-OZcikxKzlzhKOATlCGVgNKEsK9jYnJsfwy9_ms8iJRhi7vobE7ZnwPrSHpV9Cl9xdIJB5ynu-FSWT0UMvmKZWxAeAy008k279uU9V8L"
+                        />
+                    </div>
                 </div>
             </section>
 
-            {/* 2. BRANDS MARQUEE */}
-            <div className="bg-nebula-surface/50 border-y border-white/5 py-8 overflow-hidden backdrop-blur-sm">
-                <div className="inline-flex animate-marquee items-center">
-                    {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, i) => (
-                        <span key={i} className="mx-12 text-3xl font-display font-bold text-white/20 uppercase tracking-widest hover:text-nebula-violet transition-colors duration-300 cursor-default">
-                            {brand}
-                        </span>
-                    ))}
-                </div>
-            </div>
-
-            {/* 3. FEATURED COLLECTIONS */}
-            <section className="py-24 px-6 max-w-7xl mx-auto" id="collections">
-                <div className="flex items-center gap-4 mb-16">
-                    <h2 className="text-3xl font-display font-bold">Collections</h2>
-                    <div className="h-[1px] flex-grow bg-gradient-to-r from-nebula-violet to-transparent"></div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {COLLECTIONS.map((col, index) => (
-                        <div key={col.id} className={`card-nebula relative overflow-hidden group h-[500px] ${index === 0 ? 'md:col-span-2' : ''}`}>
-                            <img
-                                src={col.image}
-                                alt={col.title}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-80"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-nebula-bg via-transparent to-transparent"></div>
-
-                            <div className="absolute bottom-0 left-0 p-8 w-full">
-                                <h3 className="text-4xl font-display font-bold text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                    {col.title}
-                                </h3>
-                                <Link to={col.link} className="inline-flex items-center gap-2 text-nebula-cyan font-semibold tracking-wider hover:underline opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 translate-y-4 group-hover:translate-y-0">
-                                    EXPLORER <ArrowRight size={16} />
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* 4. TRENDING PRODUCTS */}
-            <section className="py-24 bg-nebula-bg relative" id="products">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-nebula-blue opacity-5 blur-[120px] rounded-full pointer-events-none"></div>
-
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="flex justify-between items-end mb-16">
+            {/* NEW ARRIVALS GRID */}
+            <section className="py-24 bg-white dark:bg-background-dark/50" id="products">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex justify-between items-end mb-12">
                         <div>
-                            <span className="text-nebula-violet font-bold uppercase tracking-wider mb-2 block text-xs">Sélection Premium</span>
-                            <h2 className="text-4xl font-display font-bold">
-                                {searchParams.get('category') ? `Collection ${searchParams.get('category')}` : 'Tendance Cosmique'}
-                            </h2>
+                            <h2 className="text-4xl font-bold">NEW ARRIVALS</h2>
+                            <div className="h-1 w-20 bg-primary mt-4"></div>
                         </div>
-                        <button
-                            onClick={() => navigate('/')}
-                            className="hidden md:flex items-center gap-2 text-nebula-muted hover:text-white transition-colors border-b border-transparent hover:border-white pb-1"
-                        >
-                            Voir Tout le Catalogue
-                        </button>
+                        <Link to="/" className="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
+                            VIEW ALL <ArrowRight size={20} />
+                        </Link>
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-20">
-                            <div className="w-10 h-10 border-2 border-nebula-violet border-t-transparent rounded-full animate-spin"></div>
-                        </div>
+                        <div className="flex justify-center py-20">Loading...</div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {products
-                                .filter(p => !searchParams.get('category') || p.category?.name?.toLowerCase().includes(searchParams.get('category') as string))
-                                .slice(0, 8)
-                                .map((product) => (
-                                    <Link to={`/product/${product._id}`} key={product._id} className="card-nebula group overflow-hidden flex flex-col h-full block">
-                                        {/* Image */}
-                                        <div className="relative aspect-[4/5] bg-[#0F1218] p-6 overflow-hidden flex items-center justify-center">
-                                            <div className="absolute inset-0 bg-nebula-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
-                                            <img
-                                                src={getImageUrl(product.image)}
-                                                alt={product.name}
-                                                className="w-full h-full object-contain filter brightness-90 contrast-125 group-hover:scale-110 group-hover:brightness-110 transition-all duration-500 drop-shadow-xl"
-                                            />
-                                            {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                                <span className="absolute top-3 left-3 bg-nebula-violet/20 text-nebula-violet border border-nebula-violet/30 text-[10px] font-bold px-2 py-1 rounded uppercase backdrop-blur-md">
-                                                    -{(100 - (product.price / product.compareAtPrice * 100)).toFixed(0)}%
-                                                </span>
-                                            )}
-                                            <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        navigate(`/product/${product._id}`);
-                                                    }}
-                                                    className="bg-white text-black p-3 rounded-full hover:bg-nebula-cyan hover:scale-110 shadow-lg"
-                                                >
-                                                    <ShoppingBag size={18} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Info */}
-                                        <div className="p-5 flex-grow flex flex-col justify-between">
-                                            <div>
-                                                <p className="text-xs text-nebula-muted font-medium mb-1 tracking-wider">{product.category?.name || 'Edition Limitée'}</p>
-                                                <h3 className="font-display font-bold text-lg leading-tight mb-3 text-white group-hover:text-nebula-cyan transition-colors">{product.name}</h3>
-                                            </div>
-                                            <div className="flex items-end justify-between mt-2 border-t border-white/5 pt-4">
-                                                <div className="flex flex-col">
-
-                                                    <span className="font-bold text-xl text-white">{product.price.toLocaleString()} DA</span>
-                                                    {product.compareAtPrice && (
-                                                        <span className="text-xs text-nebula-muted line-through">{product.compareAtPrice.toLocaleString()} DA</span>
-                                                    )}
-                                                </div>
-                                                <div className="flex gap-1">
-                                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={10} className="text-nebula-violet" fill="currentColor" />)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
+                            {products.slice(0, 4).map((product, index) => (
+                                <Link to={`/product/${product._id}`} key={product._id} className="group block">
+                                    <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
+                                        <img
+                                            alt={product.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            src={getImageUrl(product.image)}
+                                        />
+                                        <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            <ShoppingBag className="text-primary" size={20} />
+                                        </button>
+                                        {index === 0 && <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">TRENDING</span>}
+                                        {index === 3 && <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>}
+                                    </div>
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white">{product.name}</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">{product.category?.name || 'Performance Athletics'}</p>
+                                    <p className="text-primary font-bold text-xl">{product.price.toLocaleString()} DA</p>
+                                </Link>
+                            ))}
                         </div>
                     )}
                 </div>
             </section>
 
-            {/* 5. TRUST SIGNALS */}
-            <section className="py-16 bg-black text-white">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
-                        <ShieldCheck size={48} className="mx-auto mb-4 text-blue-500" />
-                        <h3 className="font-bold text-xl uppercase mb-2">Authenticité Garantie</h3>
-                        <p className="text-gray-400 text-sm">Tous nos produits sont 100% authentiques et vérifiés par nos experts.</p>
-                    </div>
-                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
-                        <Truck size={48} className="mx-auto mb-4 text-purple-500" />
-                        <h3 className="font-bold text-xl uppercase mb-2">Livraison Rapide</h3>
-                        <p className="text-gray-400 text-sm">Livraison express 58 wilayas. Suivi en temps réel de votre commande.</p>
-                    </div>
-                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
-                        <RotateCcw size={48} className="mx-auto mb-4 text-green-500" />
-                        <h3 className="font-bold text-xl uppercase mb-2">Retour Facile</h3>
-                        <p className="text-gray-400 text-sm">Satisfait ou remboursé. Vous avez 15 jours pour changer d'avis.</p>
-                    </div>
-                </div>
-            </section>
+            {/* CURATED COLLECTIONS */}
+            <section className="py-24">
+                <div className="max-w-7xl mx-auto px-6">
+                    <h2 className="text-4xl font-bold mb-12 text-center text-slate-900 dark:text-white">CURATED COLLECTIONS</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[700px]">
+                        {/* Featured Large */}
+                        <div className="md:col-span-8 relative group rounded-2xl overflow-hidden cursor-pointer">
+                            <img
+                                alt="Urban Explorer"
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDasQh1p9lp7uwbqY4dnYdCY2MSTHSmTYyqCjUfgmPXJffQHOGFczi3ujPqulT33uU1VfshE224ZNMNmO860O439raMcw_Lpc2fxkCXYJQPPS3z7SYEJma11gl4NcYYsWaOAa2Hh1bOJZ3Sps2wGoFHYTxQrCsWLfTksbI54bEJ2ntZgf8EgrfVE9fbNWeUj0LoHm0_DJxoC5AEfPweEeriJsUcWJuiALPSO9TuhOCtyd41fVLhExgZVc0ZWGFja3l4Y3FYoTzeRT2M"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex flex-col justify-end p-10">
+                                <p className="text-primary font-bold tracking-widest mb-2">ESSENTIALS</p>
+                                <h3 className="text-4xl font-bold text-white mb-4">THE URBAN EXPLORER</h3>
+                                <button className="text-white border-b-2 border-primary w-fit pb-1 font-bold flex items-center gap-2">DISCOVER <ArrowUpRight size={16} /></button>
+                            </div>
+                        </div>
 
-            {/* 6. NEWSLETTER */}
-            <section className="py-20 px-6 max-w-4xl mx-auto text-center">
-                <h2 className="text-3xl md:text-5xl font-black uppercase mb-4">Rejoignez le Club</h2>
-                <p className="text-gray-600 mb-8 max-w-lg mx-auto">
-                    Inscrivez-vous pour recevoir les dernières sorties, les offres exclusives et -10% sur votre première commande.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                    <input
-                        type="email"
-                        placeholder="Votre adresse email"
-                        className="flex-grow px-6 py-4 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-black font-medium"
-                    />
-                    <button className="bg-black text-white px-8 py-4 rounded-full font-bold uppercase hover:bg-gray-800 transition-colors">
-                        S'inscrire
-                    </button>
+                        {/* Two Stacked */}
+                        <div className="md:col-span-4 grid grid-rows-2 gap-6">
+                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
+                                <img
+                                    alt="Performance Lab"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzJABNuN5Izh_m8qGxgnXurt1vjCG-CY1TQ6pjwcmg5Sa4mEXq-KANhYAj2CD9PPjMLgXXSTkKXU6qv3amGHW8dvp849c_88dctVfBdkCZhBZNaxuXHuR8T2IGKIa14jpMd672cWoqgq1Tn9-B4OI_9EZNgHUNaaVAg47zhb7wMU772p2iUANFMThF6sOKCCl4dyQWn0j3RnPLNrZOqc9Scz35jEa6qQckh-GjKGcGAStnMnfJYWWeGyOwzEby8OKBfO46-YFuKVoq"
+                                />
+                                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <h3 className="text-2xl font-bold text-white">PERFORMANCE LAB</h3>
+                                </div>
+                            </div>
+                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
+                                <img
+                                    alt="Street Classics"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2neNz8bB9KoWlV_jcnRQ2YdlgOkik9eOvGIQEwlbS_WXGs5uMGqNrjqs1UYKWkAtQgWOTG_h7ag03jFoSYrT0rVJsi5uEIO7ULHr9OhZDMYz-bIZla_yELQe00Zte4LXr5HZLjADhiBSv47IUJ-e-1Fj7vHtP7dvGWERnVM4zkNA4yexJFK5-zDEH-CA7lCAaTXYpSLNhndLPADciGU9Zci72qzFh4dPpGjK6qhlQKZ7NmK_bGw9HNhTVra-xy4WzXIvxeWjDhPDn"
+                                />
+                                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <h3 className="text-2xl font-bold text-white">STREET CLASSICS</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
