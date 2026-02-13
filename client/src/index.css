@@ -63,7 +63,7 @@
 }
 
 body {
-  @apply bg-background-dark text-slate-100 font-display antialiased;
+  @apply bg-background-light text-slate-900 font-display antialiased;
   min-height: 100vh;
 }
 
