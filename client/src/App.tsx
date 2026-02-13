@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ProductLanding from './pages/ProductLanding';
 import Catalogue from './pages/Catalogue';
+import Cart from './pages/Cart';
 import SuccessPage from './pages/SuccessPage';
 import Footer from './components/Footer';
 
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Catalogue />} />
             <Route path="/product/:productId" element={<ProductLanding />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/success" element={<SuccessPage />} />
           </Routes>
         </main>

@@ -25,10 +25,10 @@ const Navbar = () => {
                     <button className="hover:text-primary transition-colors text-slate-900">
                         <Search size={24} />
                     </button>
-                    <button className="hover:text-primary transition-colors relative text-slate-900">
+                    <Link to="/cart" className="hover:text-primary transition-colors relative text-slate-900">
                         <ShoppingBag size={24} />
                         <span className="absolute -top-1 -right-1 bg-primary text-[10px] text-white font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
-                    </button>
+                    </Link>
                     <button className="md:hidden text-slate-900">
                         <Menu size={24} />
                     </button>
