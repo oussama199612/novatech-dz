@@ -3,15 +3,50 @@
 @import "tailwindcss";
 
 @theme {
+  --color-primary: #0dccf2;
+  --color-background-light: #f5f8f8;
+  --color-background-dark: #101f22;
+
   --color-nebula-bg: #05060A;
   --color-nebula-surface: #0B0F1A;
   --color-nebula-text: #F5F7FF;
   --color-nebula-muted: #AAB1C5;
   --color-nebula-border: #1C2438;
+  --color-nebula-violet: #7C3AED;
+  --color-nebula-blue: #3B82F6;
+  --color-nebula-cyan: #22D3EE;
 
   --font-sans: "Inter", sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --radius-nebula: 18px;
+
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  --background-image-nebula-gradient: linear-gradient(90deg, #7C3AED, #3B82F6, #22D3EE);
+  --background-image-nebula-glow: radial-gradient(circle at center, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
 }
 
 :root {
