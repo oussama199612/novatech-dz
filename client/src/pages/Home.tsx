@@ -50,12 +50,32 @@ const Home = () => {
                         <img
                             alt="Ventus X Sneaker"
                             className="relative z-10 w-full h-auto drop-shadow-2xl transform rotate-[-15deg] group-hover:rotate-0 transition-transform duration-700"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqkIyjB1L4t7MNj3sLd7I-qz4KijY4zaNaQuc56i7B1VxtmBNvG_DeA2F-z6a_bvh8hzn2d513-qLaBbz5pt5gmfNj_f2VJEXBJDwbJ3T4Fxr6GkJ5WASAo0Mku6ymq_JkIr-Gd-Rpv9GfPlQbVoWSKsf_H2-aKuJXEkf-OZcikxKzlzhKOATlCGVgNKEsK9jYnJsfwy9_ms8iJRhi7vobE7ZnwPrSHpV9Cl9xdIJB5ynu-FSWT0UMvmKZWxAeAy008k279uU9V8L"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqkIyjB1L4t7MNj3sLd7I-qz4KijY4zaNaQuc56i7B1VxtmBNvG_DeA2F-z6a_bvh8hzn2d513-qLaBbz5pt5gmfNj_f2VJEXBJDwbJ3T4Fxr6GkJ5WASAo0Mku6ymq_JkIr-Gd-Rpv9GfPlQbVoWSKsf_H2-aKuJXEkf-OZcikxKzlzhKOATlCGVgNKEsK9jYnJsfwy3_ms8iJRhi7vobE7ZnwPrSHpV9Cl9xdJJB5ynu-FSWT0UMvmKZWxAeAy008k279uU9V8L"
                         />
                     </div>
                 </div>
             </section>
 
+            {/* 5. TRUST SIGNALS */}
+            <section className="py-16 bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <ShieldCheck size={48} className="mx-auto mb-4 text-primary" />
+                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Authenticité Garantie</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Tous nos produits sont 100% authentiques et vérifiés par nos experts.</p>
+                    </div>
+                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <Truck size={48} className="mx-auto mb-4 text-primary" />
+                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Livraison Rapide</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Livraison express 58 wilayas. Suivi en temps réel de votre commande.</p>
+                    </div>
+                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <RotateCcw size={48} className="mx-auto mb-4 text-primary" />
+                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Retour Facile</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Satisfait ou remboursé. Vous avez 15 jours pour changer d'avis.</p>
+                    </div>
+                </div>
+            </section>
             {/* NEW ARRIVALS GRID */}
             <section className="py-24 bg-white dark:bg-background-dark/50" id="products">
                 <div className="max-w-7xl mx-auto px-6">
