@@ -37,43 +37,12 @@ const Catalogue = () => {
     const categories = Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)));
     // Extract sizes and colors from variants/options
     // Extract sizes and colors from variants/options
-    const stockPerSize: Record<string, number> = {};
-
-    products.forEach(product => {
-        const sizeOptionIndex = product.options?.findIndex(o =>
-            ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
-        );
-
-        if (sizeOptionIndex !== undefined && sizeOptionIndex !== -1 && product.hasVariants) {
-            product.variants?.forEach(variant => {
-                const parts = variant.title.split(' / ');
-                // Handle cases where title might be "Size / Color" or just "Size"
-                // This logic assumes standard " / " separator. 
-                // A more robust way would rely on option position, but variant title structure depends on creation.
-                // For now, simpler approach: if hasVariants, try to match value to options.
-
-                // Actually, variants are ordered by options. 
-                const variantSize = parts[sizeOptionIndex];
-                if (variantSize) {
-                    const normalizedSize = String(variantSize).trim();
-                    stockPerSize[normalizedSize] = (stockPerSize[normalizedSize] || 0) + (variant.stock || 0);
-                }
-            });
-        }
-    });
-
+    // Extract sizes and colors from variants/options
     const allSizes = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
             ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
         )?.values || []
-    ))).sort((a, b) => {
-        const stockA = stockPerSize[String(a).trim()] || 0;
-        const stockB = stockPerSize[String(b).trim()] || 0;
-        // Sort by stock descending (most available first)
-        if (stockB !== stockA) return stockB - stockA;
-        // Fallback to numeric sort if stocks are equal
-        return Number(a) - Number(b);
-    });
+    ))).sort((a, b) => Number(a) - Number(b));
 
     const allColors = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o => o.name.toLowerCase().includes('couleur') || o.name.toLowerCase().includes('color') || o.name.toLowerCase().includes('coloris'))?.values || []
@@ -89,18 +58,50 @@ const Catalogue = () => {
         if (product.price < priceRange[0] || product.price > priceRange[1]) {
             return false;
         }
-        // Size
-        if (selectedSizes.length > 0) {
-            const productSizes = product.options?.find(o =>
-                ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
-            )?.values || [];
-            if (!selectedSizes.some(s => productSizes.some(ps => String(ps).trim() === String(s).trim()))) return false;
+
+        // Strict Variant Availability Check
+        // If sorting by Size or Color, we must check if a valid variant exists with stock > 0
+        if (selectedSizes.length > 0 || selectedColors.length > 0) {
+            if (!product.hasVariants || !product.variants) {
+                // Determine if product matches via simple options if no variants defined (fallback)
+                // But user asked for stock check, which implies variants. 
+                // We'll keep simple check for non-variant products but strictly speaking they might not track stock correctly without variants.
+                // Assuming "simple" products have top-level stock.
+                if (!product.hasVariants) return product.stock > 0;
+            }
+
+            // Find valid variant matching ALL selected filter groups
+            const hasValidVariant = product.variants?.some(variant => {
+                const parts = variant.title.split(' / ');
+                let matchesSize = true;
+                let matchesColor = true;
+
+                // Check Size
+                if (selectedSizes.length > 0) {
+                    const sizeIndex = product.options?.findIndex(o => ['taille', 'size', 'pointure'].some(k => o.name.toLowerCase().includes(k))) ?? -1;
+                    if (sizeIndex !== -1 && parts[sizeIndex]) {
+                        matchesSize = selectedSizes.some(s => String(s).trim() === String(parts[sizeIndex]).trim());
+                    } else {
+                        matchesSize = false;
+                    }
+                }
+
+                // Check Color
+                if (selectedColors.length > 0) {
+                    const colorIndex = product.options?.findIndex(o => ['couleur', 'color', 'coloris'].some(k => o.name.toLowerCase().includes(k))) ?? -1;
+                    if (colorIndex !== -1 && parts[colorIndex]) {
+                        matchesColor = selectedColors.some(c => String(c).trim() === String(parts[colorIndex]).trim());
+                    } else {
+                        matchesColor = false;
+                    }
+                }
+
+                return matchesSize && matchesColor && (variant.stock > 0);
+            });
+
+            return hasValidVariant;
         }
-        // Color
-        if (selectedColors.length > 0) {
-            const productColors = product.options?.find(o => o.name.toLowerCase().includes('couleur') || o.name.toLowerCase().includes('color'))?.values || [];
-            if (!selectedColors.some(c => productColors.includes(c))) return false;
-        }
+
         return true;
     });
 
