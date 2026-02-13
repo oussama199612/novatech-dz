@@ -1,48 +1,19 @@
-import { useEffect, useState } from 'react';
-import { ShoppingBag, ArrowRight, Menu, Search, ArrowUpRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../api';
-import { type Product } from '../types';
-import { getImageUrl } from '../utils';
+import { Link } from 'react-router-dom';
+import { ArrowRight, ShoppingBag, Plus, ShieldCheck, Truck, RotateCcw, Facebook, AtSign, Camera } from 'lucide-react';
 
 const Home = () => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const { data } = await api.get('/products');
-                setProducts(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
-
-            {/* HERO SECTION */}
+        <div className="font-display text-slate-900 dark:text-slate-100">
+            {/* Hero Section */}
             <section className="relative overflow-hidden pt-12 pb-24 lg:py-32">
                 <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 items-center gap-12">
                     <div className="order-2 lg:order-1">
                         <span className="text-primary font-bold tracking-[0.2em] text-sm mb-4 block">NEW DROP: VENTUS X</span>
                         <h1 className="text-6xl md:text-8xl font-bold leading-none mb-6">ELEVATE<br />YOUR PACE.</h1>
-                        <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-md">
-                            Experience the next generation of athletic performance with the ultra-lightweight Ventus X. Engineered for speed, designed for the street.
-                        </p>
+                        <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-md">Experience the next generation of athletic performance with the ultra-lightweight Ventus X. Engineered for speed, designed for the street.</p>
                         <div className="flex flex-wrap gap-4">
-                            <button onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })} className="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105">
-                                SHOP NOW
-                            </button>
-                            <button className="border border-slate-200 dark:border-slate-800 hover:border-primary text-slate-900 dark:text-white px-10 py-4 rounded-lg font-bold transition-all">
-                                LEARN MORE
-                            </button>
+                            <button className="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105">SHOP NOW</button>
+                            <button className="border border-slate-200 dark:border-slate-800 hover:border-primary px-10 py-4 rounded-lg font-bold transition-all">LEARN MORE</button>
                         </div>
                     </div>
                     <div className="order-1 lg:order-2 relative group">
@@ -50,33 +21,13 @@ const Home = () => {
                         <img
                             alt="Ventus X Sneaker"
                             className="relative z-10 w-full h-auto drop-shadow-2xl transform rotate-[-15deg] group-hover:rotate-0 transition-transform duration-700"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqkIyjB1L4t7MNj3sLd7I-qz4KijY4zaNaQuc56i7B1VxtmBNvG_DeA2F-z6a_bvh8hzn2d513-qLaBbz5pt5gmfNj_f2VJEXBJDwbJ3T4Fxr6GkJ5WASAo0Mku6ymq_JkIr-Gd-Rpv9GfPlQbVoWSKsf_H2-aKuJXEkf-OZcikxKzlzhKOATlCGVgNKEsK9jYnJsfwy3_ms8iJRhi7vobE7ZnwPrSHpV9Cl9xdJJB5ynu-FSWT0UMvmKZWxAeAy008k279uU9V8L"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqkIyjB1L4t7MNj3sLd7I-qz4KijY4zaNaQuc56i7B1VxtmBNvG_DeA2F-z6a_bvh8hzn2d513-qLaBbz5pt5gmfNj_f2VJEXBJDwbJ3T4Fxr6GkJ5WASAo0Mku6ymq_JkIr-Gd-Rpv9GfPlQbVoWSKsf_H2-aKuJXEkf-OZcikxKzlzhKOATlCGVgNKEsK9jYnJsfwy9_ms8iJRhi7vobE7ZnwPrSHpV9Cl9xdIJB5ynu-FSWT0UMvmKZWxAeAy008k279uU9V8L"
                         />
                     </div>
                 </div>
             </section>
 
-            {/* 5. TRUST SIGNALS */}
-            <section className="py-16 bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <ShieldCheck size={48} className="mx-auto mb-4 text-primary" />
-                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Authenticité Garantie</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Tous nos produits sont 100% authentiques et vérifiés par nos experts.</p>
-                    </div>
-                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <Truck size={48} className="mx-auto mb-4 text-primary" />
-                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Livraison Rapide</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Livraison express 58 wilayas. Suivi en temps réel de votre commande.</p>
-                    </div>
-                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <RotateCcw size={48} className="mx-auto mb-4 text-primary" />
-                        <h3 className="font-bold text-xl text-slate-900 dark:text-white uppercase mb-2">Retour Facile</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Satisfait ou remboursé. Vous avez 15 jours pour changer d'avis.</p>
-                    </div>
-                </div>
-            </section>
-            {/* NEW ARRIVALS GRID */}
+            {/* New Arrivals Product Grid */}
             <section className="py-24 bg-white dark:bg-background-dark/50" id="products">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex justify-between items-end mb-12">
@@ -84,45 +35,86 @@ const Home = () => {
                             <h2 className="text-4xl font-bold">NEW ARRIVALS</h2>
                             <div className="h-1 w-20 bg-primary mt-4"></div>
                         </div>
-                        <Link to="/" className="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
+                        <Link to="/products" className="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
                             VIEW ALL <ArrowRight size={20} />
                         </Link>
                     </div>
-
-                    {loading ? (
-                        <div className="flex justify-center py-20">Loading...</div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {products.slice(0, 4).map((product, index) => (
-                                <Link to={`/product/${product._id}`} key={product._id} className="group block">
-                                    <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
-                                        <img
-                                            alt={product.name}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            src={getImageUrl(product.image)}
-                                        />
-                                        <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                            <ShoppingBag className="text-primary" size={20} />
-                                        </button>
-                                        {index === 0 && <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">TRENDING</span>}
-                                        {index === 3 && <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>}
-                                    </div>
-                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white">{product.name}</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">{product.category?.name || 'Performance Athletics'}</p>
-                                    <p className="text-primary font-bold text-xl">{product.price.toLocaleString()} DA</p>
-                                </Link>
-                            ))}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {/* Product 1 */}
+                        <div className="group">
+                            <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
+                                <img
+                                    alt="Ignite Runner V2"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqRt2TA-8RFCtrcBv39Pwdklec3NWx7o5ruxR8zk5y98nZZ3xczxTz5dl0gTKiTaj7oEknnqFjkl1gxNPZR3gHeTZzxPTf9hckuBJj4tSHPN_olYseLTS6rF3AO8DsP1KTRfbD4Lbt91wzr8PqqLZzt3SeTO0J_PK5amHEC2pcpwtgdzzLj0NEm92wxrjlncbHcPcZilEmilqd_J1sExv64zgU0gh7b7t6yBREQJsn1pdlORs5lUX7KXodCoWAbN554Sw3xed2TeK-"
+                                />
+                                <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                    <ShoppingBag size={20} className="text-primary" />
+                                </button>
+                                <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">TRENDING</span>
+                            </div>
+                            <h3 className="font-bold text-lg">Ignite Runner V2</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Performance Athletics</p>
+                            <p className="text-primary font-bold text-xl">$145.00</p>
                         </div>
-                    )}
+                        {/* Product 2 */}
+                        <div className="group">
+                            <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
+                                <img
+                                    alt="Urban High-Top"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAEYFr-qK8h3U5HGve_jAPx4NcBebp70LNLMLIWuxNd3ni5VHqZFKwS3vkuzkec4ikW8GcJOd_wYcP4GyXTnbs0yAQxXYw7F4WcCj9Xrot00NpTls_AZkKqfmpr7U_q4ReHYSD9MB7vnAXr4N-qS96FoDpNNJB0nY5Lj2FMeGZnH_U1ypTDvnFLKBHyKx4p5ZWpcWFFq701jedUhWAseQTvf3Pnzg61Lrfap_PCmMyoPp9GPBYC8TKd7LFX02uNNDDqjles8accpiz"
+                                />
+                                <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                    <ShoppingBag size={20} className="text-primary" />
+                                </button>
+                            </div>
+                            <h3 className="font-bold text-lg">Urban High-Top</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Lifestyle Classics</p>
+                            <p className="text-primary font-bold text-xl">$95.00</p>
+                        </div>
+                        {/* Product 3 */}
+                        <div className="group">
+                            <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
+                                <img
+                                    alt="Neo-Matrix Hybrid"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC45eHNxwQ1urf2XIgKNRvhdA78GTY65HGfayuIAPApwVdFmIkgJf1gNBarP2VNzbOdgLKKSxISSDdZUiN2TCo9vEbJiIeMeRuzhCcDJ1MygkxtZ4zRBnZJ8teqpx8WgjzZc8nXshLGt17fX4WXBkI0GhAwxvfaFuX-UgfhldKBJuPxoSpiORnqah3lesd3DQH53NTAb6uq7PzJERu1UUTNjhtR10jTizxvOJ_s2d2-QqyrI3trsaTG3lWhMCYcdFLKO0KwUeTQtpKO"
+                                />
+                                <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                    <ShoppingBag size={20} className="text-primary" />
+                                </button>
+                            </div>
+                            <h3 className="font-bold text-lg">Neo-Matrix Hybrid</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Experimental Series</p>
+                            <p className="text-primary font-bold text-xl">$180.00</p>
+                        </div>
+                        {/* Product 4 */}
+                        <div className="group">
+                            <div className="relative aspect-square bg-background-light dark:bg-slate-900 rounded-xl overflow-hidden mb-4">
+                                <img
+                                    alt="Dark Matter Elite"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuANAcLWXLANzrK88OS0MNfNky9vc2mum3KfsovEeBgaWZwSXO4OIWhDkmoyy3P37Q_uxpm9iLu2FzfZQOSwcSZHJYRmLg5AxWLlIzp8oHqk4NpX5Sv3upk5wifhlRQaHcX8v8bvKRYDt3dyt4RQloHbD_kgiXvqLLET8Utp3IIKZQJfk-QZadVLkBZexGd2t6MuNocA9V1XjeOZeALME-Abf5Ycu1RGJLHaPk5t3D2Fyd7bEtKF5MfbS2z2ZCo9d216xpY0G0rv2vKd"
+                                />
+                                <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                    <ShoppingBag size={20} className="text-primary" />
+                                </button>
+                                <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>
+                            </div>
+                            <h3 className="font-bold text-lg">Dark Matter Elite</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Night Running</p>
+                            <p className="text-primary font-bold text-xl">$210.00</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* CURATED COLLECTIONS */}
-            <section className="py-24">
+            {/* Curated Collections */}
+            <section className="py-24" id="collections">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h2 className="text-4xl font-bold mb-12 text-center text-slate-900 dark:text-white">CURATED COLLECTIONS</h2>
+                    <h2 className="text-4xl font-bold mb-12 text-center">CURATED COLLECTIONS</h2>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[700px]">
-                        {/* Featured Large */}
                         <div className="md:col-span-8 relative group rounded-2xl overflow-hidden cursor-pointer">
                             <img
                                 alt="Urban Explorer"
@@ -132,17 +124,15 @@ const Home = () => {
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex flex-col justify-end p-10">
                                 <p className="text-primary font-bold tracking-widest mb-2">ESSENTIALS</p>
                                 <h3 className="text-4xl font-bold text-white mb-4">THE URBAN EXPLORER</h3>
-                                <button className="text-white border-b-2 border-primary w-fit pb-1 font-bold flex items-center gap-2">DISCOVER <ArrowUpRight size={16} /></button>
+                                <button className="text-white border-b-2 border-primary w-fit pb-1 font-bold">DISCOVER</button>
                             </div>
                         </div>
-
-                        {/* Two Stacked */}
                         <div className="md:col-span-4 grid grid-rows-2 gap-6">
                             <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
                                 <img
                                     alt="Performance Lab"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzJABNuN5Izh_m8qGxgnXurt1vjCG-CY1TQ6pjwcmg5Sa4mEXq-KANhYAj2CD9PPjMLgXXSTkKXU6qv3amGHW8dvp849c_88dctVfBdkCZhBZNaxuXHuR8T2IGKIa14jpMd672cWoqgq1Tn9-B4OI_9EZNgHUNaaVAg47zhb7wMU772p2iUANFMThF6sOKCCl4dyQWn0j3RnPLNrZOqc9Scz35jEa6qQckh-GjKGcGAStnMnfJYWWeGyOwzEby8OKBfO46-YFuKVoq"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzJABNuN5Izh_m8qGxgnXurt1vjCG-CY1TQ6pjwcmg5Sa4mEXq-KANhYAj2CD9PPjMLgXXSTkKXU6qv3amGHW8dvp849c_88dctVfBdkCZhBZNaxuXHuR8T2IGKIa14jpMd672cWoqgq1Tn9-B4OI_9EZNgHUNaaVAg47zhb7wMU772p2iUANFMThF6sOKCCl4dyQWn0j3RnPLNrZOqc9Scz35jEa6qQckh-GjKGcGAStqMnfJYWWeGyOwzEby8OKBfO46-YFuKVoq"
                                 />
                                 <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                     <h3 className="text-2xl font-bold text-white">PERFORMANCE LAB</h3>
