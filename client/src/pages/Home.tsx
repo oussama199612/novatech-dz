@@ -1,7 +1,31 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag, Plus, ShieldCheck, Truck, RotateCcw, Facebook, AtSign, Camera } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, ShoppingBag } from 'lucide-react';
+import api from '../api';
+import { getImageUrl } from '../utils';
+import { type Product } from '../types';
 
 const Home = () => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const { data } = await api.get('/products');
+                setProducts(data);
+            } catch (error) {
+                console.error('Failed to fetch products', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    const newArrivals = products.slice(0, 4);
+
     return (
         <div className="font-display text-slate-900">
             {/* Hero Section */}
@@ -12,8 +36,8 @@ const Home = () => {
                         <h1 className="text-6xl md:text-8xl font-bold leading-none mb-6">ELEVATE<br />YOUR PACE.</h1>
                         <p className="text-lg text-slate-500 mb-10 max-w-md">Experience the next generation of athletic performance with the ultra-lightweight Ventus X. Engineered for speed, designed for the street.</p>
                         <div className="flex flex-wrap gap-4">
-                            <button className="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105">SHOP NOW</button>
-                            <button className="border border-slate-200 hover:border-primary px-10 py-4 rounded-lg font-bold transition-all">LEARN MORE</button>
+                            <Link to="/products" className="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105 inline-block text-center">SHOP NOW</Link>
+                            <Link to="/products" className="border border-slate-200 hover:border-primary px-10 py-4 rounded-lg font-bold transition-all inline-block text-center">LEARN MORE</Link>
                         </div>
                     </div>
                     <div className="order-1 lg:order-2 relative group">
@@ -39,74 +63,51 @@ const Home = () => {
                             VIEW ALL <ArrowRight size={20} />
                         </Link>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {/* Product 1 */}
-                        <div className="group">
-                            <div className="relative aspect-square bg-background-light rounded-xl overflow-hidden mb-4">
-                                <img
-                                    alt="Ignite Runner V2"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqRt2TA-8RFCtrcBv39Pwdklec3NWx7o5ruxR8zk5y98nZZ3xczxTz5dl0gTKiTaj7oEknnqFjkl1gxNPZR3gHeTZzxPTf9hckuBJj4tSHPN_olYseLTS6rF3AO8DsP1KTRfbD4Lbt91wzr8PqqLZzt3SeTO0J_PK5amHEC2pcpwtgdzzLj0NEm92wxrjlncbHcPcZilEmilqd_J1sExv64zgU0gh7b7t6yBREQJsn1pdlORs5lUX7KXodCoWAbN554Sw3xed2TeK-"
-                                />
-                                <button className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    <ShoppingBag size={20} className="text-primary" />
-                                </button>
-                                <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">TRENDING</span>
-                            </div>
-                            <h3 className="font-bold text-lg">Ignite Runner V2</h3>
-                            <p className="text-slate-500 text-sm mb-2">Performance Athletics</p>
-                            <p className="text-primary font-bold text-xl">$145.00</p>
+
+                    {loading ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="bg-slate-100 aspect-square rounded-xl mb-4"></div>
+                                    <div className="h-6 bg-slate-100 w-3/4 mb-2 rounded"></div>
+                                    <div className="h-4 bg-slate-100 w-1/2 rounded"></div>
+                                </div>
+                            ))}
                         </div>
-                        {/* Product 2 */}
-                        <div className="group">
-                            <div className="relative aspect-square bg-background-light rounded-xl overflow-hidden mb-4">
-                                <img
-                                    alt="Urban High-Top"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAEYFr-qK8h3U5HGve_jAPx4NcBebp70LNLMLIWuxNd3ni5VHqZFKwS3vkuzkec4ikW8GcJOd_wYcP4GyXTnbs0yAQxXYw7F4WcCj9Xrot00NpTls_AZkKqfmpr7U_q4ReHYSD9MB7vnAXr4N-qS96FoDpNNJB0nY5Lj2FMeGZnH_U1ypTDvnFLKBHyKx4p5ZWpcWFFq701jedUhWAseQTvf3Pnzg61Lrfap_PCmMyoPp9GPBYC8TKd7LFX02uNNDDqjles8accpiz"
-                                />
-                                <button className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    <ShoppingBag size={20} className="text-primary" />
-                                </button>
-                            </div>
-                            <h3 className="font-bold text-lg">Urban High-Top</h3>
-                            <p className="text-slate-500 text-sm mb-2">Lifestyle Classics</p>
-                            <p className="text-primary font-bold text-xl">$95.00</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {newArrivals.map((product, index) => (
+                                <Link to={`/product/${product._id}`} key={product._id} className="group block">
+                                    <div className="relative aspect-square bg-background-light rounded-xl overflow-hidden mb-4">
+                                        <img
+                                            alt={product.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            src={getImageUrl(product.image)}
+                                        />
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                navigate(`/product/${product._id}`);
+                                            }}
+                                            className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10 hover:bg-primary hover:text-white"
+                                        >
+                                            <ShoppingBag size={20} className="text-current" />
+                                        </button>
+                                        {index === 0 && <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">TRENDING</span>}
+                                        {index === 3 && <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>}
+                                    </div>
+                                    <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{product.name}</h3>
+                                    <p className="text-slate-500 text-sm mb-2">{product.category?.name || 'Vêtements'}</p>
+                                    <p className="text-primary font-bold text-xl">{product.price.toLocaleString()} DZD</p>
+                                </Link>
+                            ))}
+                            {newArrivals.length === 0 && (
+                                <div className="col-span-4 text-center text-slate-400 py-12">
+                                    Aucun produit disponible pour le moment.
+                                </div>
+                            )}
                         </div>
-                        {/* Product 3 */}
-                        <div className="group">
-                            <div className="relative aspect-square bg-background-light rounded-xl overflow-hidden mb-4">
-                                <img
-                                    alt="Neo-Matrix Hybrid"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC45eHNxwQ1urf2XIgKNRvhdA78GTY65HGfayuIAPApwVdFmIkgJf1gNBarP2VNzbOdgLKKSxISSDdZUiN2TCo9vEbJiIeMeRuzhCcDJ1MygkxtZ4zRBnZJ8teqpx8WgjzZc8nXshLGt17fX4WXBkI0GhAwxvfaFuX-UgfhldKBJuPxoSpiORnqah3lesd3DQH53NTAb6uq7PzJERu1UUTNjhtR10jTizxvOJ_s2d2-QqyrI3trsaTG3lWhMCYcdFLKO0KwUeTQtpKO"
-                                />
-                                <button className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    <ShoppingBag size={20} className="text-primary" />
-                                </button>
-                            </div>
-                            <h3 className="font-bold text-lg">Neo-Matrix Hybrid</h3>
-                            <p className="text-slate-500 text-sm mb-2">Experimental Series</p>
-                            <p className="text-primary font-bold text-xl">$180.00</p>
-                        </div>
-                        {/* Product 4 */}
-                        <div className="group">
-                            <div className="relative aspect-square bg-background-light rounded-xl overflow-hidden mb-4">
-                                <img
-                                    alt="Dark Matter Elite"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuANAcLWXLANzrK88OS0MNfNky9vc2mum3KfsovEeBgaWZwSXO4OIWhDkmoyy3P37Q_uxpm9iLu2FzfZQOSwcSZHJYRmLg5AxWLlIzp8oHqk4NpX5Sv3upk5wifhlRQaHcX8v8bvKRYDt3dyt4RQloHbD_kgiXvqLLET8Utp3IIKZQJfk-QZadVLkBZexGd2t6MuNocA9V1XjeOZeALME-Abf5Ycu1RGJLHaPk5t3D2Fyd7bEtKF5MfbS2z2ZCo9d216xpY0G0rv2vKd"
-                                />
-                                <button className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    <ShoppingBag size={20} className="text-primary" />
-                                </button>
-                                <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>
-                            </div>
-                            <h3 className="font-bold text-lg">Dark Matter Elite</h3>
-                            <p className="text-slate-500 text-sm mb-2">Night Running</p>
-                            <p className="text-primary font-bold text-xl">$210.00</p>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </section>
 
@@ -115,7 +116,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-6">
                     <h2 className="text-4xl font-bold mb-12 text-center">CURATED COLLECTIONS</h2>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[700px]">
-                        <div className="md:col-span-8 relative group rounded-2xl overflow-hidden cursor-pointer">
+                        <div className="md:col-span-8 relative group rounded-2xl overflow-hidden cursor-pointer" onClick={() => navigate('/products')}>
                             <img
                                 alt="Urban Explorer"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -128,7 +129,7 @@ const Home = () => {
                             </div>
                         </div>
                         <div className="md:col-span-4 grid grid-rows-2 gap-6">
-                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
+                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer" onClick={() => navigate('/products')}>
                                 <img
                                     alt="Performance Lab"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -138,7 +139,7 @@ const Home = () => {
                                     <h3 className="text-2xl font-bold text-white">PERFORMANCE LAB</h3>
                                 </div>
                             </div>
-                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
+                            <div className="relative group rounded-2xl overflow-hidden cursor-pointer" onClick={() => navigate('/products')}>
                                 <img
                                     alt="Street Classics"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

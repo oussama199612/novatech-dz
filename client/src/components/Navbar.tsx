@@ -14,9 +14,11 @@ const Navbar = () => {
                         />
                     </Link>
                     <div className="hidden md:flex gap-6 text-sm font-medium tracking-tight">
-                        <a href="#" className="hover:text-primary transition-colors text-slate-900">MEN</a>
-                        <a href="#" className="hover:text-primary transition-colors text-slate-900">WOMEN</a>
-                        <a href="#" className="hover:text-primary transition-colors text-primary font-bold tracking-widest">LIMITED</a>
+                        <div className="hidden md:flex gap-6 text-sm font-medium tracking-tight">
+                            <Link to="/products" className="hover:text-primary transition-colors text-slate-900">MEN</Link>
+                            <Link to="/products" className="hover:text-primary transition-colors text-slate-900">WOMEN</Link>
+                            <Link to="/products" className="hover:text-primary transition-colors text-primary font-bold tracking-widest">LIMITED</Link>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-6">
