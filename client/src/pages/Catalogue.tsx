@@ -36,11 +36,44 @@ const Catalogue = () => {
     // Unique values for filters (derived from products)
     const categories = Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)));
     // Extract sizes and colors from variants/options
+    // Extract sizes and colors from variants/options
+    const stockPerSize: Record<string, number> = {};
+
+    products.forEach(product => {
+        const sizeOptionIndex = product.options?.findIndex(o =>
+            ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
+        );
+
+        if (sizeOptionIndex !== undefined && sizeOptionIndex !== -1 && product.hasVariants) {
+            product.variants?.forEach(variant => {
+                const parts = variant.title.split(' / ');
+                // Handle cases where title might be "Size / Color" or just "Size"
+                // This logic assumes standard " / " separator. 
+                // A more robust way would rely on option position, but variant title structure depends on creation.
+                // For now, simpler approach: if hasVariants, try to match value to options.
+
+                // Actually, variants are ordered by options. 
+                const variantSize = parts[sizeOptionIndex];
+                if (variantSize) {
+                    const normalizedSize = String(variantSize).trim();
+                    stockPerSize[normalizedSize] = (stockPerSize[normalizedSize] || 0) + (variant.stock || 0);
+                }
+            });
+        }
+    });
+
     const allSizes = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
             ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
         )?.values || []
-    ))).sort((a, b) => Number(a) - Number(b));
+    ))).sort((a, b) => {
+        const stockA = stockPerSize[String(a).trim()] || 0;
+        const stockB = stockPerSize[String(b).trim()] || 0;
+        // Sort by stock descending (most available first)
+        if (stockB !== stockA) return stockB - stockA;
+        // Fallback to numeric sort if stocks are equal
+        return Number(a) - Number(b);
+    });
 
     const allColors = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o => o.name.toLowerCase().includes('couleur') || o.name.toLowerCase().includes('color') || o.name.toLowerCase().includes('coloris'))?.values || []
