@@ -3,30 +3,40 @@
 @import "tailwindcss";
 
 @theme {
-  --color-luxury-black: #ffffff;
-  --color-luxury-gold: #D4AF37;
-  --color-luxury-gold-light: #FCD34D;
-  --color-luxury-white: #0F172A;
-  --color-luxury-gray: #F1F5F9;
+  --color-shoe-primary: #000000;
+  --color-shoe-secondary: #FFFFFF;
+  --color-shoe-accent: #2563EB;
+  --color-shoe-gray: #F3F4F6;
 
   --font-sans: "Montserrat", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-display: "Oswald", sans-serif;
 }
 
 body {
-  @apply bg-luxury-black text-luxury-white font-sans antialiased;
-  background-image:
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05), transparent 40%);
+  @apply bg-white text-shoe-primary font-sans antialiased;
   min-height: 100vh;
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-white/60 backdrop-blur-md border border-gray-100 shadow-xl;
+    @apply bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm;
   }
 
-  .glass-btn {
-    @apply px-8 py-3 bg-transparent border border-luxury-gold text-luxury-gold font-medium tracking-widest uppercase text-xs transition-all duration-300 hover:bg-luxury-gold hover:text-white;
+  .btn-primary {
+    @apply bg-black text-white px-8 py-4 font-bold uppercase tracking-wider hover:bg-zinc-800 transition-all duration-300 transform hover:-translate-y-1;
+  }
+
+  .btn-outline {
+    @apply border-2 border-black text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-300;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
@@ -36,5 +46,5 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-serif;
+  @apply font-sans font-bold tracking-tight;
 }

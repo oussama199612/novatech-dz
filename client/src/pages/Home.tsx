@@ -1,205 +1,223 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, Filter, X } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Star, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { type Product, type Category } from '../types';
+import { type Product } from '../types';
 import { getImageUrl } from '../utils';
+
+// Brand Logos (Placeholders - using text for now or simple SVGs)
+const BRANDS = [
+    "NIKE", "ADIDAS", "PUMA", "NEW BALANCE", "ASICS", "JORDAN", "VANS", "CONVERSE"
+];
 
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [availableFilters, setAvailableFilters] = useState<{ vendors: string[], tags: string[] }>({ vendors: [], tags: [] });
-
-    // Filter States
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [selectedVendor, setSelectedVendor] = useState<string>('');
-    const [selectedTag, setSelectedTag] = useState<string>('');
-    const [searchTerm, setSearchTerm] = useState('');
-
     const [loading, setLoading] = useState(true);
 
-    // Fetch initial data (categories & available filters)
+    // Initial Data Fetch
     useEffect(() => {
-        const fetchInitialData = async () => {
+        const fetchData = async () => {
             try {
-                const [categoriesRes, filtersRes] = await Promise.all([
-                    api.get('/categories'),
-                    api.get('/products/filters')
-                ]);
-                setCategories(categoriesRes.data);
-                setAvailableFilters(filtersRes.data);
-            } catch (error) {
-                console.error('Error fetching initial data:', error);
-            }
-        };
-        fetchInitialData();
-    }, []);
-
-    // Fetch products with filters
-    useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const params: any = {};
-                if (searchTerm) params.keyword = searchTerm;
-                if (selectedCategory !== 'all') params.category = selectedCategory;
-                if (selectedVendor) params.vendor = selectedVendor;
-                if (selectedTag) params.tags = selectedTag;
-
-                const { data } = await api.get('/products', { params });
+                const { data } = await api.get('/products');
                 setProducts(data);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching data:', error);
             } finally {
                 setLoading(false);
             }
         };
+        fetchData();
+    }, []);
 
-        const timeoutId = setTimeout(() => {
-            fetchProducts();
-        }, 300); // Debounce search
-
-        return () => clearTimeout(timeoutId);
-    }, [selectedCategory, selectedVendor, selectedTag, searchTerm]);
-
-    const clearFilters = () => {
-        setSelectedCategory('all');
-        setSelectedVendor('');
-        setSelectedTag('');
-        setSearchTerm('');
-    };
-
-    const hasActiveFilters = selectedCategory !== 'all' || selectedVendor || selectedTag || searchTerm;
+    // Featured Collections Mock
+    const COLLECTIONS = [
+        { id: 1, title: 'MEN RUNNING', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2670&auto=format&fit=crop', link: '/?category=men' },
+        { id: 2, title: 'WOMEN LIFESTYLE', image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=2612&auto=format&fit=crop', link: '/?category=women' },
+        { id: 3, title: 'NEW DROPS', image: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?q=80&w=2525&auto=format&fit=crop', link: '/?tag=new' },
+    ];
 
     return (
-        <div className="space-y-8 bg-white min-h-screen">
-            {/* Hero / Header */}
-            <div className="relative py-20 md:py-32 text-center overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-luxury-gold/10 via-transparent to-transparent opacity-40 blur-3xl"></div>
+        <div className="bg-white min-h-screen text-black">
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative z-10 space-y-6 px-4"
-                >
-                    <span className="text-luxury-gold uppercase tracking-[0.3em] text-xs md:text-sm font-bold">Collection Exclusive</span>
-                    <h1 className="text-5xl md:text-7xl font-serif text-black leading-tight">
-                        L'Art du <span className="italic text-luxury-gold">Gaming</span>
-                    </h1>
-                    <p className="text-gray-600 max-w-xl mx-auto font-medium text-base md:text-lg leading-relaxed">
-                        Une sélection rigoureuse d'équipements haute performance, alliant design d'exception et technologie de pointe.
-                    </p>
-                    <div className="pt-8">
-                        <button className="glass-btn group border-black text-black hover:bg-black hover:text-white hover:border-black">
-                            Découvrir la Collection
-                            <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">→</span>
-                        </button>
-                    </div>
-                </motion.div>
-            </div>
+            {/* 1. HERO SECTION */}
+            <section className="relative h-[85vh] w-full overflow-hidden flex items-center">
+                {/* Background Image/Video */}
+                <div className="absolute inset-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1556906781-9a412961d289?q=80&w=2000&auto=format&fit=crop"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover object-center brightness-75"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
 
-            {/* Filters Bar */}
-            <div className="sticky top-16 z-20 bg-white/80 backdrop-blur-md border-y border-gray-100 py-4 shadow-sm">
-                <div className="flex flex-col md:flex-row gap-6 justify-between items-center px-4 max-w-7xl mx-auto">
-                    {/* Category Tabs */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto text-sm no-scrollbar justify-start md:justify-start">
-                        <button
-                            onClick={() => setSelectedCategory('all')}
-                            className={`px-5 py-2 whitespace-nowrap rounded-full transition-all duration-300 uppercase tracking-wider text-[10px] font-bold border ${selectedCategory === 'all' ? 'border-luxury-gold text-white bg-luxury-gold' : 'border-gray-200 text-gray-500 bg-white hover:border-gray-400 hover:text-black'}`}
-                        >
-                            Tout
-                        </button>
-                        {categories.map((cat) => (
-                            <button
-                                key={cat._id}
-                                onClick={() => setSelectedCategory(cat._id)}
-                                className={`px-5 py-2 whitespace-nowrap rounded-full transition-all duration-300 uppercase tracking-wider text-[10px] font-bold border ${selectedCategory === cat._id ? 'border-luxury-gold text-white bg-luxury-gold' : 'border-gray-200 text-gray-500 bg-white hover:border-gray-400 hover:text-black'}`}
-                            >
-                                {cat.name}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full text-white">
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <span className="inline-block py-1 px-3 border border-white/30 rounded-full text-sm font-medium tracking-wider mb-6 backdrop-blur-sm">
+                            NOUVELLE COLLECTION 2026
+                        </span>
+                        <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-6 leading-none">
+                            WALK YOUR <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">WAY.</span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-gray-200 max-w-lg mb-10 font-light">
+                            Découvrez notre sélection exclusive de sneakers. Performance, style et authenticité garantis.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <button className="bg-white text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                                Acheter Maintenant <ArrowRight size={20} />
                             </button>
-                        ))}
-                    </div>
-
-                    {/* Search & Advanced Filters */}
-                    <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-center md:justify-end">
-
-                        {/* Search Input */}
-                        <div className="relative w-full md:w-64 border-b border-gray-300 focus-within:border-black transition-colors">
-                            <Search className="absolute left-0 top-2.5 h-4 w-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="RECHERCHER..."
-                                className="w-full bg-transparent border-none pl-8 pr-4 py-2 text-black placeholder-gray-400 text-xs uppercase tracking-wider focus:ring-0 font-medium"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                            <button className="border-2 border-white text-white px-8 py-4 font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
+                                Voir les Nouveautés
+                            </button>
                         </div>
-                    </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* 2. BRANDS MARQUEE */}
+            <div className="bg-black py-6 overflow-hidden whitespace-nowrap border-y border-white/10">
+                <div className="inline-flex animate-marquee">
+                    {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, i) => (
+                        <span key={i} className="mx-8 text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 opacity-50 hover:opacity-100 transition-opacity cursor-default">
+                            {brand}
+                        </span>
+                    ))}
                 </div>
             </div>
 
-            {/* Grid */}
-            <div className="max-w-7xl mx-auto px-4 pb-20">
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-luxury-gold"></div>
+            {/* 3. FEATURED COLLECTIONS (BENTO) */}
+            <section className="py-20 px-6 max-w-7xl mx-auto">
+                <h2 className="text-4xl font-black mb-12 tracking-tight uppercase flex items-center gap-4">
+                    Collections <span className="h-1 flex-grow bg-black"></span>
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[600px]">
+                    {COLLECTIONS.map((col, index) => (
+                        <div key={col.id} className={`relative group overflow-hidden rounded-2xl ${index === 0 ? 'md:col-span-2' : ''}`}>
+                            <img
+                                src={col.image}
+                                alt={col.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                            <div className="absolute bottom-0 left-0 p-8 w-full">
+                                <h3 className="text-3xl font-black text-white uppercase italic mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                    {col.title}
+                                </h3>
+                                <Link to={col.link} className="inline-flex items-center gap-2 text-white font-bold uppercase tracking-wider hover:underline opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 translate-y-4 group-hover:translate-y-0">
+                                    Découvrir <ArrowRight size={16} />
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* 4. TRENDING PRODUCTS */}
+            <section className="py-20 bg-gray-50">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex justify-between items-end mb-12">
+                        <div>
+                            <span className="text-blue-600 font-bold uppercase tracking-wider mb-2 block">Populaire</span>
+                            <h2 className="text-4xl font-black uppercase tracking-tight">Tendance Actuelle</h2>
+                        </div>
+                        <Link to="/products" className="hidden md:flex items-center gap-2 font-bold border-b-2 border-black pb-1 hover:text-blue-600 hover:border-blue-600 transition-colors">
+                            Voir Tout
+                        </Link>
                     </div>
-                ) : products.length === 0 ? (
-                    <div className="text-center py-20 text-gray-500 font-serif italic">
-                        <p className="text-xl">Aucune pièce d'exception trouvée.</p>
-                        <button onClick={clearFilters} className="text-luxury-gold hover:underline mt-4 text-sm uppercase tracking-widest font-bold">
-                            Voir toute la collection
-                        </button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
-                        {products.map((product) => (
-                            <motion.div
-                                key={product._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="group relative flex flex-col h-full"
-                            >
-                                <Link to={`/product/${product._id}`} className="block overflow-hidden relative aspect-[4/5] bg-gray-50 mb-4">
-                                    <img
-                                        src={getImageUrl(product.image)}
-                                        alt={product.name}
-                                        className="w-full h-full object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-105"
-                                    />
-                                    {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                        <div className="absolute top-2 left-2 bg-black text-white text-[9px] font-bold px-2 py-1 uppercase tracking-widest">
-                                            Privilège
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/90 backdrop-blur-sm border-t border-gray-100">
-                                        <button className="w-full py-2 bg-black text-white uppercase tracking-widest text-[10px] font-bold hover:bg-luxury-gold transition-colors">
-                                            Voir
+
+                    {loading ? (
+                        <div className="flex justify-center py-20">Loading...</div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {products.slice(0, 4).map((product) => (
+                                <div key={product._id} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+                                    {/* Image */}
+                                    <div className="relative aspect-square bg-gray-100 p-6 overflow-hidden">
+                                        <img
+                                            src={getImageUrl(product.image)}
+                                            alt={product.name}
+                                            className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                                        />
+                                        {product.compareAtPrice && product.compareAtPrice > product.price && (
+                                            <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-sm uppercase">
+                                                Promo
+                                            </span>
+                                        )}
+                                        <button className="absolute bottom-4 right-4 bg-black text-white p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-blue-600">
+                                            <ShoppingBag size={20} />
                                         </button>
                                     </div>
-                                </Link>
 
-                                <div className="text-center space-y-1">
-                                    <div className="text-[9px] text-gray-400 uppercase tracking-[0.2em]">{product.category.name}</div>
-                                    <h3 className="font-serif text-base md:text-lg text-black group-hover:text-luxury-gold transition-colors duration-300 leading-tight">
-                                        <Link to={`/product/${product._id}`}>
-                                            {product.name}
-                                        </Link>
-                                    </h3>
-
-                                    <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 pt-1">
-                                        <span className="text-sm font-bold text-black">{product.price.toLocaleString()} DA</span>
-                                        {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                            <span className="text-xs text-gray-400 line-through">{product.compareAtPrice.toLocaleString()} DA</span>
-                                        )}
+                                    {/* Info */}
+                                    <div className="p-5">
+                                        <p className="text-sm text-gray-500 font-bold uppercase mb-1">{product.category?.name || 'Sneakers'}</p>
+                                        <h3 className="font-bold text-lg leading-tight mb-2 truncate">{product.name}</h3>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-xl">{product.price.toLocaleString()} DA</span>
+                                                {product.compareAtPrice && (
+                                                    <span className="text-sm text-gray-400 line-through">{product.compareAtPrice.toLocaleString()} DA</span>
+                                                )}
+                                            </div>
+                                            <div className="flex text-yellow-500 text-xs">
+                                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={12} fill="currentColor" />)}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </motion.div>
-                        ))}
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* 5. TRUST SIGNALS */}
+            <section className="py-16 bg-black text-white">
+                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
+                        <ShieldCheck size={48} className="mx-auto mb-4 text-blue-500" />
+                        <h3 className="font-bold text-xl uppercase mb-2">Authenticité Garantie</h3>
+                        <p className="text-gray-400 text-sm">Tous nos produits sont 100% authentiques et vérifiés par nos experts.</p>
                     </div>
-                )}
-            </div>
+                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
+                        <Truck size={48} className="mx-auto mb-4 text-purple-500" />
+                        <h3 className="font-bold text-xl uppercase mb-2">Livraison Rapide</h3>
+                        <p className="text-gray-400 text-sm">Livraison express 58 wilayas. Suivi en temps réel de votre commande.</p>
+                    </div>
+                    <div className="p-6 border border-white/10 rounded-2xl hover:bg-white/5 transition-colors">
+                        <RotateCcw size={48} className="mx-auto mb-4 text-green-500" />
+                        <h3 className="font-bold text-xl uppercase mb-2">Retour Facile</h3>
+                        <p className="text-gray-400 text-sm">Satisfait ou remboursé. Vous avez 15 jours pour changer d'avis.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* 6. NEWSLETTER */}
+            <section className="py-20 px-6 max-w-4xl mx-auto text-center">
+                <h2 className="text-3xl md:text-5xl font-black uppercase mb-4">Rejoignez le Club</h2>
+                <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+                    Inscrivez-vous pour recevoir les dernières sorties, les offres exclusives et -10% sur votre première commande.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <input
+                        type="email"
+                        placeholder="Votre adresse email"
+                        className="flex-grow px-6 py-4 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-black font-medium"
+                    />
+                    <button className="bg-black text-white px-8 py-4 rounded-full font-bold uppercase hover:bg-gray-800 transition-colors">
+                        S'inscrire
+                    </button>
+                </div>
+            </section>
+
         </div>
     );
 };
