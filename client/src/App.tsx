@@ -3,23 +3,22 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ProductLanding from './pages/ProductLanding';
 import SuccessPage from './pages/SuccessPage';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-background-light text-slate-900 font-display selection:bg-primary selection:text-white">
         <Navbar />
-        <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Removed padding/max-w wrapper to allow full-width heroes */}
+        <main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/product/:productId" element={<ProductLanding />} />
             <Route path="/success" element={<SuccessPage />} />
           </Routes>
         </main>
-
-        <footer className="border-t border-white/10 mt-12 py-8 text-center text-gray-500">
-          <p>© {new Date().getFullYear()} Novatech. All rights reserved.</p>
-        </footer>
+        <Footer />
       </div>
     </Router>
   );
