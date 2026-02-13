@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ProductLanding from './pages/ProductLanding';
+import Catalogue from './pages/Catalogue';
 import SuccessPage from './pages/SuccessPage';
 import Footer from './components/Footer';
 
@@ -14,6 +15,7 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Catalogue />} />
             <Route path="/product/:productId" element={<ProductLanding />} />
             <Route path="/success" element={<SuccessPage />} />
           </Routes>
