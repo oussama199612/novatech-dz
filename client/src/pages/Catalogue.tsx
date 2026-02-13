@@ -37,7 +37,9 @@ const Catalogue = () => {
     const categories = Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)));
     // Extract sizes and colors from variants/options
     const allSizes = Array.from(new Set(products.flatMap(p =>
-        p.options?.find(o => o.name.toLowerCase().includes('taille') || o.name.toLowerCase().includes('size') || o.name.toLowerCase().includes('pointure'))?.values || []
+        p.options?.find(o =>
+            ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
+        )?.values || []
     ))).sort((a, b) => Number(a) - Number(b));
 
     const allColors = Array.from(new Set(products.flatMap(p =>
@@ -56,8 +58,10 @@ const Catalogue = () => {
         }
         // Size
         if (selectedSizes.length > 0) {
-            const productSizes = product.options?.find(o => o.name.toLowerCase().includes('taille') || o.name.toLowerCase().includes('size'))?.values || [];
-            if (!selectedSizes.some(s => productSizes.includes(s))) return false;
+            const productSizes = product.options?.find(o =>
+                ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
+            )?.values || [];
+            if (!selectedSizes.some(s => productSizes.some(ps => String(ps).trim() === String(s).trim()))) return false;
         }
         // Color
         if (selectedColors.length > 0) {
@@ -170,8 +174,8 @@ const Catalogue = () => {
                                             key={size}
                                             onClick={() => toggleFilter(size, setSelectedSizes)}
                                             className={`aspect-square flex items-center justify-center border text-xs font-bold transition-colors ${selectedSizes.includes(size)
-                                                    ? 'border-primary bg-primary/5 text-primary'
-                                                    : 'border-slate-200 hover:border-primary'
+                                                ? 'border-primary bg-primary/5 text-primary'
+                                                : 'border-slate-200 hover:border-primary'
                                                 }`}
                                         >
                                             {size}
