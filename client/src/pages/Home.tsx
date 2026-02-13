@@ -38,43 +38,39 @@ const Home = () => {
     ];
 
     return (
-        <div className="bg-white min-h-screen text-black">
+        <div className="bg-nebula-bg min-h-screen text-nebula-text overflow-x-hidden">
 
-            {/* 1. HERO SECTION */}
-            <section className="relative h-[85vh] w-full overflow-hidden flex items-center">
-                {/* Background Image/Video */}
-                <div className="absolute inset-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1556906781-9a412961d289?q=80&w=2000&auto=format&fit=crop"
-                        alt="Hero Background"
-                        className="w-full h-full object-cover object-center brightness-75"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            {/* 1. HERO SECTION (NEBULA) */}
+            <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center">
+                {/* Background - Cosmic Effect */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-auto bg-nebula-glow opacity-40 blur-3xl animate-pulse"></div>
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
                 </div>
 
-                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full text-white">
+                <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <span className="inline-block py-1 px-3 border border-white/30 rounded-full text-sm font-medium tracking-wider mb-6 backdrop-blur-sm">
-                            NOUVELLE COLLECTION 2026
-                        </span>
-                        <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-6 leading-none">
-                            WALK YOUR <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">WAY.</span>
+                        <h2 className="text-nebula-blue font-bold tracking-[0.3em] text-sm md:text-base mb-6 uppercase">
+                            Nouvelle Collection 2026
+                        </h2>
+                        <h1 className="text-7xl md:text-9xl font-display font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                            NEBULA
                         </h1>
-                        <p className="text-lg md:text-xl text-gray-200 max-w-lg mb-10 font-light">
-                            Découvrez notre sélection exclusive de sneakers. Performance, style et authenticité garantis.
+                        <p className="text-lg md:text-2xl text-nebula-muted max-w-2xl mx-auto mb-12 font-light leading-relaxed">
+                            Chaussures d’exception, style cosmique.<br />
+                            <span className="text-sm opacity-70">Élégance, confort, finitions parfaites.</span>
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <button className="bg-white text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
-                                Acheter Maintenant <ArrowRight size={20} />
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                            <button className="btn-primary">
+                                Découvrir la Boutique <ArrowRight size={18} />
                             </button>
-                            <button className="border-2 border-white text-white px-8 py-4 font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
-                                Voir les Nouveautés
+                            <button className="btn-outline">
+                                Voir le Lookbook
                             </button>
                         </div>
                     </motion.div>
@@ -82,37 +78,39 @@ const Home = () => {
             </section>
 
             {/* 2. BRANDS MARQUEE */}
-            <div className="bg-black py-6 overflow-hidden whitespace-nowrap border-y border-white/10">
-                <div className="inline-flex animate-marquee">
+            <div className="bg-nebula-surface/50 border-y border-white/5 py-8 overflow-hidden backdrop-blur-sm">
+                <div className="inline-flex animate-marquee items-center">
                     {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, i) => (
-                        <span key={i} className="mx-8 text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 opacity-50 hover:opacity-100 transition-opacity cursor-default">
+                        <span key={i} className="mx-12 text-3xl font-display font-bold text-white/20 uppercase tracking-widest hover:text-nebula-violet transition-colors duration-300 cursor-default">
                             {brand}
                         </span>
                     ))}
                 </div>
             </div>
 
-            {/* 3. FEATURED COLLECTIONS (BENTO) */}
-            <section className="py-20 px-6 max-w-7xl mx-auto">
-                <h2 className="text-4xl font-black mb-12 tracking-tight uppercase flex items-center gap-4">
-                    Collections <span className="h-1 flex-grow bg-black"></span>
-                </h2>
+            {/* 3. FEATURED COLLECTIONS */}
+            <section className="py-24 px-6 max-w-7xl mx-auto" id="collections">
+                <div className="flex items-center gap-4 mb-16">
+                    <h2 className="text-3xl font-display font-bold">Collections</h2>
+                    <div className="h-[1px] flex-grow bg-gradient-to-r from-nebula-violet to-transparent"></div>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[600px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {COLLECTIONS.map((col, index) => (
-                        <div key={col.id} className={`relative group overflow-hidden rounded-2xl ${index === 0 ? 'md:col-span-2' : ''}`}>
+                        <div key={col.id} className={`card-nebula relative overflow-hidden group h-[500px] ${index === 0 ? 'md:col-span-2' : ''}`}>
                             <img
                                 src={col.image}
                                 alt={col.title}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-80"
                             />
-                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-nebula-bg via-transparent to-transparent"></div>
+
                             <div className="absolute bottom-0 left-0 p-8 w-full">
-                                <h3 className="text-3xl font-black text-white uppercase italic mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <h3 className="text-4xl font-display font-bold text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                                     {col.title}
                                 </h3>
-                                <Link to={col.link} className="inline-flex items-center gap-2 text-white font-bold uppercase tracking-wider hover:underline opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 translate-y-4 group-hover:translate-y-0">
-                                    Découvrir <ArrowRight size={16} />
+                                <Link to={col.link} className="inline-flex items-center gap-2 text-nebula-cyan font-semibold tracking-wider hover:underline opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 translate-y-4 group-hover:translate-y-0">
+                                    EXPLORER <ArrowRight size={16} />
                                 </Link>
                             </div>
                         </div>
@@ -121,54 +119,62 @@ const Home = () => {
             </section>
 
             {/* 4. TRENDING PRODUCTS */}
-            <section className="py-20 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex justify-between items-end mb-12">
+            <section className="py-24 bg-nebula-bg relative">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-nebula-blue opacity-5 blur-[120px] rounded-full pointer-events-none"></div>
+
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <div className="flex justify-between items-end mb-16">
                         <div>
-                            <span className="text-blue-600 font-bold uppercase tracking-wider mb-2 block">Populaire</span>
-                            <h2 className="text-4xl font-black uppercase tracking-tight">Tendance Actuelle</h2>
+                            <span className="text-nebula-violet font-bold uppercase tracking-wider mb-2 block text-xs">Sélection Premium</span>
+                            <h2 className="text-4xl font-display font-bold">Tendance Cosmique</h2>
                         </div>
-                        <Link to="/products" className="hidden md:flex items-center gap-2 font-bold border-b-2 border-black pb-1 hover:text-blue-600 hover:border-blue-600 transition-colors">
-                            Voir Tout
+                        <Link to="/" className="hidden md:flex items-center gap-2 text-nebula-muted hover:text-white transition-colors border-b border-transparent hover:border-white pb-1">
+                            Voir Tout le Catalogue
                         </Link>
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-20">Loading...</div>
+                        <div className="flex justify-center py-20">
+                            <div className="w-10 h-10 border-2 border-nebula-violet border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {products.slice(0, 4).map((product) => (
-                                <div key={product._id} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+                                <div key={product._id} className="card-nebula group overflow-hidden flex flex-col h-full">
                                     {/* Image */}
-                                    <div className="relative aspect-square bg-gray-100 p-6 overflow-hidden">
+                                    <div className="relative aspect-[4/5] bg-[#0F1218] p-6 overflow-hidden flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-nebula-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
                                         <img
                                             src={getImageUrl(product.image)}
                                             alt={product.name}
-                                            className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                                            className="w-full h-full object-contain filter brightness-90 contrast-125 group-hover:scale-110 group-hover:brightness-110 transition-all duration-500 drop-shadow-xl"
                                         />
                                         {product.compareAtPrice && product.compareAtPrice > product.price && (
-                                            <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-sm uppercase">
-                                                Promo
+                                            <span className="absolute top-3 left-3 bg-nebula-violet/20 text-nebula-violet border border-nebula-violet/30 text-[10px] font-bold px-2 py-1 rounded uppercase backdrop-blur-md">
+                                                -{(100 - (product.price / product.compareAtPrice * 100)).toFixed(0)}%
                                             </span>
                                         )}
-                                        <button className="absolute bottom-4 right-4 bg-black text-white p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-blue-600">
-                                            <ShoppingBag size={20} />
+                                        <button className="absolute bottom-4 right-4 bg-white text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-nebula-cyan hover:scale-110 shadow-lg">
+                                            <ShoppingBag size={18} />
                                         </button>
                                     </div>
 
                                     {/* Info */}
-                                    <div className="p-5">
-                                        <p className="text-sm text-gray-500 font-bold uppercase mb-1">{product.category?.name || 'Sneakers'}</p>
-                                        <h3 className="font-bold text-lg leading-tight mb-2 truncate">{product.name}</h3>
-                                        <div className="flex items-center justify-between">
+                                    <div className="p-5 flex-grow flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-xs text-nebula-muted font-medium mb-1 tracking-wider">{product.category?.name || 'Edition Limitée'}</p>
+                                            <h3 className="font-display font-bold text-lg leading-tight mb-3 text-white group-hover:text-nebula-cyan transition-colors">{product.name}</h3>
+                                        </div>
+                                        <div className="flex items-end justify-between mt-2 border-t border-white/5 pt-4">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-xl">{product.price.toLocaleString()} DA</span>
+
+                                                <span className="font-bold text-xl text-white">{product.price.toLocaleString()} DA</span>
                                                 {product.compareAtPrice && (
-                                                    <span className="text-sm text-gray-400 line-through">{product.compareAtPrice.toLocaleString()} DA</span>
+                                                    <span className="text-xs text-nebula-muted line-through">{product.compareAtPrice.toLocaleString()} DA</span>
                                                 )}
                                             </div>
-                                            <div className="flex text-yellow-500 text-xs">
-                                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={12} fill="currentColor" />)}
+                                            <div className="flex gap-1">
+                                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={10} className="text-nebula-violet" fill="currentColor" />)}
                                             </div>
                                         </div>
                                     </div>

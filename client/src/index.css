@@ -1,33 +1,88 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --color-shoe-primary: #000000;
-  --color-shoe-secondary: #FFFFFF;
-  --color-shoe-accent: #2563EB;
-  --color-shoe-gray: #F3F4F6;
+  --color-nebula-bg: #05060A;
+  --color-nebula-surface: #0B0F1A;
+  --color-nebula-text: #F5F7FF;
+  --color-nebula-muted: #AAB1C5;
+  --color-nebula-border: #1C2438;
 
-  --font-sans: "Montserrat", sans-serif;
-  --font-display: "Oswald", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --radius-nebula: 18px;
+}
+
+:root {
+  --bg: #05060A;
+  --surface: #0B0F1A;
+  --text: #F5F7FF;
+  --muted: #AAB1C5;
+  --border: #1C2438;
+  --violet: #7C3AED;
+  --blue: #3B82F6;
+  --cyan: #22D3EE;
+  --grad: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+  --radius: 18px;
 }
 
 body {
-  @apply bg-white text-shoe-primary font-sans antialiased;
+  @apply bg-nebula-bg text-nebula-text font-sans antialiased;
   min-height: 100vh;
+  /* background-image: 
+    linear-gradient(to bottom, transparent, #05060A),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231C2438' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); */
 }
 
 @layer components {
-  .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm;
+
+  /* CTA */
+  .btn-primary {
+    background: var(--grad);
+    border-radius: var(--radius);
+    color: white;
+    @apply px-6 py-3 font-semibold flex items-center justify-center gap-2;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.18);
+    transition: transform .2s ease, box-shadow .2s ease;
   }
 
-  .btn-primary {
-    @apply bg-black text-white px-8 py-4 font-bold uppercase tracking-wider hover:bg-zinc-800 transition-all duration-300 transform hover:-translate-y-1;
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 60px rgba(59, 130, 246, 0.20);
   }
 
   .btn-outline {
-    @apply border-2 border-black text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-300;
+    background: transparent;
+    border-radius: var(--radius);
+    color: var(--text);
+    @apply px-6 py-3 font-semibold flex items-center justify-center gap-2;
+    border: 1px solid rgba(245, 247, 255, 0.18);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+
+  .btn-outline:hover {
+    transform: translateY(-1px);
+    border-color: rgba(34, 211, 238, 0.55);
+    @apply text-white;
+  }
+
+  /* Cards */
+  .card-nebula {
+    background: var(--surface);
+    border: 1px solid rgba(245, 247, 255, 0.08);
+    border-radius: var(--radius);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+
+  .card-nebula:hover {
+    transform: translateY(-3px);
+    border-color: rgba(124, 58, 237, 0.35);
+  }
+
+  .glass-panel {
+    @apply bg-nebula-surface/80 backdrop-blur-md border border-nebula-border shadow-2xl;
   }
 
   .hide-scrollbar::-webkit-scrollbar {
@@ -46,5 +101,5 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-sans font-bold tracking-tight;
+  @apply font-display font-bold tracking-tight;
 }

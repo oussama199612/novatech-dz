@@ -7,37 +7,45 @@ export default {
     theme: {
         extend: {
             colors: {
-                shoe: {
-                    primary: '#000000', // Deep Black
-                    secondary: '#FFFFFF', // Pure White
-                    accent: '#2563EB', // Electric Blue (default accent)
-                    gray: '#F3F4F6', // Light Gray background
-                    darkgray: '#1F2937',
-                    red: '#EF4444', // Sale/Hot
+                nebula: {
+                    bg: '#05060A', // Deep Black
+                    surface: '#0B0F1A', // Card BG
+                    text: '#F5F7FF', // Main Text
+                    muted: '#AAB1C5', // Secondary Text
+                    border: '#1C2438',
+                    violet: '#7C3AED',
+                    blue: '#3B82F6',
+                    cyan: '#22D3EE',
                 },
-                novatech: { // Keeping for backward compatibility if needed temporarily
-                    dark: '#0F172A',
-                    blue: '#1a56db',
-                    cyan: '#06b6d4',
-                    gold: '#D4AF37',
+                // Keeping legacy mapped to new for safety
+                shoe: {
+                    primary: '#F5F7FF',
+                    secondary: '#05060A',
+                    accent: '#7C3AED',
+                    gray: '#0B0F1A',
                 }
             },
             fontFamily: {
-                sans: ['Montserrat', 'Inter', 'sans-serif'],
-                serif: ['"Playfair Display"', 'serif'],
-                display: ['"Oswald"', 'sans-serif'], // Added for bold headers
+                sans: ['Inter', 'sans-serif'], // Body
+                display: ['"Space Grotesk"', '"Sora"', 'sans-serif'], // Headers
+            },
+            backgroundImage: {
+                'nebula-gradient': 'linear-gradient(90deg, #7C3AED, #3B82F6, #22D3EE)',
+                'nebula-glow': 'radial-gradient(circle at center, rgba(124, 58, 237, 0.15) 0%, transparent 70%)',
             },
             animation: {
-                'marquee': 'marquee 25s linear infinite',
+                'marquee': 'marquee 30s linear infinite',
+                'float': 'float 6s ease-in-out infinite',
             },
             keyframes: {
                 marquee: {
                     '0%': { transform: 'translateX(0%)' },
                     '100%': { transform: 'translateX(-100%)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
                 }
-            },
-            backgroundImage: {
-                'shoe-gradient': 'linear-gradient(to right, #000000, #1a1a1a)',
             }
         },
     },

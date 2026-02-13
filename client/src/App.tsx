@@ -7,7 +7,7 @@ import SuccessPage from './pages/SuccessPage';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
+      <div className="min-h-screen bg-nebula-bg text-nebula-text font-sans selection:bg-nebula-violet selection:text-white">
         <Navbar />
         <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <Routes>
