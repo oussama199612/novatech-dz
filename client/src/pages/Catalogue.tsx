@@ -159,7 +159,17 @@ const Catalogue = () => {
                 <div className="flex flex-col lg:flex-row gap-12">
 
                     {/* Sidebar / Filters */}
-                    <aside className={`lg:w-64 flex-shrink-0 space-y-10 ${isMobileFiltersOpen ? 'block' : 'hidden lg:block'}`}>
+                    <aside className={`
+                        fixed inset-0 z-50 bg-white p-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto lg:p-0 lg:w-64 lg:overflow-visible lg:bg-transparent lg:border-none lg:shadow-none
+                        ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'}
+                    `}>
+                        <div className="flex justify-between items-center mb-8 lg:hidden">
+                            <h2 className="text-xl font-bold">FILTERS</h2>
+                            <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2">
+                                <X size={24} />
+                            </button>
+                        </div>
+
                         {/* Categories */}
                         <div>
                             <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Category</h3>
@@ -179,7 +189,7 @@ const Catalogue = () => {
                         </div>
 
                         {/* Price Range */}
-                        <div>
+                        <div className="mt-10">
                             <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Price Range</h3>
                             <div className="px-2">
                                 <input
@@ -200,7 +210,7 @@ const Catalogue = () => {
 
                         {/* Size (US) */}
                         {allSizes.length > 0 && (
-                            <div>
+                            <div className="mt-10">
                                 <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Size (US)</h3>
                                 <div className="grid grid-cols-4 gap-2">
                                     {allSizes.map(size => (
@@ -221,7 +231,7 @@ const Catalogue = () => {
 
                         {/* Colors */}
                         {allColors.length > 0 && (
-                            <div>
+                            <div className="mt-10 mb-10">
                                 <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Colors</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {allColors.map(color => {
@@ -262,6 +272,16 @@ const Catalogue = () => {
                         >
                             Clear All
                         </button>
+
+                        {/* Mobile: Apply Button */}
+                        <div className="lg:hidden mt-4">
+                            <button
+                                onClick={() => setIsMobileFiltersOpen(false)}
+                                className="w-full py-3 border border-slate-900 text-slate-900 text-xs font-bold tracking-widest uppercase rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Apply Filters
+                            </button>
+                        </div>
                     </aside>
 
                     {/* Product Grid */}
