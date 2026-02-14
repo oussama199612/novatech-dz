@@ -68,10 +68,12 @@ const Orders = () => {
                                         <td className="p-4">
                                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500' :
                                                     order.status === 'paid' ? 'bg-blue-500/10 text-blue-500' :
-                                                        'bg-yellow-500/10 text-yellow-500'
+                                                        order.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
+                                                            'bg-yellow-500/10 text-yellow-500'
                                                 }`}>
                                                 {order.status === 'pending' ? 'En attente' :
-                                                    order.status === 'paid' ? 'Payé' : 'Livré'}
+                                                    order.status === 'paid' ? 'Payé' :
+                                                        order.status === 'delivered' ? 'Livré' : 'Annulé'}
                                             </span>
                                         </td>
                                         <td className="p-4">
@@ -130,17 +132,40 @@ const Orders = () => {
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => handleStatusUpdate(selectedOrder._id, 'paid')}
-                                        disabled={selectedOrder.status === 'paid' || selectedOrder.status === 'delivered'}
+                                        disabled={selectedOrder.status === 'paid' || selectedOrder.status === 'delivered' || selectedOrder.status === 'cancelled'}
                                         className="btn bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <CheckCircle size={14} /> Payé
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedOrder._id, 'delivered')}
-                                        disabled={selectedOrder.status === 'delivered'}
+                                        disabled={selectedOrder.status === 'delivered' || selectedOrder.status === 'cancelled'}
                                         className="btn bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <CheckCircle size={14} /> Livré
+                                    </button>
+                                    <button
+                                        onClick={() => handleStatusUpdate(selectedOrder._id, 'cancelled')}
+                                        disabled={selectedOrder.status === 'cancelled' || selectedOrder.status === 'delivered'}
+                                        className="btn bg-slate-600 hover:bg-slate-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <CheckCircle size={14} /> Annuler
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            if (window.confirm('Êtes-vous sûr de vouloir SUPPRIMER cette commande définitivement ?')) {
+                                                try {
+                                                    await api.delete(`/orders/${selectedOrder._id}`);
+                                                    setSelectedOrder(null);
+                                                    fetchOrders();
+                                                } catch (error) {
+                                                    alert('Erreur lors de la suppression');
+                                                }
+                                            }
+                                        }}
+                                        className="btn bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2"
+                                    >
+                                        <CheckCircle size={14} /> Supprimer
                                     </button>
                                 </div>
                             </div>
