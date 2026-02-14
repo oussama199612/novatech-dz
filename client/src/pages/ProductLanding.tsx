@@ -171,11 +171,11 @@ Merci de confirmer ma commande !
                     {/* LEFT COLUMN: GALLERY (Sticky) */}
                     <div className="lg:col-span-7">
                         <div className="sticky top-24 space-y-8">
-                            {/* Main Image */}
+                            {/* Desktop/Tablet Main Image (Hidden on Mobile) */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="aspect-square md:aspect-[4/3] relative group overflow-hidden"
+                                className="hidden md:block aspect-[4/3] relative group overflow-hidden"
                             >
                                 <img
                                     src={getImageUrl(activeImage)}
@@ -189,8 +189,39 @@ Merci de confirmer ma commande !
                                 )}
                             </motion.div>
 
-                            {/* Thumbnails */}
-                            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            {/* Mobile Swipeable Carousel */}
+                            <div className="md:hidden relative w-full aspect-square bg-white">
+                                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide w-full h-full">
+                                    {allImages.map((img, idx) => (
+                                        <div key={idx} className="w-full h-full flex-shrink-0 snap-center flex items-center justify-center relative">
+                                            <img
+                                                src={getImageUrl(img!)}
+                                                alt={`${product.name} - ${idx + 1}`}
+                                                className="w-full h-full object-contain"
+                                            />
+                                            {idx === 0 && product.compareAtPrice > (currentVariant?.price || product.price) && (
+                                                <div className="absolute top-4 left-4 bg-luxury-gold text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest shadow-lg">
+                                                    Privilège
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                    {allImages.map((_, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="w-1.5 h-1.5 rounded-full bg-black/20"
+                                        />
+                                    ))}
+                                </div>
+                                <div className="absolute bottom-4 right-4 bg-black/80 text-white text-[10px] px-2 py-1 rounded-full font-bold">
+                                    {allImages.length} Photos
+                                </div>
+                            </div>
+
+                            {/* Thumbnails (Desktop Only) */}
+                            <div className="hidden md:flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                                 {allImages.map((img, idx) => (
                                     <button
                                         key={idx}
