@@ -67,9 +67,9 @@ const Orders = () => {
                                         <td className="p-4 text-emerald-400 font-bold">{order.totalAmount?.toLocaleString()} DA</td>
                                         <td className="p-4">
                                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                    order.status === 'paid' ? 'bg-blue-500/10 text-blue-500' :
-                                                        order.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
-                                                            'bg-yellow-500/10 text-yellow-500'
+                                                order.status === 'paid' ? 'bg-blue-500/10 text-blue-500' :
+                                                    order.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
+                                                        'bg-yellow-500/10 text-yellow-500'
                                                 }`}>
                                                 {order.status === 'pending' ? 'En attente' :
                                                     order.status === 'paid' ? 'Payé' :
@@ -112,18 +112,55 @@ const Orders = () => {
                                 {selectedOrder.gameId && <div className="text-sm text-yellow-400 mt-1">ID Jeu: {selectedOrder.gameId}</div>}
                             </div>
 
-                            {/* Items */}
+                            {/* Items Table (Professional Look) */}
                             <div className="space-y-3">
-                                <p className="text-sm text-slate-400">Articles</p>
-                                {selectedOrder.products.map((item: any, idx: number) => (
-                                    <div key={idx} className="flex gap-3 items-center bg-slate-950 p-2 rounded">
-                                        {item.image && <img src={item.image} className="w-10 h-10 object-cover rounded bg-slate-800" />}
-                                        <div className="text-sm flex-1">
-                                            <div className="text-white line-clamp-1">{item.name}</div>
-                                            <div className="text-slate-500">x{item.quantity} · {item.price} DA</div>
-                                        </div>
-                                    </div>
-                                ))}
+                                <p className="text-sm text-slate-400 uppercase tracking-widest font-bold">Articles Commandés</p>
+                                <div className="bg-white rounded-lg overflow-hidden text-slate-900">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-slate-50 border-b border-slate-200">
+                                            <tr>
+                                                <th className="p-3 text-left">Produit</th>
+                                                <th className="p-3 text-center">Qté</th>
+                                                <th className="p-3 text-right">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {selectedOrder.products.map((item: any, idx: number) => (
+                                                <tr key={idx}>
+                                                    <td className="p-3">
+                                                        <div className="flex items-center gap-3">
+                                                            {item.image && (
+                                                                <img src={item.image} className="w-10 h-10 object-cover rounded border border-slate-200" />
+                                                            )}
+                                                            <div>
+                                                                <div className="font-bold">{item.name}</div>
+                                                                {item.variant && (
+                                                                    <div className="text-xs text-slate-500">
+                                                                        {item.variant.title}
+                                                                        {/* Fallback code if variant title isn't descriptive enough, show options */}
+                                                                        {item.options && Object.entries(item.options).length > 0 && (
+                                                                            <span className="ml-1 opacity-75">
+                                                                                ({Object.values(item.options).join(' / ')})
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-3 text-center font-mono font-bold text-slate-600">x{item.quantity}</td>
+                                                    <td className="p-3 text-right font-bold">{item.totalItemPrice?.toLocaleString()} DA</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                        <tfoot className="bg-slate-50 font-bold border-t border-slate-200">
+                                            <tr>
+                                                <td colSpan={2} className="p-3 text-right">TOTAL</td>
+                                                <td className="p-3 text-right text-emerald-600 text-lg">{selectedOrder.totalAmount?.toLocaleString()} DA</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
 
                             {/* Actions */}
