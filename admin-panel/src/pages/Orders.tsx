@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, CheckCircle, Clock } from 'lucide-react';
+import { Eye, CheckCircle, Clock, Printer } from 'lucide-react';
 import api from '../api';
 
 const Orders = () => {
@@ -43,64 +43,58 @@ const Orders = () => {
             <h1 className="text-3xl font-bold text-white mb-2">Gestion des Commandes</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Orders List */}
-                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="overflow-x-auto">
+                {/* Orders List - Takes 1/3 width on desktop (sidebar style) */}
+                <div className="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden h-[80vh] flex flex-col print:hidden">
+                    <div className="overflow-y-auto custom-scrollbar flex-1">
                         <table className="w-full text-left text-slate-300">
-                            <thead className="bg-slate-950 text-slate-400 uppercase text-xs font-semibold">
+                            <thead className="bg-slate-950 text-slate-400 uppercase text-xs font-semibold sticky top-0 z-10">
                                 <tr>
-                                    <th className="p-4">ID</th>
-                                    <th className="p-4">Client</th>
-                                    <th className="p-4">Montant</th>
-                                    <th className="p-4">Statut</th>
-                                    <th className="p-4">Action</th>
+                                    <th className="p-4">Info Commande</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800">
                                 {orders.map((order) => (
-                                    <tr key={order._id} className="hover:bg-slate-800/50 transition-colors">
-                                        <td className="p-4 font-mono text-sm text-blue-400 w-24 truncate" title={order.orderId}>{order.orderId}</td>
-                                        <td className="p-4 font-medium text-white">
-                                            {order.customerName}
-                                            <div className="text-xs text-slate-500">{order.customerPhone}</div>
-                                        </td>
-                                        <td className="p-4 text-emerald-400 font-bold">{order.totalAmount?.toLocaleString()} DA</td>
+                                    <tr
+                                        key={order._id}
+                                        onClick={() => setSelectedOrder(order)}
+                                        className={`cursor-pointer transition-colors ${selectedOrder?._id === order._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : 'hover:bg-slate-800/50 border-l-4 border-transparent'}`}
+                                    >
                                         <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                order.status === 'paid' ? 'bg-blue-500/10 text-blue-500' :
-                                                    order.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
-                                                        'bg-yellow-500/10 text-yellow-500'
-                                                }`}>
-                                                {order.status === 'pending' ? 'En attente' :
-                                                    order.status === 'paid' ? 'Payé' :
-                                                        order.status === 'delivered' ? 'Livré' : 'Annulé'}
-                                            </span>
-                                        </td>
-                                        <td className="p-4">
-                                            <button
-                                                onClick={() => setSelectedOrder(order)}
-                                                className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-blue-400 transition-colors"
-                                            >
-                                                <Eye size={18} />
-                                            </button>
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-mono text-sm text-blue-400" title={order.orderId}>#{order.orderId.slice(-6)}</span>
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                    order.status === 'paid' ? 'bg-blue-500/10 text-blue-500' :
+                                                        order.status === 'cancelled' ? 'bg-red-500/10 text-red-500' :
+                                                            'bg-yellow-500/10 text-yellow-500'
+                                                    }`}>
+                                                    {order.status === 'pending' ? 'Attente' :
+                                                        order.status === 'paid' ? 'Payé' :
+                                                            order.status === 'delivered' ? 'Livré' : 'Annulé'}
+                                                </span>
+                                            </div>
+                                            <div className="font-medium text-white text-sm mb-0.5">{order.customerName}</div>
+                                            <div className="flex justify-between items-center text-xs text-slate-500">
+                                                <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                                                <span className="text-emerald-400 font-bold">{order.totalAmount?.toLocaleString()} DA</span>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                         {orders.length === 0 && (
-                            <div className="p-8 text-center text-slate-500">Aucune commande trouvée.</div>
+                            <div className="p-8 text-center text-slate-500">Aucune commande.</div>
                         )}
                     </div>
                 </div>
 
-                {/* Order Details Panel */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-6">
+                {/* Order Details Panel - Takes 2/3 width on desktop (main view) */}
+                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-6 print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
                     {selectedOrder ? (
                         <>
                             {/* Invoice Header */}
-                            <div className="bg-white p-6 rounded-t-lg border-b border-slate-100">
-                                <div className="flex justify-between items-start mb-6">
+                            <div className="bg-white p-8 rounded-t-lg border-b border-slate-100 print:rounded-none print:border-none">
+                                <div className="flex justify-between items-start mb-8">
                                     <div>
                                         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">FACTURE</h2>
                                         <p className="text-sm text-slate-500 font-mono mt-1">#{selectedOrder.orderId}</p>
@@ -251,6 +245,12 @@ const Orders = () => {
                                     className="btn bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2"
                                 >
                                     <CheckCircle size={14} /> Supprimer
+                                </button>
+                                <button
+                                    onClick={() => window.print()}
+                                    className="btn bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-sm flex items-center justify-center gap-2 print:hidden"
+                                >
+                                    <Printer size={14} /> Imprimer
                                 </button>
                             </div>
                         </>

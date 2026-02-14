@@ -21,3 +21,34 @@ body {
     @apply px-6 py-4 whitespace-nowrap text-sm text-slate-300 border-b border-slate-800;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .bg-slate-950 {
+    background-color: white !important;
+  }
+
+  /* Target the detail panel specifically */
+  .lg\:col-span-2,
+  .lg\:col-span-2 * {
+    visibility: visible;
+  }
+
+  .lg\:col-span-2 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  /* Hide buttons in print */
+  button {
+    display: none !important;
+  }
+}
