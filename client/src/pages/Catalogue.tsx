@@ -13,7 +13,7 @@ const Catalogue = () => {
 
     // Filters State
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState('newest');
@@ -195,7 +195,7 @@ const Catalogue = () => {
                                 <input
                                     type="range"
                                     min="0"
-                                    max="50000"
+                                    max="1000000"
                                     step="500"
                                     value={priceRange[1]}
                                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
@@ -264,7 +264,7 @@ const Catalogue = () => {
                         <button
                             onClick={() => {
                                 setSelectedCategories([]);
-                                setPriceRange([0, 50000]);
+                                setPriceRange([0, 1000000]);
                                 setSelectedSizes([]);
                                 setSelectedColors([]);
                             }}
@@ -329,7 +329,7 @@ const Catalogue = () => {
                                         <p className="text-lg text-slate-400">Aucun produit ne correspond à vos critères.</p>
                                         <button onClick={() => {
                                             setSelectedCategories([]);
-                                            setPriceRange([0, 50000]);
+                                            setPriceRange([0, 1000000]);
                                             setSelectedSizes([]);
                                             setSelectedColors([]);
                                         }} className="mt-4 text-primary font-bold underline">Effacer les filtres</button>
