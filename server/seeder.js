@@ -27,54 +27,31 @@ const importData = async () => {
         console.log('Admin Created: admin@novatech.com / password123');
 
         // 2. Create Categories
-        const categories = await Category.insertMany([
-            { name: 'Gaming PC', slug: 'gaming-pc', icon: 'Cpu' },
-            { name: 'Peripherals', slug: 'peripherals', icon: 'Keyboard' },
-            { name: 'Components', slug: 'components', icon: 'HardDrive' },
-            { name: 'Laptops', slug: 'laptops', icon: 'Laptop' },
-        ]);
+        const categoriesData = require('./data/categories');
+        const createdCategories = await Category.insertMany(categoriesData);
         console.log('Categories Created');
 
+        // Map category slugs to IDs for product association
+        const categoryMap = {};
+        createdCategories.forEach(cat => {
+            categoryMap[cat.slug] = cat._id;
+        });
+
         // 3. Create Products
-        const products = [
-            {
-                name: 'RTX 4090 Gaming PC',
-                description: 'Ultimate gaming machine with i9-14900K and RTX 4090.',
-                price: 850000,
-                image: 'https://via.placeholder.com/600x400.png?text=RTX+4090+PC',
-                category: categories[0]._id,
-                stock: 5,
-                orderIndex: 0
-            },
-            {
-                name: 'Mechanical Keyboard RGB',
-                description: 'Blue switches, fully customizable RGB.',
-                price: 12000,
-                image: 'https://via.placeholder.com/600x400.png?text=Keyboard',
-                category: categories[1]._id,
-                stock: 50,
-                orderIndex: 1
-            },
-            {
-                name: 'Gaming Mouse Wireless',
-                description: 'Lightweight, ultra-fast response.',
-                price: 8500,
-                image: 'https://via.placeholder.com/600x400.png?text=Mouse',
-                category: categories[1]._id,
-                stock: 100,
-                orderIndex: 2
-            },
-            {
-                name: 'Curved Monitor 27"',
-                description: '165Hz refresh rate, 1ms response time.',
-                price: 45000,
-                image: 'https://via.placeholder.com/600x400.png?text=Monitor',
-                category: categories[1]._id,
-                stock: 10,
-                orderIndex: 3
-            },
-        ];
-        await Product.insertMany(products);
+        const productsData = require('./data/products');
+        const enrichedProducts = productsData.map((product, index) => {
+            const catId = categoryMap[product.categorySlug];
+            if (!catId) {
+                console.warn(`Warning: Category slug '${product.categorySlug}' not found for product '${product.name}'. Defaulting to first category.`);
+            }
+            return {
+                ...product,
+                category: catId || createdCategories[0]._id,
+                orderIndex: index
+            };
+        });
+
+        await Product.insertMany(enrichedProducts);
         console.log('Products Created');
 
         // 4. Create Payment Methods
