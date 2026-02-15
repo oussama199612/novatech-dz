@@ -88,179 +88,97 @@ const Orders = () => {
                     </div>
                 </div>
 
-                {/* Order Details Panel - Takes 2/3 width on desktop (main view) */}
-                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-6 print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
+                {/* Order Details Panel */}
+                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-6">
                     {selectedOrder ? (
-                        <>
-                            {/* Invoice Header */}
-                            <div className="bg-white p-8 rounded-t-lg border-b border-slate-100 print:rounded-none print:border-none">
-                                <div className="flex justify-between items-start mb-8">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">FACTURE</h2>
-                                        <p className="text-sm text-slate-500 font-mono mt-1">#{selectedOrder.orderId}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Date</div>
-                                        <div className="text-slate-700 font-medium">
-                                            {new Date(selectedOrder.createdAt).toLocaleDateString('fr-FR', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </div>
-                                    </div>
+                        <div className="space-y-6">
+                            <div className="border-b border-slate-800 pb-4 flex justify-between items-start">
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-1">Détails de la commande</h3>
+                                    <p className="text-slate-400 text-sm font-mono">ID: {selectedOrder.orderId}</p>
                                 </div>
+                                <div className="text-right">
+                                    <p className="text-slate-400 text-sm">Date: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                                </div>
+                            </div>
 
-                                <div className="grid grid-cols-2 gap-8 text-sm">
-                                    <div>
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Facturé à</div>
-                                        <div className="font-bold text-slate-900">{selectedOrder.customerName}</div>
-                                        <div className="text-slate-600">{selectedOrder.customerPhone}</div>
-                                        <div className="text-slate-600">{selectedOrder.customerEmail}</div>
-                                        {selectedOrder.gameId && (
-                                            <div className="mt-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded inline-block font-bold">
-                                                ID Jeu: {selectedOrder.gameId}
+                            {/* Customer Info */}
+                            <div className="grid grid-cols-2 gap-4 bg-slate-800/50 p-4 rounded-lg">
+                                <div>
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Client</p>
+                                    <p className="font-medium text-white">{selectedOrder.customerName}</p>
+                                    <p className="text-sm text-slate-400">{selectedOrder.customerPhone || 'N/A'}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Total</p>
+                                    <p className="text-xl font-bold text-emerald-400">{selectedOrder.totalAmount?.toLocaleString()} DA</p>
+                                </div>
+                            </div>
+
+                            {/* Simple Items List */}
+                            <div>
+                                <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Produits</h4>
+                                <div className="bg-slate-800/30 rounded-lg overflow-hidden border border-slate-800">
+                                    {selectedOrder.products.map((item: any, idx: number) => (
+                                        <div key={idx} className="p-4 flex items-center gap-4 border-b border-slate-800 last:border-0">
+                                            {item.image && (
+                                                <img src={item.image} alt="" className="w-12 h-12 object-contain bg-white rounded" />
+                                            )}
+                                            <div className="flex-1">
+                                                <p className="font-bold text-white">{item.name}</p>
+                                                {/* Raw variant dump for debugging/simplicity */}
+                                                <p className="text-sm text-slate-400">
+                                                    {item.variant?.title || (item.options && Object.values(item.options).join(' / ')) || 'Standard'}
+                                                </p>
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Paiement</div>
-                                        <div className="font-medium text-slate-900">{selectedOrder?.paymentMethodSnapshot?.name || 'Standard'}</div>
-                                        <div className={`mt-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold uppercase ${selectedOrder.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-                                            selectedOrder.status === 'delivered' ? 'bg-blue-100 text-blue-700' :
-                                                selectedOrder.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                                    'bg-amber-100 text-amber-700'
-                                            }`}>
-                                            {selectedOrder.status === 'pending' ? 'En attente' :
-                                                selectedOrder.status === 'paid' ? 'Payé' :
-                                                    selectedOrder.status === 'delivered' ? 'Livré' : 'Annulé'}
+                                            <div className="text-right">
+                                                <p className="text-white font-mono">x{item.quantity}</p>
+                                                <p className="text-sm text-slate-400">{(item.totalItemPrice || item.price * item.quantity).toLocaleString()} DA</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Order Items Table */}
-                            <div className="bg-white rounded-b-lg overflow-hidden border-t-0">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
-                                        <tr>
-                                            <th className="py-3 px-6 w-1/2">Description</th>
-                                            <th className="py-3 px-4 text-center">Qté</th>
-                                            <th className="py-3 px-6 text-right">Montant</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {selectedOrder.products.map((item: any, idx: number) => {
-                                            // Fallback logic for old orders that didn't have totalItemPrice
-                                            const itemTotal = item.totalItemPrice || (item.price * item.quantity);
-
-                                            // Debug log to check what's actually in item.variant and item.options
-                                            console.log('Order Item:', item.name, 'Variant:', item.variant, 'Options:', item.options);
-
-                                            // Variant formatting - prioritized check
-                                            let variantText = '';
-                                            if (item.variant && item.variant.title) {
-                                                variantText = item.variant.title;
-                                            } else if (item.options && typeof item.options === 'object') {
-                                                // Handle options object (e.g. { Size: "42", Color: "Brown" })
-                                                const optionsValues = Object.values(item.options).filter(Boolean);
-                                                if (optionsValues.length > 0) {
-                                                    variantText = optionsValues.join(' / ');
-                                                }
-                                            }
-
-                                            return (
-                                                <tr key={`${item._id || idx}-${idx}`} className="hover:bg-slate-50/50 transition-colors">
-                                                    <td className="py-4 px-6">
-                                                        <div className="flex items-center gap-4">
-                                                            {item.image && (
-                                                                <div className="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden flex-shrink-0 bg-white p-1">
-                                                                    <img src={item.image} className="w-full h-full object-contain" alt="" />
-                                                                </div>
-                                                            )}
-                                                            <div>
-                                                                <div className="font-bold text-slate-900">{item.name}</div>
-                                                                {variantText && (
-                                                                    <div className="text-xs text-slate-500 font-medium mt-0.5">
-                                                                        Variante: <span className="text-slate-900 font-bold">{variantText}</span>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-4 text-center font-mono text-slate-600">
-                                                        {item.quantity}
-                                                    </td>
-                                                    <td className="py-4 px-6 text-right font-medium text-slate-900">
-                                                        {itemTotal.toLocaleString()} <span className="text-xs text-slate-400">DA</span>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                    <tfoot className="bg-slate-50/50 border-t border-slate-100">
-                                        <tr>
-                                            <td className="py-4 px-6 text-right font-medium text-slate-500" colSpan={2}>Total Commande</td>
-                                            <td className="py-4 px-6 text-right">
-                                                <span className="text-xl font-bold text-slate-900">
-                                                    {selectedOrder.totalAmount?.toLocaleString()}
-                                                </span>
-                                                <span className="text-sm font-medium text-slate-500 ml-1">DA</span>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-
-                            {/* Actions Footer */}
-                            <div className="pt-4 flex justify-end gap-3">
+                            {/* Actions */}
+                            <div className="pt-4 flex justify-end gap-3 border-t border-slate-800">
                                 <button
                                     onClick={() => handleStatusUpdate(selectedOrder._id, 'paid')}
                                     disabled={selectedOrder.status === 'paid' || selectedOrder.status === 'delivered' || selectedOrder.status === 'cancelled'}
-                                    className="btn bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded text-sm flex items-center gap-2 disabled:opacity-50"
                                 >
-                                    <CheckCircle size={14} /> Payé
+                                    <CheckCircle size={16} /> Payé
                                 </button>
                                 <button
                                     onClick={() => handleStatusUpdate(selectedOrder._id, 'delivered')}
                                     disabled={selectedOrder.status === 'delivered' || selectedOrder.status === 'cancelled'}
-                                    className="btn bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="btn bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded text-sm flex items-center gap-2 disabled:opacity-50"
                                 >
-                                    <CheckCircle size={14} /> Livré
+                                    <CheckCircle size={16} /> Livré
                                 </button>
                                 <button
                                     onClick={() => handleStatusUpdate(selectedOrder._id, 'cancelled')}
                                     disabled={selectedOrder.status === 'cancelled' || selectedOrder.status === 'delivered'}
-                                    className="btn bg-slate-600 hover:bg-slate-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="btn bg-slate-600 hover:bg-slate-700 text-white py-2 px-4 rounded text-sm flex items-center gap-2 disabled:opacity-50"
                                 >
-                                    <CheckCircle size={14} /> Annuler
+                                    <CheckCircle size={16} /> Annuler
                                 </button>
                                 <button
                                     onClick={async () => {
-                                        if (window.confirm('Êtes-vous sûr de vouloir SUPPRIMER cette commande définitivement ?')) {
+                                        if (window.confirm('Supprimer définitivement ?')) {
                                             try {
                                                 await api.delete(`/orders/${selectedOrder._id}`);
                                                 setSelectedOrder(null);
                                                 fetchOrders();
-                                            } catch (error) {
-                                                alert('Erreur lors de la suppression');
-                                            }
+                                            } catch (e) { alert('Erreur'); }
                                         }
                                     }}
-                                    className="btn bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm flex items-center justify-center gap-2"
+                                    className="btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded text-sm flex items-center gap-2"
                                 >
-                                    <CheckCircle size={14} /> Supprimer
-                                </button>
-                                <button
-                                    onClick={() => window.print()}
-                                    className="btn bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-sm flex items-center justify-center gap-2 print:hidden"
-                                >
-                                    <Printer size={14} /> Imprimer
+                                    <CheckCircle size={16} /> Supprimer
                                 </button>
                             </div>
-                        </>
+                        </div>
                     ) : (
                         <div className="text-center text-slate-500 py-12 flex flex-col items-center">
                             <Clock size={48} className="mb-4 opacity-20" />
