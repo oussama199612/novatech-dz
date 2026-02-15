@@ -108,7 +108,8 @@ const ProductLanding = () => {
                         title: currentVariant.title,
                         price: currentVariant.price,
                         sku: currentVariant.sku
-                    } : undefined
+                    } : undefined,
+                    options: selectedOptions // Pass the raw selected options (Size, Color, etc.)
                 }],
                 ...formData,
                 paymentMethodId: selectedMethodId

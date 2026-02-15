@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Copy, Check, ArrowRight, Wallet } from 'lucide-react';
 import api from '../api';
 import { type Product, type PaymentMethod } from '../types';
@@ -8,6 +8,11 @@ import { getImageUrl } from '../utils';
 const OrderPage = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Retrieve variant info passed from ProductLanding
+    const { quantity = 1, variant = null, options = null } = location.state || {};
+
     const [product, setProduct] = useState<Product | null>(null);
     const [methods, setMethods] = useState<PaymentMethod[]>([]);
     const [selectedMethodId, setSelectedMethodId] = useState<string>('');
@@ -51,9 +56,14 @@ const OrderPage = () => {
         if (!product || !selectedMethodId) return;
 
         try {
-            // 1. Create order in Backend
+            // 1. Create order in Backend with Variant Info
             const orderData = {
-                orderItems: [{ product: product._id, qty: 1 }],
+                orderItems: [{
+                    product: product._id,
+                    qty: quantity,
+                    variant: variant,
+                    options: options
+                }],
                 ...formData,
                 paymentMethodId: selectedMethodId
             };
@@ -62,11 +72,18 @@ const OrderPage = () => {
 
             // 2. Generate WhatsApp Message
             const method = methods.find(m => m._id === selectedMethodId);
+
+            // Format variant text for WA
+            let variantText = '';
+            if (variant?.title) variantText = `(${variant.title})`;
+            else if (options) variantText = `(${Object.values(options).join('/')})`;
+
             const message = `
 *NOUVELLE COMMANDE* 🛍️
 ------------------
-*Produit:* ${product.name}
-*Prix:* ${product.price} DZD
+*Produit:* ${product.name} ${variantText}
+*Qté:* ${quantity}
+*Prix:* ${variant?.price || product.price} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
 ------------------
@@ -95,9 +112,6 @@ Merci de confirmer ma commande !
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Product Info */}
             <div className="space-y-6">
-                import {getImageUrl} from '../utils';
-
-                // ...
 
                 <div className="glass-panel p-2">
                     <img src={getImageUrl(product.image)} alt={product.name} className="w-full rounded-xl" />

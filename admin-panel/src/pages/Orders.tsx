@@ -150,11 +150,15 @@ const Orders = () => {
                                                 <img src={item.image} alt="" className="w-12 h-12 object-contain bg-white rounded" />
                                             )}
                                             <div className="flex-1">
-                                                <p className="font-bold text-white">{item.name}</p>
-                                                {/* Raw variant dump for debugging/simplicity */}
-                                                <p className="text-sm text-slate-400">
-                                                    {item.variant?.title || (item.options && Object.values(item.options).join(' / ')) || 'Standard'}
-                                                </p>
+                                                <p className="font-bold text-white mb-0.5">{item.name}</p>
+                                                {/* Enhanced Variant Display */}
+                                                {(item.variant?.title || (item.options && Object.keys(item.options).length > 0)) ? (
+                                                    <div className="text-sm text-novatech-blue font-medium bg-blue-900/20 px-2 py-1 rounded w-fit border border-blue-500/30">
+                                                        {item.variant?.title || Object.values(item.options).join(' / ')}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500 italic">Standard</p>
+                                                )}
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-white font-mono">x{item.quantity}</p>
