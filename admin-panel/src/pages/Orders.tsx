@@ -156,16 +156,23 @@ const Orders = () => {
                                             // Fallback logic for old orders that didn't have totalItemPrice
                                             const itemTotal = item.totalItemPrice || (item.price * item.quantity);
 
-                                            // Variant formatting
+                                            // Debug log to check what's actually in item.variant and item.options
+                                            console.log('Order Item:', item.name, 'Variant:', item.variant, 'Options:', item.options);
+
+                                            // Variant formatting - prioritized check
                                             let variantText = '';
-                                            if (item.variant?.title) {
-                                                variantText = item.variant.title; // e.g., "Noir / 42"
-                                            } else if (item.options) {
-                                                variantText = Object.values(item.options).join(' / ');
+                                            if (item.variant && item.variant.title) {
+                                                variantText = item.variant.title;
+                                            } else if (item.options && typeof item.options === 'object') {
+                                                // Handle options object (e.g. { Size: "42", Color: "Brown" })
+                                                const optionsValues = Object.values(item.options).filter(Boolean);
+                                                if (optionsValues.length > 0) {
+                                                    variantText = optionsValues.join(' / ');
+                                                }
                                             }
 
                                             return (
-                                                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                                                <tr key={`${item._id || idx}-${idx}`} className="hover:bg-slate-50/50 transition-colors">
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center gap-4">
                                                             {item.image && (
@@ -177,7 +184,7 @@ const Orders = () => {
                                                                 <div className="font-bold text-slate-900">{item.name}</div>
                                                                 {variantText && (
                                                                     <div className="text-xs text-slate-500 font-medium mt-0.5">
-                                                                        Variante: <span className="text-slate-700">{variantText}</span>
+                                                                        Variante: <span className="text-slate-900 font-bold">{variantText}</span>
                                                                     </div>
                                                                 )}
                                                             </div>
