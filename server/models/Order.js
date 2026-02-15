@@ -17,6 +17,9 @@ const orderSchema = mongoose.Schema({
         price: { type: Number, required: true },
         quantity: { type: Number, required: true },
         image: { type: String, required: true },
+        variant: { type: Object }, // Store variant snapshot (title, price, sku)
+        options: { type: Object }, // Store selected options (Size: 42, Color: Red)
+        totalItemPrice: { type: Number } // Store calculated total for this item
     }],
 
     totalAmount: { type: Number, required: true },
