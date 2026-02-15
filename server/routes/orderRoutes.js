@@ -38,6 +38,32 @@ router.post('/', asyncHandler(async (req, res) => {
 
             // OLD LOCATION OF PUSH REMOVED TO PREVENT DUPLICATION
 
+            let unitPrice = product.price; // Default to base price
+
+            // Decrement Stock Logic & Determine Unit Price
+            if (product.hasVariants && item.variant) {
+                const variantIndex = product.variants.findIndex(v => v.title === item.variant.title);
+                if (variantIndex > -1) {
+                    if (product.variants[variantIndex].stock < item.qty) {
+                        res.status(400);
+                        throw new Error(`Stock insuffisant pour ${product.name} - ${item.variant.title}`);
+                    }
+                    product.variants[variantIndex].stock -= item.qty;
+                    // Also decrement total stock if you track it
+                    product.stock -= item.qty;
+
+                    // USE VARIANT PRICE
+                    unitPrice = product.variants[variantIndex].price;
+                }
+            } else {
+                if (product.stock < item.qty) {
+                    res.status(400);
+                    throw new Error(`Stock insuffisant pour ${product.name}`);
+                }
+                product.stock -= item.qty;
+            }
+            await product.save();
+
             let itemPrice = 0;
             let remainingQty = item.qty;
 
@@ -53,34 +79,13 @@ router.post('/', asyncHandler(async (req, res) => {
                 }
             }
 
-            // Add remaining items at standard unit price
-            itemPrice += remainingQty * product.price;
-
-            // Decrement Stock Logic
-            if (product.hasVariants && item.variant) {
-                const variantIndex = product.variants.findIndex(v => v.title === item.variant.title);
-                if (variantIndex > -1) {
-                    if (product.variants[variantIndex].stock < item.qty) {
-                        res.status(400);
-                        throw new Error(`Stock insuffisant pour ${product.name} - ${item.variant.title}`);
-                    }
-                    product.variants[variantIndex].stock -= item.qty;
-                    // Also decrement total stock if you track it
-                    product.stock -= item.qty;
-                }
-            } else {
-                if (product.stock < item.qty) {
-                    res.status(400);
-                    throw new Error(`Stock insuffisant pour ${product.name}`);
-                }
-                product.stock -= item.qty;
-            }
-            await product.save();
+            // Add remaining items at standard unit price (Variant Price or Base Price)
+            itemPrice += remainingQty * unitPrice;
 
             dbOrderItems.push({
                 product: product._id,
                 name: product.name,
-                price: product.price, // Unit price (base)
+                price: unitPrice, // Save the actual unit price used
                 quantity: item.qty,
                 image: item.variant?.image || product.image, // Use variant image if available
                 variant: item.variant, // SAVE THE VARIANT
