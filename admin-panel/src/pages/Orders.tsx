@@ -119,7 +119,32 @@ const Orders = () => {
                             <div>
                                 <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Produits</h4>
                                 <div className="bg-slate-800/30 rounded-lg overflow-hidden border border-slate-800">
-                                    {selectedOrder.products.map((item: any, idx: number) => (
+                                    {/* Deduplicate items for display to handle legacy bad data */}
+                                    {selectedOrder.products.reduce((acc: any[], item: any) => {
+                                        // Create a unique key based on product ID and variant info
+                                        const variantKey = item.variant?.title || (item.options ? JSON.stringify(item.options) : 'standard');
+                                        const key = `${item.product}-${variantKey}`;
+
+                                        // Check if we already have this item (naive dedupe for exact duplicates)
+                                        // Note: If you have 2 identical items legitimately (unlikely in this context), this might merge them,
+                                        // but it's better than the current double-display bug.
+                                        // A better check is to see if one has 'variant' populated and the other doesn't (the bug case).
+
+                                        // The bug produced one entry with NO variant info, and one WITH variant info (or just duplicates).
+                                        // We prefer the one WITH keys if possible, or just unique ones.
+
+                                        // Simple Unique Filter by comparing properties:
+                                        const exists = acc.find(existing =>
+                                            existing.product._id === item.product._id &&
+                                            JSON.stringify(existing.variant) === JSON.stringify(item.variant) &&
+                                            JSON.stringify(existing.options) === JSON.stringify(item.options)
+                                        );
+
+                                        if (!exists) {
+                                            acc.push(item);
+                                        }
+                                        return acc;
+                                    }, []).map((item: any, idx: number) => (
                                         <div key={idx} className="p-4 flex items-center gap-4 border-b border-slate-800 last:border-0">
                                             {item.image && (
                                                 <img src={item.image} alt="" className="w-12 h-12 object-contain bg-white rounded" />

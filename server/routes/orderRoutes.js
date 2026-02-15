@@ -35,13 +35,9 @@ router.post('/', asyncHandler(async (req, res) => {
                 res.status(404);
                 throw new Error(`Product not found: ${item.product}`);
             }
-            dbOrderItems.push({
-                product: product._id,
-                name: product.name,
-                price: product.price,
-                quantity: item.qty,
-                image: product.image
-            });
+
+            // OLD LOCATION OF PUSH REMOVED TO PREVENT DUPLICATION
+
             let itemPrice = 0;
             let remainingQty = item.qty;
 
