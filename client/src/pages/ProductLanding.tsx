@@ -387,7 +387,9 @@ Merci de confirmer ma commande !
                                         <CreditCard size={16} className="text-luxury-gold" />
                                         Commander
                                     </span>
-                                    {currentVariant?.stock === 0 ? (
+                                    {product.hasVariants && !currentVariant ? (
+                                        <span className="text-xs text-gray-500 font-mono">● Non disponible</span>
+                                    ) : currentVariant?.stock === 0 ? (
                                         <span className="text-xs text-red-500 font-mono">● Rupture de stock</span>
                                     ) : (
                                         <span className="text-xs text-emerald-600 font-mono animate-pulse">● En Stock</span>
@@ -543,7 +545,7 @@ Merci de confirmer ma commande !
 
                                     <button
                                         type="submit"
-                                        disabled={!selectedMethodId || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
+                                        disabled={!selectedMethodId || (product.hasVariants && !currentVariant) || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
                                         className="w-full py-5 font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
                                         style={{ backgroundColor: 'black' }}
                                     >
@@ -554,7 +556,7 @@ Merci de confirmer ma commande !
                                     <button
                                         type="button"
                                         onClick={handleAddToCart}
-                                        disabled={currentVariant?.stock === 0 && currentVariant?.trackQuantity}
+                                        disabled={(product.hasVariants && !currentVariant) || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
                                         className="w-full py-5 font-bold text-black border-2 border-black bg-white shadow-xl shadow-gray-200/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
                                     >
                                         Ajouter au panier <ShoppingBag size={18} />

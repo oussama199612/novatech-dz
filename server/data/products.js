@@ -14,9 +14,9 @@ const products = [
             { name: 'Stockage', values: ['256GB', '512GB', '1TB'] }
         ],
         variants: [
-            { title: 'Titane Naturel / 256GB', price: 285000, stock: 5 },
-            { title: 'Titane Bleu / 256GB', price: 285000, stock: 5 },
-            { title: 'Titane Noir / 512GB', price: 310000, stock: 3 }
+            { title: 'Titane Naturel / 256GB', price: 285000, stock: 5, image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=800' },
+            { title: 'Titane Bleu / 256GB', price: 285000, stock: 5, image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?auto=format&fit=crop&q=80&w=800' },
+            { title: 'Titane Noir / 512GB', price: 310000, stock: 3, image: 'https://images.unsplash.com/photo-1696446700547-0628e8f80472?auto=format&fit=crop&q=80&w=800' }
         ],
         features: [
             { title: 'Processeur', description: 'A17 Pro' },
