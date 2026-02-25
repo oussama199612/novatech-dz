@@ -8,6 +8,7 @@ const Categories = () => {
     const [newName, setNewName] = useState('');
     const [newSlug, setNewSlug] = useState('');
     const [newIcon, setNewIcon] = useState('');
+    const [newParentCategory, setNewParentCategory] = useState('');
 
     const fetchCategories = async () => {
         try {
@@ -27,10 +28,11 @@ const Categories = () => {
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/categories', { name: newName, slug: newSlug, icon: newIcon });
+            await api.post('/categories', { name: newName, slug: newSlug, icon: newIcon, parentCategory: newParentCategory || null });
             setNewName('');
             setNewSlug('');
             setNewIcon('');
+            setNewParentCategory('');
             fetchCategories();
         } catch (error) {
             alert('Erreur: Vérifiez que le slug est unique.');
@@ -91,6 +93,19 @@ const Categories = () => {
                                 placeholder="ex: Monitor"
                             />
                         </div>
+                        <div>
+                            <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Catégorie Parente</label>
+                            <select
+                                value={newParentCategory}
+                                onChange={(e) => setNewParentCategory(e.target.value)}
+                                className="input-field w-full"
+                            >
+                                <option value="">Aucune (Catégorie Principale)</option>
+                                {categories.filter(c => !c.parentCategory).map(cat => (
+                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
                         <button type="submit" className="btn-primary w-full py-2">Ajouter</button>
                     </form>
                 </div>
@@ -104,7 +119,10 @@ const Categories = () => {
                                     <Layers size={24} />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white">{cat.name}</h4>
+                                    <h4 className="font-bold text-white">
+                                        {cat.parentCategory && <span className="text-slate-500 mr-2 text-sm">↳ {cat.parentCategory.name} /</span>}
+                                        {cat.name}
+                                    </h4>
                                     <div className="text-sm text-slate-500 font-mono">/{cat.slug}</div>
                                 </div>
                             </div>

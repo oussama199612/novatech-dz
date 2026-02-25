@@ -8,7 +8,7 @@ const { protect } = require('../middleware/authMiddleware');
 // @route   GET /api/categories
 // @access  Public
 router.get('/', asyncHandler(async (req, res) => {
-    const categories = await Category.find({}).sort({ createdAt: -1 });
+    const categories = await Category.find({}).populate('parentCategory').sort({ createdAt: -1 });
     res.json(categories);
 }));
 
@@ -16,7 +16,7 @@ router.get('/', asyncHandler(async (req, res) => {
 // @route   POST /api/categories
 // @access  Private/Admin
 router.post('/', protect, asyncHandler(async (req, res) => {
-    const { name, slug, icon } = req.body;
+    const { name, slug, icon, parentCategory } = req.body;
 
     const categoryExists = await Category.findOne({ slug });
     if (categoryExists) {
@@ -27,7 +27,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
     const category = await Category.create({
         name,
         slug,
-        icon
+        icon,
+        parentCategory: parentCategory || null
     });
 
     if (category) {
@@ -49,6 +50,9 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         category.slug = req.body.slug || category.slug;
         category.icon = req.body.icon || category.icon;
         category.active = req.body.active !== undefined ? req.body.active : category.active;
+        if (req.body.parentCategory !== undefined) {
+            category.parentCategory = req.body.parentCategory || null;
+        }
 
         const updatedCategory = await category.save();
         res.json(updatedCategory);

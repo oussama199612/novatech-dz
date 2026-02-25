@@ -12,6 +12,7 @@ const ProductLanding = () => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [product, setProduct] = useState<Product | null>(null);
+    const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
     const [methods, setMethods] = useState<PaymentMethod[]>([]);
     const [activeImage, setActiveImage] = useState('');
     const [selectedMethodId, setSelectedMethodId] = useState<string>('');
@@ -36,13 +37,15 @@ const ProductLanding = () => {
         window.scrollTo(0, 0);
         const fetchData = async () => {
             try {
-                const [prodRes, methodsRes, settingsRes] = await Promise.all([
+                const [prodRes, methodsRes, settingsRes, similarRes] = await Promise.all([
                     api.get(`/products/${productId}`),
                     api.get('/payment-methods'),
-                    api.get('/settings')
+                    api.get('/settings'),
+                    api.get(`/products/${productId}/similar`)
                 ]);
                 const prod = prodRes.data;
                 setProduct(prod);
+                setSimilarProducts(similarRes.data);
                 setMethods(methodsRes.data);
                 setSettings(settingsRes.data || {});
 
@@ -595,6 +598,28 @@ Merci de confirmer ma commande !
                     </div>
 
                 </div>
+
+                {/* SIMILAR PRODUCTS */}
+                {similarProducts.length > 0 && (
+                    <div className="mt-24 border-t border-gray-200 pt-16">
+                        <h2 className="text-3xl font-serif text-black mb-8 text-center">Vous aimerez aussi</h2>
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            {similarProducts.map((p) => (
+                                <div key={p._id} className="group cursor-pointer" onClick={() => navigate(`/product/${p._id}`)}>
+                                    <div className="relative aspect-square bg-white rounded-xl overflow-hidden mb-4 border border-slate-100 shadow-sm">
+                                        <img
+                                            alt={p.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            src={getImageUrl(p.image)}
+                                        />
+                                    </div>
+                                    <h3 className="line-clamp-1 font-bold text-sm mb-1 group-hover:text-luxury-gold transition-colors">{p.name}</h3>
+                                    <p className="text-luxury-gold font-bold text-sm">{p.price.toLocaleString()} DZD</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

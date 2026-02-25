@@ -20,7 +20,22 @@ router.get('/', asyncHandler(async (req, res) => {
     const filters = { ...keyword };
 
     if (req.query.vendor) {
-        filters.vendor = req.query.vendor;
+        // Support multiple vendors sent as comma separated string
+        const vendorsArray = req.query.vendor.split(',').map(v => v.trim());
+        filters.vendor = { $in: vendorsArray };
+    }
+
+    if (req.query.inStock === 'true') {
+        filters.$or = [
+            { stock: { $gt: 0 } },
+            { 'variants.stock': { $gt: 0 } }
+        ];
+    }
+
+    if (req.query.minPrice || req.query.maxPrice) {
+        filters.price = {};
+        if (req.query.minPrice) filters.price.$gte = Number(req.query.minPrice);
+        if (req.query.maxPrice) filters.price.$lte = Number(req.query.maxPrice);
     }
 
     if (req.query.tags) {
@@ -57,6 +72,38 @@ router.get('/filters', asyncHandler(async (req, res) => {
         vendors: cleanVendors,
         tags: cleanTags
     });
+}));
+
+// @desc    Get similar products
+// @route   GET /api/products/:id/similar
+// @access  Public
+router.get('/:id/similar', asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        res.status(404);
+        throw new Error('Product not found');
+    }
+
+    const filters = {
+        _id: { $ne: product._id },
+        active: true
+    };
+
+    if (product.tags && product.tags.length > 0) {
+        filters.$or = [
+            { category: product.category },
+            { tags: { $in: product.tags } }
+        ];
+    } else {
+        filters.category = product.category;
+    }
+
+    const similarProducts = await Product.find(filters)
+        .populate('category')
+        .sort({ createdAt: -1 })
+        .limit(4);
+
+    res.json(similarProducts);
 }));
 
 // @desc    Fetch single product

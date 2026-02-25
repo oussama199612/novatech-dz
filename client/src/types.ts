@@ -22,6 +22,9 @@ export interface Product {
     features?: { icon: string; title: string; description: string }[];
     longDescription?: string;
     accentColor?: string;
+    vendor?: string;
+    productType?: string;
+    tags?: string[];
 }
 
 export interface Category {

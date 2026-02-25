@@ -1,40 +1,66 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ChevronRight, Search, Menu, Filter, X, ChevronDown } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ShoppingBag, ChevronRight, Filter, X } from 'lucide-react';
 import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product } from '../types';
 
 const Catalogue = () => {
     const [products, setProducts] = useState<Product[]>([]);
+    const [fetchedCategories, setFetchedCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // Filters State
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
-    const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-    const [selectedColors, setSelectedColors] = useState<string[]>([]);
-    const [sortBy, setSortBy] = useState('newest');
+    // Filters State initialized from URL
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(searchParams.get('cat')?.split(',').filter(Boolean) || []);
+    const [selectedVendors, setSelectedVendors] = useState<string[]>(searchParams.get('vendor')?.split(',').filter(Boolean) || []);
+    const [priceRange, setPriceRange] = useState<[number, number]>([
+        Number(searchParams.get('minP')) || 0,
+        Number(searchParams.get('maxP')) || 1000000
+    ]);
+    const [selectedSizes, setSelectedSizes] = useState<string[]>(searchParams.get('size')?.split(',').filter(Boolean) || []);
+    const [selectedColors, setSelectedColors] = useState<string[]>(searchParams.get('color')?.split(',').filter(Boolean) || []);
+    const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === 'true');
+    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
+
+    // URL Sync Effect
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (selectedCategories.length) params.set('cat', selectedCategories.join(','));
+        if (selectedVendors.length) params.set('vendor', selectedVendors.join(','));
+        if (priceRange[0] > 0) params.set('minP', priceRange[0].toString());
+        if (priceRange[1] < 1000000) params.set('maxP', priceRange[1].toString());
+        if (selectedSizes.length) params.set('size', selectedSizes.join(','));
+        if (selectedColors.length) params.set('color', selectedColors.join(','));
+        if (inStockOnly) params.set('stock', 'true');
+        if (sortBy !== 'newest') params.set('sort', sortBy);
+
+        setSearchParams(params, { replace: true });
+    }, [selectedCategories, selectedVendors, priceRange, selectedSizes, selectedColors, inStockOnly, sortBy, setSearchParams]);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchAllData = async () => {
             try {
-                // Fetch all products (active true by default in backend usually, or filter client side)
-                const { data } = await api.get('/products');
-                setProducts(data);
+                const [productsRes, categoriesRes] = await Promise.all([
+                    api.get('/products'),
+                    api.get('/categories')
+                ]);
+                setProducts(productsRes.data);
+                setFetchedCategories(categoriesRes.data);
             } catch (error) {
-                console.error('Failed to fetch products', error);
+                console.error('Failed to fetch data', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProducts();
+        fetchAllData();
     }, []);
 
-    // Unique values for filters (derived from products)
-    const categories = Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)));
+    // Organized categories
+    const parentCategories = fetchedCategories.filter(cat => !cat.parentCategory);
+    const allVendors = Array.from(new Set(products.map(p => p.vendor).filter((v): v is string => !!v)));
     // Extract sizes and colors from variants/options
     // Extract sizes and colors from variants/options
     // Extract sizes and colors from variants/options
@@ -54,9 +80,18 @@ const Catalogue = () => {
         if (selectedCategories.length > 0 && (!product.category || !selectedCategories.includes(product.category.name))) {
             return false;
         }
+        // Vendor
+        if (selectedVendors.length > 0 && (!product.vendor || !selectedVendors.includes(product.vendor))) {
+            return false;
+        }
         // Price
         if (product.price < priceRange[0] || product.price > priceRange[1]) {
             return false;
+        }
+        // In Stock
+        if (inStockOnly) {
+            const hasStock = product.stock > 0 || (product.variants?.some(v => v.stock > 0));
+            if (!hasStock) return false;
         }
 
         // Strict Variant Availability Check
@@ -174,18 +209,73 @@ const Catalogue = () => {
                         <div>
                             <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Category</h3>
                             <div className="space-y-3">
-                                {categories.map(cat => (
-                                    <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedCategories.includes(cat)}
-                                            onChange={() => toggleFilter(cat, setSelectedCategories)}
-                                            className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
-                                        />
-                                        <span className="text-sm group-hover:text-primary transition-colors">{cat}</span>
-                                    </label>
-                                ))}
+                                {parentCategories.map(parentCat => {
+                                    const subCats = fetchedCategories.filter(c => c.parentCategory?._id === parentCat._id);
+                                    return (
+                                        <div key={parentCat._id} className="space-y-2">
+                                            <label className="flex items-center gap-3 cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories.includes(parentCat.name)}
+                                                    onChange={() => toggleFilter(parentCat.name, setSelectedCategories)}
+                                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                                />
+                                                <span className="text-sm font-bold group-hover:text-primary transition-colors">{parentCat.name}</span>
+                                            </label>
+                                            {subCats.length > 0 && (
+                                                <div className="pl-6 space-y-2">
+                                                    {subCats.map(subCat => (
+                                                        <label key={subCat._id} className="flex items-center gap-3 cursor-pointer group">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedCategories.includes(subCat.name)}
+                                                                onChange={() => toggleFilter(subCat.name, setSelectedCategories)}
+                                                                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                                            />
+                                                            <span className="text-sm text-slate-500 group-hover:text-primary transition-colors">{subCat.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
+                        </div>
+
+                        {/* Vendors / Brands */}
+                        {allVendors.length > 0 && (
+                            <div className="mt-10">
+                                <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Marque</h3>
+                                <div className="space-y-3">
+                                    {allVendors.map(vendor => (
+                                        <label key={vendor} className="flex items-center gap-3 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedVendors.includes(vendor)}
+                                                onChange={() => toggleFilter(vendor, setSelectedVendors)}
+                                                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                            />
+                                            <span className="text-sm group-hover:text-primary transition-colors">{vendor}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* In Stock Only */}
+                        <div className="mt-10 mb-2">
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={inStockOnly}
+                                    onChange={(e) => setInStockOnly(e.target.checked)}
+                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                />
+                                <span className="font-bold text-sm tracking-widest uppercase group-hover:text-primary transition-colors">
+                                    En Stock Uniquement
+                                </span>
+                            </label>
                         </div>
 
                         {/* Price Range */}
@@ -264,6 +354,8 @@ const Catalogue = () => {
                         <button
                             onClick={() => {
                                 setSelectedCategories([]);
+                                setSelectedVendors([]);
+                                setInStockOnly(false);
                                 setPriceRange([0, 1000000]);
                                 setSelectedSizes([]);
                                 setSelectedColors([]);
@@ -329,6 +421,8 @@ const Catalogue = () => {
                                         <p className="text-lg text-slate-400">Aucun produit ne correspond à vos critères.</p>
                                         <button onClick={() => {
                                             setSelectedCategories([]);
+                                            setSelectedVendors([]);
+                                            setInStockOnly(false);
                                             setPriceRange([0, 1000000]);
                                             setSelectedSizes([]);
                                             setSelectedColors([]);
