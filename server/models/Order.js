@@ -6,6 +6,7 @@ const orderSchema = mongoose.Schema({
     customerEmail: { type: String, required: true },
     customerPhone: { type: String, required: true },
     gameId: { type: String }, // Optional field for Game ID
+    store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' }, // Store origin
 
     products: [{
         product: {

@@ -17,7 +17,8 @@ router.post('/', asyncHandler(async (req, res) => {
         customerEmail,
         customerPhone,
         gameId,
-        paymentMethodId
+        paymentMethodId,
+        storeId
     } = req.body;
 
     if (orderItems && orderItems.length === 0) {
@@ -44,10 +45,27 @@ router.post('/', asyncHandler(async (req, res) => {
             if (product.hasVariants && item.variant) {
                 const variantIndex = product.variants.findIndex(v => v.title === item.variant.title);
                 if (variantIndex > -1) {
+                    let localStockAvailable = false;
+
+                    if (storeId) {
+                        const locIdx = product.variants[variantIndex].locationsStock?.findIndex(l => l.store.toString() === storeId);
+                        if (locIdx > -1) {
+                            if (product.variants[variantIndex].locationsStock[locIdx].stock >= item.qty) {
+                                product.variants[variantIndex].locationsStock[locIdx].stock -= item.qty;
+                                localStockAvailable = true;
+                            }
+                        }
+                    }
+
                     if (product.variants[variantIndex].stock < item.qty) {
                         res.status(400);
-                        throw new Error(`Stock insuffisant pour ${product.name} - ${item.variant.title}`);
+                        throw new Error(`Stock global insuffisant pour ${product.name} - ${item.variant.title}`);
                     }
+                    if (storeId && !localStockAvailable) {
+                        res.status(400);
+                        throw new Error(`Stock local insuffisant dans ce magasin pour ${product.name} - ${item.variant.title}`);
+                    }
+
                     product.variants[variantIndex].stock -= item.qty;
                     // Also decrement total stock if you track it
                     product.stock -= item.qty;
@@ -56,10 +74,26 @@ router.post('/', asyncHandler(async (req, res) => {
                     unitPrice = product.variants[variantIndex].price;
                 }
             } else {
+                let localStockAvailable = false;
+                if (storeId) {
+                    const locIdx = product.locationsStock?.findIndex(l => l.store.toString() === storeId);
+                    if (locIdx > -1) {
+                        if (product.locationsStock[locIdx].stock >= item.qty) {
+                            product.locationsStock[locIdx].stock -= item.qty;
+                            localStockAvailable = true;
+                        }
+                    }
+                }
+
                 if (product.stock < item.qty) {
                     res.status(400);
-                    throw new Error(`Stock insuffisant pour ${product.name}`);
+                    throw new Error(`Stock global insuffisant pour ${product.name}`);
                 }
+                if (storeId && !localStockAvailable) {
+                    res.status(400);
+                    throw new Error(`Stock local insuffisant dans ce magasin pour ${product.name}`);
+                }
+
                 product.stock -= item.qty;
             }
             await product.save();
@@ -113,6 +147,7 @@ router.post('/', asyncHandler(async (req, res) => {
             products: dbOrderItems,
             totalAmount: totalPrice,
             paymentMethodId,
+            store: storeId || undefined,
             paymentMethodSnapshot: {
                 name: paymentMethod.name,
                 accountLabel: paymentMethod.accountLabel,
@@ -135,6 +170,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
+        .populate('store', 'name city')
         .sort({ createdAt: -1 })
         .limit(pageSize)
         .skip(pageSize * (page - 1));
@@ -149,9 +185,9 @@ router.get('/:id', asyncHandler(async (req, res) => {
     // :id can be mongo ID or orderId string
     let order;
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-        order = await Order.findById(req.params.id).populate('products.product');
+        order = await Order.findById(req.params.id).populate('products.product').populate('store', 'name city address');
     } else {
-        order = await Order.findOne({ orderId: req.params.id }).populate('products.product');
+        order = await Order.findOne({ orderId: req.params.id }).populate('products.product').populate('store', 'name city address');
     }
 
     if (order) {

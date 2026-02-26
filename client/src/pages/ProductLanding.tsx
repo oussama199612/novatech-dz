@@ -25,6 +25,8 @@ const ProductLanding = () => {
         customerPhone: '',
         gameId: '',
     });
+    const [stores, setStores] = useState<any[]>([]);
+    const [selectedStoreId, setSelectedStoreId] = useState<string>('');
     const [alternatives, setAlternatives] = useState<any[]>([]);
     const [settings, setSettings] = useState<any>({});
     const [copied, setCopied] = useState(false);
@@ -38,12 +40,13 @@ const ProductLanding = () => {
         window.scrollTo(0, 0);
         const fetchData = async () => {
             try {
-                const [prodRes, methodsRes, settingsRes, similarRes, altsRes] = await Promise.all([
+                const [prodRes, methodsRes, settingsRes, similarRes, altsRes, storesRes] = await Promise.all([
                     api.get(`/products/${productId}`),
                     api.get('/payment-methods'),
                     api.get('/settings'),
                     api.get(`/products/${productId}/similar`),
-                    api.get(`/products/${productId}/alternatives`)
+                    api.get(`/products/${productId}/alternatives`),
+                    api.get('/stores/active')
                 ]);
                 const prod = prodRes.data;
                 setProduct(prod);
@@ -51,6 +54,11 @@ const ProductLanding = () => {
                 setAlternatives(altsRes.data);
                 setMethods(methodsRes.data);
                 setSettings(settingsRes.data || {});
+                setStores(storesRes.data);
+
+                if (storesRes.data && storesRes.data.length > 0) {
+                    setSelectedStoreId(storesRes.data[0]._id);
+                }
 
                 // Init Variants
                 if (prod.hasVariants && prod.options?.length > 0) {
@@ -118,7 +126,8 @@ const ProductLanding = () => {
                     options: selectedOptions // Pass the raw selected options (Size, Color, etc.)
                 }],
                 ...formData,
-                paymentMethodId: selectedMethodId
+                paymentMethodId: selectedMethodId,
+                storeId: selectedStoreId
             };
 
             const { data: order } = await api.post('/orders', orderData);
@@ -136,6 +145,7 @@ ${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Qté:* ${quanti
 *Total:* ${total.toLocaleString()} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
+*Magasin:* ${stores.find(s => s._id === selectedStoreId)?.name || 'Standard'}
 ------------------
 *Paiement:* ${method?.name}
 Merci de confirmer ma commande !
@@ -427,6 +437,22 @@ Merci de confirmer ma commande !
                                             <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
                                             <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
                                         </div>
+
+                                        {stores.length > 0 && (
+                                            <div className="pt-2">
+                                                <label className="text-xs font-bold text-black uppercase tracking-widest block mb-2">Magasin de Traitement</label>
+                                                <select
+                                                    value={selectedStoreId}
+                                                    onChange={(e) => setSelectedStoreId(e.target.value)}
+                                                    className="w-full bg-white border border-gray-200 rounded-none px-4 py-3 text-black font-medium focus:outline-none focus:border-luxury-gold transition-all"
+                                                >
+                                                    {stores.map(store => (
+                                                        <option key={store._id} value={store._id}>{store.name} - {store.city}</option>
+                                                    ))}
+                                                </select>
+                                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide">Sélectionnez le magasin le plus proche de chez vous</p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="space-y-4 pt-4">
