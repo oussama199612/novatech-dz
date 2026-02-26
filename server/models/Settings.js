@@ -12,6 +12,8 @@ const settingsSchema = mongoose.Schema({
 
     contactEmail: { type: String },
     contactPhone: { type: String },
+
+    enableMultiStore: { type: Boolean, default: false }, // Toggle for multi-store logic
 }, {
     timestamps: true
 });

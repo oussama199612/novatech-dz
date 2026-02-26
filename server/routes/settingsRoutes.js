@@ -14,7 +14,8 @@ router.get('/', asyncHandler(async (req, res) => {
         settings = {
             shopName: 'Novatech',
             currency: 'DZD',
-            exchangeRate: 1
+            exchangeRate: 1,
+            enableMultiStore: false
         }
     }
     res.json(settings);
@@ -36,6 +37,10 @@ router.put('/', protect, asyncHandler(async (req, res) => {
         settings.telegramUrl = req.body.telegramUrl || settings.telegramUrl;
         settings.contactEmail = req.body.contactEmail || settings.contactEmail;
         settings.contactPhone = req.body.contactPhone || settings.contactPhone;
+
+        if (req.body.enableMultiStore !== undefined) {
+            settings.enableMultiStore = req.body.enableMultiStore;
+        }
 
         const updatedSettings = await settings.save();
         res.json(updatedSettings);

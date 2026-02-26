@@ -127,7 +127,7 @@ const ProductLanding = () => {
                 }],
                 ...formData,
                 paymentMethodId: selectedMethodId,
-                storeId: selectedStoreId
+                ...(settings?.enableMultiStore ? { storeId: selectedStoreId } : {})
             };
 
             const { data: order } = await api.post('/orders', orderData);
@@ -145,8 +145,7 @@ ${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Qté:* ${quanti
 *Total:* ${total.toLocaleString()} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
-*Magasin:* ${stores.find(s => s._id === selectedStoreId)?.name || 'Standard'}
-------------------
+${settings?.enableMultiStore ? `*Magasin:* ${stores.find(s => s._id === selectedStoreId)?.name || 'Standard'}\n` : ''}------------------
 *Paiement:* ${method?.name}
 Merci de confirmer ma commande !
 `.trim();
@@ -438,7 +437,7 @@ Merci de confirmer ma commande !
                                             <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
                                         </div>
 
-                                        {stores.length > 0 && (
+                                        {settings?.enableMultiStore && stores.length > 0 && (
                                             <div className="pt-2">
                                                 <label className="text-xs font-bold text-black uppercase tracking-widest block mb-2">Magasin de Traitement</label>
                                                 <select

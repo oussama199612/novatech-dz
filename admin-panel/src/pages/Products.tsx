@@ -83,6 +83,7 @@ const Products = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [stores, setStores] = useState<Store[]>([]);
+    const [settings, setSettings] = useState<any>({});
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -133,14 +134,16 @@ const Products = () => {
 
     const fetchData = async () => {
         try {
-            const [productsRes, categoriesRes, storesRes] = await Promise.all([
+            const [productsRes, categoriesRes, storesRes, settingsRes] = await Promise.all([
                 api.get('/products'),
                 api.get('/categories'),
-                api.get('/stores/active')
+                api.get('/stores/active'),
+                api.get('/settings')
             ]);
             setProducts(productsRes.data);
             setCategories(categoriesRes.data);
             setStores(storesRes.data);
+            setSettings(settingsRes.data);
         } catch (error) {
             console.error(error);
         } finally {
@@ -752,7 +755,7 @@ const Products = () => {
                                                                                                         </div>
                                                                                                     </td>
                                                                                                     <td className="p-3 align-top min-w-[140px]">
-                                                                                                        {stores.length > 0 ? (
+                                                                                                        {settings?.enableMultiStore && stores.length > 0 ? (
                                                                                                             <div className="space-y-2">
                                                                                                                 {stores.map(store => {
                                                                                                                     const vStock = variant.locationsStock?.find((s: any) => s.store === store._id)?.stock || 0;
@@ -967,7 +970,7 @@ const Products = () => {
                                                 </div>
                                                 {formData.trackQuantity && (
                                                     <div className="pt-4 border-t border-slate-800">
-                                                        {stores.length > 0 ? (
+                                                        {settings?.enableMultiStore && stores.length > 0 ? (
                                                             <div className="space-y-3">
                                                                 <h4 className="text-sm font-bold text-white mb-2">Stock par magasin</h4>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

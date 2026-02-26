@@ -22,7 +22,8 @@ const Settings = () => {
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSettings({ ...settings, [e.target.name]: e.target.value });
+        const { name, type, checked, value } = e.target;
+        setSettings({ ...settings, [name]: type === 'checkbox' ? checked : value });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +61,29 @@ const Settings = () => {
                             <label className="block text-sm text-slate-400 mb-1">Devise (Suffixe)</label>
                             <input name="currency" value={settings.currency || ''} onChange={handleChange} className="input-field w-full" />
                         </div>
+                    </div>
+                </div>
+
+                {/* Feature Toggles */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Fonctionnalités & Modules</h3>
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="enableMultiStore"
+                                checked={settings.enableMultiStore || false}
+                                onChange={handleChange}
+                                className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500/50"
+                            />
+                            <div>
+                                <div className="text-white font-medium text-lg">Activer la Gestion Multi-Magasins</div>
+                                <div className="text-sm text-slate-400 mt-1">
+                                    Affiche l'onglet "Magasins", permet d'affecter du stock par localité et offre le choix de retrait en point de vente aux clients. <br />
+                                    <strong>Si désactivé</strong>, le site bascule sur une simple gestion de "Stock Global".
+                                </div>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
