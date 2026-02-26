@@ -16,6 +16,8 @@ export interface Product {
     }[];
     compareAtPrice: number;
     hasVariants: boolean;
+    trackQuantity?: boolean;
+    continueSellingWhenOutOfStock?: boolean;
     options: { name: string; values: string[] }[];
     // New Fields
     gallery: string[];

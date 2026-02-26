@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Save, Image as ImageIcon, LayoutTemplate, Palette, List, Upload, ChevronDown } from 'lucide-react';
 import api from '../api';
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import RichTextEditor from '../components/RichTextEditor';
 
 class ErrorBoundary extends Component<{ children: ReactNode, fallback: ReactNode }, { hasError: boolean, error: Error | null }> {
@@ -54,8 +55,14 @@ interface ProductVariant {
     sku: string;
     barcode: string;
     stock: number;
+    locationsStock?: { store: string; stock: number }[];
     trackQuantity: boolean;
     image: string;
+}
+
+interface Store {
+    _id: string;
+    name: string;
 }
 
 interface ProductOffer {
@@ -75,6 +82,7 @@ const PREDEFINED_COLORS: Record<string, string> = {
 const Products = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
+    const [stores, setStores] = useState<Store[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -90,6 +98,7 @@ const Products = () => {
         image: '',
         category: '',
         stock: 0,
+        locationsStock: [] as { store: string; stock: number }[],
         active: true,
         // Phase 1: Organization
         vendor: '',
@@ -124,12 +133,14 @@ const Products = () => {
 
     const fetchData = async () => {
         try {
-            const [productsRes, categoriesRes] = await Promise.all([
+            const [productsRes, categoriesRes, storesRes] = await Promise.all([
                 api.get('/products'),
-                api.get('/categories')
+                api.get('/categories'),
+                api.get('/stores/active')
             ]);
             setProducts(productsRes.data);
             setCategories(categoriesRes.data);
+            setStores(storesRes.data);
         } catch (error) {
             console.error(error);
         } finally {
@@ -151,6 +162,7 @@ const Products = () => {
             image: '',
             category: categories.length > 0 ? categories[0]._id : '',
             stock: 10,
+            locationsStock: [],
             active: true,
             vendor: '',
             productType: '',
@@ -191,6 +203,7 @@ const Products = () => {
             image: product.image || '',
             category: product.category?._id || (categories.length > 0 ? categories[0]._id : ''),
             stock: product.stock || 0,
+            locationsStock: product.locationsStock || [],
             active: product.active,
             vendor: product.vendor || '',
             productType: product.productType || '',
@@ -612,6 +625,7 @@ const Products = () => {
                                                                                 sku: formData.sku ? `${formData.sku}-${title.replace(/\s/g, '').replace(/\//g, '-')}`.toUpperCase() : '',
                                                                                 barcode: '',
                                                                                 stock: 0,
+                                                                                locationsStock: [],
                                                                                 trackQuantity: true,
                                                                                 image: ''
                                                                             };
@@ -737,17 +751,47 @@ const Products = () => {
                                                                                                             <span className="absolute right-7 top-1 text-slate-500 text-xs hidden">DZD</span>
                                                                                                         </div>
                                                                                                     </td>
-                                                                                                    <td className="p-3">
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            value={variant.stock}
-                                                                                                            onChange={e => {
-                                                                                                                const newVariants = [...formData.variants];
-                                                                                                                newVariants[realIndex].stock = Number(e.target.value);
-                                                                                                                setFormData({ ...formData, variants: newVariants });
-                                                                                                            }}
-                                                                                                            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-full text-white text-center focus:border-blue-500 outline-none"
-                                                                                                        />
+                                                                                                    <td className="p-3 align-top min-w-[140px]">
+                                                                                                        {stores.length > 0 ? (
+                                                                                                            <div className="space-y-2">
+                                                                                                                {stores.map(store => {
+                                                                                                                    const vStock = variant.locationsStock?.find((s: any) => s.store === store._id)?.stock || 0;
+                                                                                                                    return (
+                                                                                                                        <div key={store._id} className="flex items-center justify-between text-xs bg-slate-800/50 p-1 rounded">
+                                                                                                                            <span className="text-slate-400 truncate w-16" title={store.name}>{store.name}</span>
+                                                                                                                            <input
+                                                                                                                                type="number"
+                                                                                                                                value={vStock}
+                                                                                                                                onChange={e => {
+                                                                                                                                    const val = Number(e.target.value);
+                                                                                                                                    const newVariants = [...formData.variants];
+                                                                                                                                    const locs = [...(newVariants[realIndex].locationsStock || [])];
+                                                                                                                                    const eIdx = locs.findIndex((s: any) => s.store === store._id);
+                                                                                                                                    if (eIdx >= 0) locs[eIdx].stock = val;
+                                                                                                                                    else locs.push({ store: store._id, stock: val });
+                                                                                                                                    newVariants[realIndex].locationsStock = locs;
+                                                                                                                                    newVariants[realIndex].stock = locs.reduce((sum, l) => sum + l.stock, 0);
+                                                                                                                                    setFormData({ ...formData, variants: newVariants });
+                                                                                                                                }}
+                                                                                                                                className="bg-slate-900 border border-slate-700 rounded px-1 py-0.5 w-14 text-white text-center focus:border-blue-500 outline-none"
+                                                                                                                            />
+                                                                                                                        </div>
+                                                                                                                    );
+                                                                                                                })}
+                                                                                                                <div className="text-right text-xs text-emerald-400 font-bold border-t border-slate-800 pt-1">Total: {variant.stock}</div>
+                                                                                                            </div>
+                                                                                                        ) : (
+                                                                                                            <input
+                                                                                                                type="number"
+                                                                                                                value={variant.stock}
+                                                                                                                onChange={e => {
+                                                                                                                    const newVariants = [...formData.variants];
+                                                                                                                    newVariants[realIndex].stock = Number(e.target.value);
+                                                                                                                    setFormData({ ...formData, variants: newVariants });
+                                                                                                                }}
+                                                                                                                className="bg-slate-900 border border-slate-700 rounded px-2 py-1 w-full text-white text-center focus:border-blue-500 outline-none"
+                                                                                                            />
+                                                                                                        )}
                                                                                                     </td>
                                                                                                     <td className="p-3">
                                                                                                         <input
@@ -922,9 +966,44 @@ const Products = () => {
                                                     <label className="text-sm text-slate-300">Suivre la quantité</label>
                                                 </div>
                                                 {formData.trackQuantity && (
-                                                    <div className="pt-2 border-t border-slate-800">
-                                                        <label className="label">Quantité en stock</label>
-                                                        <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: Number(e.target.value) })} className="input-field w-full md:w-1/3" />
+                                                    <div className="pt-4 border-t border-slate-800">
+                                                        {stores.length > 0 ? (
+                                                            <div className="space-y-3">
+                                                                <h4 className="text-sm font-bold text-white mb-2">Stock par magasin</h4>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                    {stores.map(store => {
+                                                                        const stockVal = formData.locationsStock.find((s: any) => s.store === store._id)?.stock || 0;
+                                                                        return (
+                                                                            <div key={store._id} className="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-800">
+                                                                                <span className="text-sm text-slate-300 font-medium">{store.name}</span>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    value={stockVal}
+                                                                                    onChange={e => {
+                                                                                        const val = Number(e.target.value);
+                                                                                        const newLocs = [...formData.locationsStock];
+                                                                                        const exIdx = newLocs.findIndex((s: any) => s.store === store._id);
+                                                                                        if (exIdx >= 0) newLocs[exIdx].stock = val;
+                                                                                        else newLocs.push({ store: store._id, stock: val });
+                                                                                        const total = newLocs.reduce((sum, l) => sum + l.stock, 0);
+                                                                                        setFormData({ ...formData, locationsStock: newLocs, stock: total });
+                                                                                    }}
+                                                                                    className="input-field w-24 text-center"
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                                <div className="flex justify-end pt-2 text-sm text-slate-400">
+                                                                    Stock total (calculé) : <span className="text-white font-bold ml-2 text-lg">{formData.stock}</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <label className="label">Quantité en stock (Globale)</label>
+                                                                <input type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: Number(e.target.value) })} className="input-field w-full md:w-1/3" />
+                                                            </>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

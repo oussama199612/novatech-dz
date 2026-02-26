@@ -9,6 +9,10 @@ const productSchema = mongoose.Schema({
     active: { type: Boolean, default: true },
     orderIndex: { type: Number, default: 0 }, // For manual sorting
     stock: { type: Number, default: 0 },
+    locationsStock: [{
+        store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+        stock: { type: Number, default: 0 }
+    }],
     // Phase 1: Core & Organization
     vendor: { type: String },
     productType: { type: String },
@@ -41,6 +45,10 @@ const productSchema = mongoose.Schema({
         sku: { type: String },
         barcode: { type: String },
         stock: { type: Number, default: 0 },
+        locationsStock: [{
+            store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+            stock: { type: Number, default: 0 }
+        }],
         trackQuantity: { type: Boolean, default: true },
         image: { type: String } // Variant specific image
     }],

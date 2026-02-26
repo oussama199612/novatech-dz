@@ -403,11 +403,14 @@ const Catalogue = () => {
                                                 <button className="absolute bottom-4 right-4 bg-primary text-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10">
                                                     <ShoppingBag size={20} />
                                                 </button>
+                                                {product.stock === 0 && (
+                                                    <span className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">RUPTURE</span>
+                                                )}
                                                 {product.stock <= 5 && product.stock > 0 && (
-                                                    <span className="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded">LIMITED</span>
+                                                    <span className="absolute top-4 left-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">STOCK FAIBLE</span>
                                                 )}
                                                 {product.compareAtPrice > product.price && (
-                                                    <span className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">SALE</span>
+                                                    <span className="absolute top-4 right-4 bg-luxury-gold text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">PROMO</span>
                                                 )}
                                             </div>
                                             <h3 className="font-bold text-base mb-1 group-hover:text-primary transition-colors cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h3>

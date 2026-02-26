@@ -106,6 +106,39 @@ router.get('/:id/similar', asyncHandler(async (req, res) => {
     res.json(similarProducts);
 }));
 
+// @desc    Get in-stock alternatives for a product
+// @route   GET /api/products/:id/alternatives
+// @access  Public
+router.get('/:id/alternatives', asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        res.status(404);
+        throw new Error('Product not found');
+    }
+
+    const filters = {
+        _id: { $ne: product._id },
+        active: true,
+        $or: [
+            { category: product.category },
+            { tags: { $in: product.tags || [] } }
+        ],
+        $or: [
+            { stock: { $gt: 0 } },
+            { continueSellingWhenOutOfStock: true },
+            { trackQuantity: false }
+        ]
+    };
+
+    const alternatives = await Product.find(filters)
+        .populate('category')
+        .sort({ stock: -1 })
+        .limit(4);
+
+    res.json(alternatives);
+}));
+
 // @desc    Fetch single product
 // @route   GET /api/products/:id
 // @access  Public
@@ -130,7 +163,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         vendor, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
         hasVariants, options, variants,
-        offers
+        offers, locationsStock
     } = req.body;
 
     const product = new Product({
@@ -159,7 +192,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         hasVariants,
         options,
         variants,
-        offers
+        offers,
+        locationsStock
     });
 
     const createdProduct = await product.save();
@@ -176,7 +210,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         vendor, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
         hasVariants, options, variants,
-        offers
+        offers, locationsStock
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -216,6 +250,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
         if (options !== undefined) product.options = options;
         if (variants !== undefined) product.variants = variants;
         if (offers !== undefined) product.offers = offers;
+        if (locationsStock !== undefined) product.locationsStock = locationsStock;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);

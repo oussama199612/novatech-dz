@@ -44,6 +44,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/stores', require('./routes/storeRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment-methods', require('./routes/paymentMethodRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));

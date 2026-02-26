@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Copy, ShoppingCart, Star, Shield, Zap, Box, ArrowRight, Truck, CreditCard, Lock, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
+import { Check, Copy, Star, Shield, Zap, ArrowRight, Truck, CreditCard, Lock, ShoppingBag } from 'lucide-react';
 import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
@@ -25,6 +25,7 @@ const ProductLanding = () => {
         customerPhone: '',
         gameId: '',
     });
+    const [alternatives, setAlternatives] = useState<any[]>([]);
     const [settings, setSettings] = useState<any>({});
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'desc' | 'features'>('desc');
@@ -37,15 +38,17 @@ const ProductLanding = () => {
         window.scrollTo(0, 0);
         const fetchData = async () => {
             try {
-                const [prodRes, methodsRes, settingsRes, similarRes] = await Promise.all([
+                const [prodRes, methodsRes, settingsRes, similarRes, altsRes] = await Promise.all([
                     api.get(`/products/${productId}`),
                     api.get('/payment-methods'),
                     api.get('/settings'),
-                    api.get(`/products/${productId}/similar`)
+                    api.get(`/products/${productId}/similar`),
+                    api.get(`/products/${productId}/alternatives`)
                 ]);
                 const prod = prodRes.data;
                 setProduct(prod);
                 setSimilarProducts(similarRes.data);
+                setAlternatives(altsRes.data);
                 setMethods(methodsRes.data);
                 setSettings(settingsRes.data || {});
 
@@ -163,8 +166,12 @@ Merci de confirmer ma commande !
     if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Chargement...</div>;
     if (!product) return <div className="min-h-screen flex items-center justify-center text-white">Produit introuvable</div>;
 
-    const accentColor = product.accentColor || '#3b82f6';
     const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
+
+    const stockToDisplay = product.hasVariants ? currentVariant?.stock : product.stock;
+    const isTracking = product.hasVariants ? currentVariant?.trackQuantity : product.trackQuantity;
+    const isOutOfStock = isTracking && stockToDisplay === 0 && !product.continueSellingWhenOutOfStock;
+    const stockStatus = isOutOfStock ? 'out_of_stock' : (isTracking && stockToDisplay !== undefined && stockToDisplay <= 5) ? 'low_stock' : 'in_stock';
 
     return (
         <div className="min-h-screen pb-20 bg-luxury-black">
@@ -287,8 +294,21 @@ Merci de confirmer ma commande !
 
                             {/* Header Info */}
                             <div className="space-y-4 border-b border-gray-200 pb-8">
-                                <h1 className="text-3xl md:text-4xl font-serif text-black leading-tight">{product.name}</h1>
-
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        {stockStatus === 'out_of_stock' && (
+                                            <span className="bg-red-50 text-red-600 text-xs font-bold px-3 py-1 rounded inline-block uppercase tracking-wider border border-red-100">
+                                                Victime de son succès (Rupture)
+                                            </span>
+                                        )}
+                                        {stockStatus === 'low_stock' && (
+                                            <span className="bg-orange-50 text-orange-600 animate-pulse text-xs font-bold px-3 py-1 rounded inline-block uppercase tracking-wider border border-orange-100">
+                                                Stock très limité : plus que {stockToDisplay}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h1 className="text-3xl md:text-4xl font-serif text-black leading-tight">{product.name}</h1>
+                                </div>
                                 <div className="flex items-center justify-between">
                                     <div className="text-3xl font-bold text-black">
                                         {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-gray-600 font-medium">DZD</span>
@@ -391,9 +411,9 @@ Merci de confirmer ma commande !
                                         Commander
                                     </span>
                                     {product.hasVariants && !currentVariant ? (
-                                        <span className="text-xs text-gray-500 font-mono">● Non disponible</span>
-                                    ) : currentVariant?.stock === 0 ? (
-                                        <span className="text-xs text-red-500 font-mono">● Rupture de stock</span>
+                                        <span className="text-xs text-gray-500 font-mono">● Sélectionnez une option</span>
+                                    ) : stockStatus === 'out_of_stock' ? (
+                                        <span className="text-xs text-red-500 font-bold font-mono">● Rupture de stock</span>
                                     ) : (
                                         <span className="text-xs text-emerald-600 font-mono animate-pulse">● En Stock</span>
                                     )}
@@ -548,7 +568,7 @@ Merci de confirmer ma commande !
 
                                     <button
                                         type="submit"
-                                        disabled={!selectedMethodId || (product.hasVariants && !currentVariant) || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
+                                        disabled={!selectedMethodId || (product.hasVariants && !currentVariant) || isOutOfStock}
                                         className="w-full py-5 font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
                                         style={{ backgroundColor: 'black' }}
                                     >
@@ -559,7 +579,7 @@ Merci de confirmer ma commande !
                                     <button
                                         type="button"
                                         onClick={handleAddToCart}
-                                        disabled={(product.hasVariants && !currentVariant) || (currentVariant?.stock === 0 && currentVariant?.trackQuantity)}
+                                        disabled={(product.hasVariants && !currentVariant) || isOutOfStock}
                                         className="w-full py-5 font-bold text-black border-2 border-black bg-white shadow-xl shadow-gray-200/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
                                     >
                                         Ajouter au panier <ShoppingBag size={18} />
@@ -599,8 +619,30 @@ Merci de confirmer ma commande !
 
                 </div>
 
-                {/* SIMILAR PRODUCTS */}
-                {similarProducts.length > 0 && (
+                {/* ALTERNATIVES OR SIMILAR PRODUCTS */}
+                {stockStatus === 'out_of_stock' && alternatives.length > 0 ? (
+                    <div className="mt-24 border-t border-gray-200 pt-16">
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 mb-8 text-center shadow-sm">
+                            <h2 className="text-3xl font-serif text-red-700 mb-2">Victime de son succès !</h2>
+                            <p className="text-red-600/80 font-medium">Ne vous inquiétez pas, voici d'excellentes alternatives actuellement disponibles :</p>
+                        </div>
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            {alternatives.map((p) => (
+                                <div key={p._id} className="group cursor-pointer" onClick={() => navigate(`/product/${p._id}`)}>
+                                    <div className="relative aspect-square bg-white rounded-xl overflow-hidden mb-4 border border-slate-100 shadow-sm">
+                                        <img
+                                            alt={p.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            src={getImageUrl(p.image)}
+                                        />
+                                    </div>
+                                    <h3 className="line-clamp-1 font-bold text-sm mb-1 group-hover:text-luxury-gold transition-colors">{p.name}</h3>
+                                    <p className="text-luxury-gold font-bold text-sm">{p.price.toLocaleString()} DZD</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : similarProducts.length > 0 && (
                     <div className="mt-24 border-t border-gray-200 pt-16">
                         <h2 className="text-3xl font-serif text-black mb-8 text-center">Vous aimerez aussi</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
