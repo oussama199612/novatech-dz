@@ -63,26 +63,9 @@ const Profile = () => {
                                 <p className="text-sm text-gray-500">Téléphone</p>
                                 <div className="flex items-center gap-2">
                                     <p className="font-bold text-gray-900">{customer.phone}</p>
-                                    {customer.isPhoneVerified ? (
-                                        <CheckCircle size={16} className="text-green-500" />
-                                    ) : (
-                                        <div title="Téléphone non vérifié">
-                                            <AlertTriangle size={16} className="text-amber-500" />
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
-
-                        {!customer.isPhoneVerified && (
-                            <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-4">
-                                <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" />
-                                <div>
-                                    <h3 className="font-bold text-amber-800">Votre téléphone n'est pas vérifié</h3>
-                                    <p className="text-sm text-amber-700 mt-1">Vous devez vérifier votre numéro pour valider vos commandes. Un code vous a été envoyé lors de l'inscription.</p>
-                                </div>
-                            </div>
-                        )}
 
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <Package size={24} /> Mes Commandes

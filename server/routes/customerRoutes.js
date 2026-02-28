@@ -63,6 +63,20 @@ router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res, next
 router.get('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
     const customer = await Customer.findById(req.customer._id).select('-password');
     if (customer) {
+        // Sync email verification status from Firebase
+        try {
+            const admin = require('../config/firebase');
+            if (customer.firebaseUid) {
+                const firebaseUser = await admin.auth().getUser(customer.firebaseUid);
+                if (firebaseUser.emailVerified && !customer.isEmailVerified) {
+                    customer.isEmailVerified = true;
+                    // Mongoose requires saving the updated document
+                    await customer.save();
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching firebase user status:', error);
+        }
         res.json(customer);
     } else {
         res.status(404);
