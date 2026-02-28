@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ArrowLeft, CreditCard, Wallet, Banknote, Check, Copy } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { getImageUrl } from '../utils';
 import api from '../api';
 import { type PaymentMethod } from '../types';
@@ -24,6 +25,18 @@ const Cart = () => {
 
     // Toggle Checkout Form visibility
     const [showCheckout, setShowCheckout] = useState(false);
+
+    // Auto-fill form if user is logged in
+    const { customer } = useAuth();
+    useEffect(() => {
+        if (showCheckout && customer) {
+            setFormData({
+                customerName: `${customer.firstName} ${customer.lastName}`,
+                customerEmail: customer.email,
+                customerPhone: customer.phone,
+            });
+        }
+    }, [showCheckout, customer]);
 
     useEffect(() => {
         const fetchMethods = async () => {
