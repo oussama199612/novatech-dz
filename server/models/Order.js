@@ -5,6 +5,7 @@ const orderSchema = mongoose.Schema({
     customerName: { type: String, required: true },
     customerEmail: { type: String, required: true },
     customerPhone: { type: String, required: true },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }, // Optional link to registered customer
     gameId: { type: String }, // Optional field for Game ID
     store: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' }, // Store origin
 

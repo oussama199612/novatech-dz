@@ -6,11 +6,13 @@ import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductLanding = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const { customer } = useAuth();
     const [product, setProduct] = useState<Product | null>(null);
     const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
     const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -25,6 +27,18 @@ const ProductLanding = () => {
         customerPhone: '',
         gameId: '',
     });
+
+    useEffect(() => {
+        if (customer) {
+            setFormData(prev => ({
+                ...prev,
+                customerName: `${customer.firstName} ${customer.lastName}`,
+                customerEmail: customer.email,
+                customerPhone: customer.phone,
+            }));
+        }
+    }, [customer]);
+
     const [stores, setStores] = useState<any[]>([]);
     const [selectedStoreId, setSelectedStoreId] = useState<string>('');
     const [alternatives, setAlternatives] = useState<any[]>([]);

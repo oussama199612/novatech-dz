@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ChevronRight, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Navbar = () => {
     const { cartCount } = useCart();
+    const { customer } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -38,6 +40,9 @@ const Navbar = () => {
                         <button className="hover:text-primary transition-colors text-slate-900">
                             <Search size={24} />
                         </button>
+                        <Link to={customer ? "/profile" : "/auth"} className="hover:text-primary transition-colors text-slate-900" onClick={() => setIsMenuOpen(false)}>
+                            <User size={24} />
+                        </Link>
                         <Link to="/cart" className="hover:text-primary transition-colors relative text-slate-900" onClick={() => setIsMenuOpen(false)}>
                             <ShoppingBag size={24} />
                             {cartCount > 0 && (
