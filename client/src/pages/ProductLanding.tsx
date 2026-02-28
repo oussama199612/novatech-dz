@@ -147,8 +147,9 @@ const ProductLanding = () => {
             await api.post('/orders', orderData);
 
             navigate('/success');
-        } catch (error) {
-            alert('Erreur lors de la commande.');
+        } catch (error: any) {
+            console.error(error);
+            alert(error.response?.data?.message || 'Erreur lors de la commande.');
         }
     };
 

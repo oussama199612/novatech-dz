@@ -79,10 +79,6 @@ router.post('/', asyncHandler(async (req, res) => {
                         res.status(400);
                         throw new Error(`Stock global insuffisant pour ${product.name} - ${item.variant.title}`);
                     }
-                    if (storeId && !localStockAvailable) {
-                        res.status(400);
-                        throw new Error(`Stock local insuffisant dans ce magasin pour ${product.name} - ${item.variant.title}`);
-                    }
 
                     product.variants[variantIndex].stock -= item.qty;
                     // Also decrement total stock if you track it
@@ -106,10 +102,6 @@ router.post('/', asyncHandler(async (req, res) => {
                 if (product.stock < item.qty) {
                     res.status(400);
                     throw new Error(`Stock global insuffisant pour ${product.name}`);
-                }
-                if (storeId && !localStockAvailable) {
-                    res.status(400);
-                    throw new Error(`Stock local insuffisant dans ce magasin pour ${product.name}`);
                 }
 
                 product.stock -= item.qty;

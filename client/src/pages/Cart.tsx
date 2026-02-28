@@ -81,9 +81,9 @@ const Cart = () => {
             clearCart();
             navigate('/success');
 
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Erreur lors de la commande.');
+            alert(error.response?.data?.message || 'Erreur lors de la commande.');
         }
     };
 
