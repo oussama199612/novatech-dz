@@ -7,7 +7,7 @@ const { protectCustomer } = require('../middleware/customerAuthMiddleware');
 // @desc    Register a new customer (Sync from Firebase)
 // @route   POST /api/customers/register
 // @access  Public
-router.post('/register', asyncHandler(async (req, res) => {
+router.post('/register', asyncHandler(async (req, res, next) => {
     const { firebaseUid, firstName, lastName, email, phone } = req.body;
 
     const customerExists = await Customer.findOne({ $or: [{ email }, { phone }, { firebaseUid }] });
@@ -43,7 +43,7 @@ router.post('/register', asyncHandler(async (req, res) => {
 // @desc    Verify Phone (Sync verified status)
 // @route   POST /api/customers/verify-phone
 // @access  Private
-router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res) => {
+router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res, next) => {
     const customer = await Customer.findById(req.customer._id);
 
     if (!customer) {
@@ -60,7 +60,7 @@ router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res) => {
 // @desc    Get customer profile
 // @route   GET /api/customers/profile
 // @access  Private
-router.get('/profile', protectCustomer, asyncHandler(async (req, res) => {
+router.get('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
     const customer = await Customer.findById(req.customer._id).select('-password');
     if (customer) {
         res.json(customer);
