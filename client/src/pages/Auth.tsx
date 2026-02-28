@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import { Mail, Phone, Lock, User, ArrowRight } from 'lucide-react';
 import { auth } from '../firebase';
@@ -12,6 +13,7 @@ import {
 
 const Auth = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
         firstName: '',
@@ -62,7 +64,7 @@ const Auth = () => {
                 }
 
                 // 3. Sync to Custom Backend
-                await api.post('/customers/register', {
+                const response = await api.post('/customers/register', {
                     firebaseUid: user.uid,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
@@ -70,10 +72,14 @@ const Auth = () => {
                     phone: phoneNumber,
                 });
 
+                // 4. Update the AuthContext manually so the redirect doesn't fail due to `onAuthStateChanged` race condition
+                const token = await user.getIdToken();
+                login(token, response.data);
+
                 setSuccess('Inscription réussie ! Un email de confirmation a été envoyé.');
                 setTimeout(() => {
                     navigate('/profile');
-                }, 2000);
+                }, 1000); // Faster redirect
             }
         } catch (err: any) {
             console.error("Auth Error:", err);
