@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { Mail, Phone, Lock, User, ArrowRight } from 'lucide-react';
@@ -32,7 +32,7 @@ const Auth = () => {
     const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
     // Initialize reCAPTCHA silently when component mounts
-    const setupRecaptcha = () => {
+    useEffect(() => {
         if (!(window as any).recaptchaVerifier) {
             (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 size: 'invisible',
@@ -41,7 +41,7 @@ const Auth = () => {
                 },
             });
         }
-    };
+    }, [isLogin]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,8 +63,7 @@ const Auth = () => {
                     phoneNumber = '+213' + phoneNumber; // Fallback
                 }
 
-                // Setup recaptcha (invisible)
-                setupRecaptcha();
+
 
                 // 2. Firebase Register
                 const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
