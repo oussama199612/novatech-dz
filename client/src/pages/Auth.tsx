@@ -35,11 +35,17 @@ const Auth = () => {
     useEffect(() => {
         if (!(window as any).recaptchaVerifier) {
             (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                size: 'invisible',
+                size: 'normal',
                 callback: () => {
                     // reCAPTCHA solved
                 },
+                'expired-callback': () => {
+                    // Response expired. Ask user to solve reCAPTCHA again.
+                    setError('Le recaptcha a expiré, veuillez le refaire.');
+                }
             });
+            // Render the recaptcha widget explicitly
+            (window as any).recaptchaVerifier.render();
         }
     }, [isLogin]);
 
@@ -275,6 +281,8 @@ const Auth = () => {
                             </div>
                         </div>
 
+                        <div id="recaptcha-container" className="my-4 flex justify-center"></div>
+
                         <div>
                             <button
                                 type="submit"
@@ -285,8 +293,6 @@ const Auth = () => {
                             </button>
                         </div>
                     </form>
-
-                    <div id="recaptcha-container"></div>
 
                     <div className="mt-6">
                         <div className="relative">
