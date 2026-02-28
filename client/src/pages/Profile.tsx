@@ -1,15 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, Package, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const Profile = () => {
     const { customer, logout, loading } = useAuth();
     const navigate = useNavigate();
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loadingOrders, setLoadingOrders] = useState(true);
 
     useEffect(() => {
         if (!loading && !customer) {
             navigate('/auth');
+        } else if (customer) {
+            // Fetch orders
+            api.get('/orders/myorders')
+                .then(res => {
+                    setOrders(res.data);
+                })
+                .catch(err => console.error("Could not fetch orders", err))
+                .finally(() => setLoadingOrders(false));
         }
     }, [customer, loading, navigate]);
 
@@ -71,9 +82,46 @@ const Profile = () => {
                             <Package size={24} /> Mes Commandes
                         </h2>
 
-                        <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
-                            <p className="text-gray-500">Votre historique de commandes apparaîtra ici.</p>
-                        </div>
+                        {loadingOrders ? (
+                            <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
+                                <p className="text-gray-500">Chargement de votre historique...</p>
+                            </div>
+                        ) : orders.length === 0 ? (
+                            <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
+                                <p className="text-gray-500">Votre historique de commandes apparaîtra ici.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {orders.map(order => (
+                                    <div key={order._id} className="bg-white border text-sm border-gray-200 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                                        <div>
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <span className="font-mono font-bold text-gray-900">{order.orderId}</span>
+                                                <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                                                        order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
+                                                            order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                                                'bg-amber-100 text-amber-800'
+                                                    }`}>
+                                                    {order.status === 'pending' ? 'En attente' :
+                                                        order.status === 'paid' ? 'Payée' :
+                                                            order.status === 'delivered' ? 'Livrée' : 'Annulée'}
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-500 mb-1">{new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                                                year: 'numeric', month: 'long', day: 'numeric',
+                                                hour: '2-digit', minute: '2-digit'
+                                            })}</p>
+                                            <div className="text-gray-600">
+                                                {order.products.length} article(s) - Paiement: {order.paymentMethodSnapshot?.name || 'Inconnu'}
+                                            </div>
+                                        </div>
+                                        <div className="text-left sm:text-right">
+                                            <p className="text-lg font-bold text-gray-900">{order.totalAmount.toLocaleString()} DZD</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 

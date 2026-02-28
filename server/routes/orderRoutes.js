@@ -6,6 +6,24 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const PaymentMethod = require('../models/PaymentMethod');
 const { protect } = require('../middleware/authMiddleware');
+const { protectCustomer } = require('../middleware/customerAuthMiddleware');
+
+// @desc    Get logged in customer orders
+// @route   GET /api/orders/myorders
+// @access  Private (Customer)
+router.get('/myorders', protectCustomer, asyncHandler(async (req, res) => {
+    // Find all orders where the email or phone matches the logged-in customer's details
+    const orders = await Order.find({
+        $or: [
+            { customerEmail: req.customer.email },
+            { customerPhone: req.customer.phone }
+        ]
+    })
+        .populate('products.product')
+        .sort({ createdAt: -1 });
+
+    res.json(orders);
+}));
 
 // @desc    Create new order
 // @route   POST /api/orders
