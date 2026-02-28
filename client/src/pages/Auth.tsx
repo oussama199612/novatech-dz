@@ -39,11 +39,19 @@ const Auth = () => {
             } else {
                 // Formatting phone number
                 let phoneNumber = formData.phone.trim();
+
+                // Validate phone number format (only digits, spaces, +, -, or ())
+                const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+                if (!phoneRegex.test(phoneNumber) || phoneNumber.replace(/\D/g, '').length < 8) {
+                    setError('Le numéro de téléphone est invalide. Veuillez n\'utiliser que des chiffres.');
+                    return;
+                }
+
                 // Ensure the phone number has a country code, default to Algeria +213 for example if it starts with 0
                 if (phoneNumber.startsWith('0')) {
-                    phoneNumber = '+213' + phoneNumber.substring(1);
+                    phoneNumber = '+213' + phoneNumber.substring(1).replace(/\s+/g, '');
                 } else if (!phoneNumber.startsWith('+')) {
-                    phoneNumber = '+213' + phoneNumber; // Fallback
+                    phoneNumber = '+213' + phoneNumber.replace(/\s+/g, ''); // Fallback
                 }
 
 
