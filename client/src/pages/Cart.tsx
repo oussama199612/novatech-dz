@@ -76,34 +76,9 @@ const Cart = () => {
                 paymentMethodId: selectedMethodId
             };
 
-            const { data: order } = await api.post('/orders', orderData);
-
-            // Backend URL for WhatsApp (or static fallback)
-            const whatsappBaseUrl = 'https://wa.me/213550000000'; // Should come from settings in real app
-
-            // Generate Message
-            const method = methods.find(m => m._id === selectedMethodId);
-            const itemsList = cartItems.map(item =>
-                `- ${item.name} ${item.variant ? `(${item.variant.title})` : ''} x${item.quantity} = ${(item.price * item.quantity).toLocaleString()} DA`
-            ).join('\n');
-
-            const message = `
-*NOUVELLE COMMANDE (PANIER)* 🛒
-------------------
-${itemsList}
-------------------
-*Total:* ${cartTotal.toLocaleString()} DZD
-*Client:* ${formData.customerName}
-*ID Commande:* ${order.orderId}
-------------------
-*Paiement:* ${method?.name}
-Merci de confirmer ma commande !
-            `.trim();
-
-            const whatsappUrl = `${whatsappBaseUrl}?text=${encodeURIComponent(message)}`;
+            await api.post('/orders', orderData);
 
             clearCart();
-            window.open(whatsappUrl, '_blank');
             navigate('/success');
 
         } catch (error) {

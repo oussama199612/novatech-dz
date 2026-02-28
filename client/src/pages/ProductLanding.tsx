@@ -144,32 +144,8 @@ const ProductLanding = () => {
                 ...(settings?.enableMultiStore ? { storeId: selectedStoreId } : {})
             };
 
-            const { data: order } = await api.post('/orders', orderData);
+            await api.post('/orders', orderData);
 
-            const method = methods.find(m => m._id === selectedMethodId);
-            const price = currentVariant?.price || product.price;
-            const total = price * quantity;
-
-            const message = `
-*NOUVELLE COMMANDE* 🛍️
-------------------
-*Produit:* ${product.name}
-${currentVariant ? `*Variante:* ${currentVariant.title}\n` : ''}*Qté:* ${quantity}
-*Prix:* ${price.toLocaleString()} DZD
-*Total:* ${total.toLocaleString()} DZD
-*Client:* ${formData.customerName}
-*ID Commande:* ${order.orderId}
-${settings?.enableMultiStore ? `*Magasin:* ${stores.find(s => s._id === selectedStoreId)?.name || 'Standard'}\n` : ''}------------------
-*Paiement:* ${method?.name}
-Merci de confirmer ma commande !
-`.trim();
-
-            const baseUrl = settings.whatsappUrl || 'https://wa.me/213550000000';
-            // Clean url to ensure we can append params
-            const cleanUrl = baseUrl.split('?')[0];
-            const whatsappUrl = `${cleanUrl}?text=${encodeURIComponent(message)}`;
-
-            window.open(whatsappUrl, '_blank');
             navigate('/success');
         } catch (error) {
             alert('Erreur lors de la commande.');
