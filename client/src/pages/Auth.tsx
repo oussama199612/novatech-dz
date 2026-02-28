@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import { Mail, Phone, Lock, User, ArrowRight } from 'lucide-react';
 import { auth } from '../firebase';
@@ -8,14 +7,14 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     RecaptchaVerifier,
-    signInWithPhoneNumber,
-    ConfirmationResult,
+    linkWithPhoneNumber,
+    sendEmailVerification,
     updateProfile
 } from 'firebase/auth';
+import type { ConfirmationResult } from 'firebase/auth';
 
 const Auth = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [step, setStep] = useState<'form' | 'verifyPhone'>('form');
 
@@ -34,8 +33,8 @@ const Auth = () => {
 
     // Initialize reCAPTCHA silently when component mounts
     const setupRecaptcha = () => {
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        if (!(window as any).recaptchaVerifier) {
+            (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 size: 'invisible',
                 callback: () => {
                     // reCAPTCHA solved
@@ -75,6 +74,13 @@ const Auth = () => {
                     displayName: `${formData.firstName} ${formData.lastName}`
                 });
 
+                // Send Email Verification
+                try {
+                    await sendEmailVerification(user);
+                } catch (emailErr) {
+                    console.error("Failed to send verification email", emailErr);
+                }
+
                 // 3. Sync to Custom Backend
                 await api.post('/customers/register', {
                     firebaseUid: user.uid,
@@ -84,12 +90,12 @@ const Auth = () => {
                     phone: phoneNumber,
                 });
 
-                // 4. Send Firebase OTP SMS
-                const appVerifier = window.recaptchaVerifier;
-                const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+                // 4. Send Firebase OTP SMS to LINK phone number to existing user
+                const appVerifier = (window as any).recaptchaVerifier;
+                const confirmation = await linkWithPhoneNumber(user, phoneNumber, appVerifier);
                 setConfirmationResult(confirmation);
 
-                setSuccess('Inscription réussie ! Un code SMS a été envoyé à votre numéro.');
+                setSuccess('Inscription réussie ! Un email de confirmation et un SMS ont été envoyés.');
                 setStep('verifyPhone'); // Move to OTP verification
             }
         } catch (err: any) {
