@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const PaymentMethod = require('../models/PaymentMethod');
+const Customer = require('../models/Customer');
+const admin = require('../config/firebase');
 const { protect } = require('../middleware/authMiddleware');
 const { protectCustomer } = require('../middleware/customerAuthMiddleware');
 
@@ -12,11 +14,12 @@ const { protectCustomer } = require('../middleware/customerAuthMiddleware');
 // @route   GET /api/orders/myorders
 // @access  Private (Customer)
 router.get('/myorders', protectCustomer, asyncHandler(async (req, res) => {
-    // Find all orders where the email or phone matches the logged-in customer's details
+    // Find all orders strictly assigned to this customer OR old unassigned orders matching their email
     const orders = await Order.find({
         $or: [
-            { customerEmail: req.customer.email },
-            { customerPhone: req.customer.phone }
+            { customer: req.customer._id },
+            { customer: { $exists: false }, customerEmail: req.customer.email },
+            { customer: null, customerEmail: req.customer.email }
         ]
     })
         .populate('products.product')
@@ -145,6 +148,24 @@ router.post('/', asyncHandler(async (req, res) => {
             throw new Error('Payment method not found');
         }
 
+        // Optional Structured Auth Check: strongly bind the order to a Customer DB Document if a valid token is provided
+        let customerId = null;
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                const decodedToken = await admin.auth().verifyIdToken(token);
+                const userDoc = await Customer.findOne({
+                    $or: [{ firebaseUid: decodedToken.uid }, { email: decodedToken.email }]
+                });
+                if (userDoc) {
+                    customerId = userDoc._id;
+                }
+            } catch (error) {
+                console.error("Optional Auth for Order linking failed:", error.message);
+                // Proceed as guest checkout
+            }
+        }
+
         // Generate Short Order ID
         const orderId = 'CMD-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 100);
 
@@ -153,6 +174,7 @@ router.post('/', asyncHandler(async (req, res) => {
             customerName,
             customerEmail,
             customerPhone,
+            customer: customerId || undefined,
             gameId,
             products: dbOrderItems,
             totalAmount: totalPrice,
