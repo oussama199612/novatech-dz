@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
@@ -8,7 +8,8 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     sendEmailVerification,
-    updateProfile
+    updateProfile,
+    deleteUser
 } from 'firebase/auth';
 
 const Auth = () => {
@@ -24,12 +25,10 @@ const Auth = () => {
     });
 
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
 
         try {
             if (isLogin) {
@@ -56,38 +55,55 @@ const Auth = () => {
 
 
 
-                // 2. Firebase Register
-                const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-                const user = userCredential.user;
 
-                await updateProfile(user, {
-                    displayName: `${formData.firstName} ${formData.lastName}`
-                });
-
-                // Send Email Verification
+                let userCredential;
                 try {
-                    await sendEmailVerification(user);
-                } catch (emailErr) {
-                    console.error("Failed to send verification email", emailErr);
+                    // 2. Firebase Register
+                    userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+                    const user = userCredential.user;
+
+                    await updateProfile(user, {
+                        displayName: `${formData.firstName} ${formData.lastName}`
+                    });
+
+                    // Send Email Verification
+                    try {
+                        await sendEmailVerification(user);
+                    } catch (emailErr) {
+                        console.error("Failed to send verification email", emailErr);
+                    }
+
+                    // 3. Sync to Custom Backend
+                    const response = await api.post('/customers/register', {
+                        firebaseUid: user.uid,
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        email: formData.email,
+                        phone: phoneNumber,
+                    });
+
+                    // 4. Update the AuthContext manually
+                    const token = await user.getIdToken();
+                    login(token, response.data);
+
+                    setTimeout(() => {
+                        navigate('/profile');
+                    }, 1000);
+
+                } catch (registrationErr: any) {
+                    console.error("Registration Sync Error:", registrationErr);
+
+                    // If backend failed, but firebase succeeded, delete the firebase user to avoid ghost accounts
+                    if (userCredential && userCredential.user) {
+                        try {
+                            await deleteUser(userCredential.user);
+                        } catch (deleteErr) {
+                            console.error("Failed to cleanup firebase user", deleteErr);
+                        }
+                    }
+
+                    throw registrationErr; // Pass to the main catch block
                 }
-
-                // 3. Sync to Custom Backend
-                const response = await api.post('/customers/register', {
-                    firebaseUid: user.uid,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    email: formData.email,
-                    phone: phoneNumber,
-                });
-
-                // 4. Update the AuthContext manually so the redirect doesn't fail due to `onAuthStateChanged` race condition
-                const token = await user.getIdToken();
-                login(token, response.data);
-
-                setSuccess('Inscription réussie ! Un email de confirmation a été envoyé.');
-                setTimeout(() => {
-                    navigate('/profile');
-                }, 1000); // Faster redirect
             }
         } catch (err: any) {
             console.error("Auth Error:", err);

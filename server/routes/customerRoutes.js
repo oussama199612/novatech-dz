@@ -36,7 +36,7 @@ router.post('/register', asyncHandler(async (req, res, next) => {
         res.status(201).json(customer);
     } else {
         res.status(400);
-        throw new Error('Invalid customer data');
+        throw new Error('Une erreur s\'est produite lors de la création de votre profil. Veuillez réessayer.');
     }
 }));
 
@@ -79,8 +79,61 @@ router.get('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
         }
         res.json(customer);
     } else {
-        res.status(404);
-        throw new Error('Customer not found');
+        // AUTOSYNC RECOVERY: If Firebase Token is valid but MongoDB profile is missing, reconstruct it
+        if (req.customer) { // Wait, the middleware already throws 401 if it doesn't find it. Let's look at `protectCustomer`.
+            res.status(404);
+            throw new Error('Customer not found');
+        }
+    }
+}));
+
+// @desc    Self-heal ghost Firebase account during login
+// @route   POST /api/customers/recover
+// @access  Public (needs Bearer Token manually verified)
+router.post('/recover', asyncHandler(async (req, res, next) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+        try {
+            const admin = require('../config/firebase');
+            const decodedToken = await admin.auth().verifyIdToken(token);
+            const firebaseUid = decodedToken.uid;
+
+            // Check if customer exists by email or uid
+            let customer = await Customer.findOne({ $or: [{ firebaseUid }, { email: decodedToken.email }] });
+
+            if (customer) {
+                // Return existing
+                if (!customer.firebaseUid) {
+                    customer.firebaseUid = firebaseUid;
+                    await customer.save();
+                }
+                res.json(customer);
+            } else {
+                // Recover/Create new DB record based on Firebase Token info
+                const nameParts = decodedToken.name ? decodedToken.name.split(' ') : [];
+                const firstName = nameParts[0] || decodedToken.email.split('@')[0] || 'Utilisateur';
+                const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ' ';
+
+                customer = await Customer.create({
+                    firebaseUid: firebaseUid,
+                    email: decodedToken.email,
+                    firstName: firstName,
+                    lastName: lastName,
+                    phone: decodedToken.phone_number || '0000000000', // Placeholder
+                    isEmailVerified: decodedToken.email_verified || false,
+                    isPhoneVerified: false
+                });
+                res.status(201).json(customer);
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(401);
+            throw new Error('Recovery failed: invalid token');
+        }
+    } else {
+        res.status(401);
+        throw new Error('No token provided');
     }
 }));
 

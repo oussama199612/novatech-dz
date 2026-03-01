@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
+import { onAuthStateChanged, type User as FirebaseUser, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import api from '../api';
 
@@ -42,10 +42,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     api.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
 
                     // Fetch or sync the customer profile from our Backend MongoDB
-                    const { data } = await api.get('/customers/profile');
-                    setCustomer(data);
+                    try {
+                        const { data } = await api.get('/customers/profile');
+                        setCustomer(data);
+                    } catch (profileErr: any) {
+                        // If the backend returns 404 (Not Found) or 401, the MongoDB profile might be missing (Ghost Account)
+                        if (profileErr.response?.status === 404 || profileErr.response?.status === 401) {
+                            console.log("Profile missing in DB, attempting recovery...");
+                            try {
+                                const { data: recoveredData } = await api.post('/customers/recover');
+                                setCustomer(recoveredData);
+                            } catch (recoverErr) {
+                                console.error('Failed to recover profile', recoverErr);
+                                setCustomer(null);
+                                setToken(null);
+                                localStorage.removeItem('customerToken');
+                                delete api.defaults.headers.common['Authorization'];
+                            }
+                        } else {
+                            console.error('Failed to sync profile', profileErr);
+                        }
+                    }
                 } catch (error) {
-                    console.error('Failed to sync profile', error);
+                    console.error('Failed to handle firebase token', error);
                 }
             } else {
                 setCustomer(null);
