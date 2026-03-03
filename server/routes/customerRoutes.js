@@ -28,11 +28,31 @@ router.post('/register', asyncHandler(async (req, res, next) => {
     const userExists = await User.findOne({ $or: [{ email }, { phone }, { firebaseUid }] });
 
     if (userExists) {
+        let updated = false;
         if (!userExists.firebaseUid && firebaseUid) {
             userExists.firebaseUid = firebaseUid;
-            await userExists.save();
+            updated = true;
         }
+        if ((!userExists.phone || userExists.phone === '0000000000') && phone) {
+            userExists.phone = phone;
+            updated = true;
+        }
+        if (updated) await userExists.save();
+
         const profile = await CustomerProfile.findOne({ user: userExists._id });
+        if (profile) {
+            let profileUpdated = false;
+            if ((profile.firstName === 'Utilisateur' || !profile.firstName) && firstName) {
+                profile.firstName = firstName;
+                profileUpdated = true;
+            }
+            if ((profile.lastName === ' ' || !profile.lastName) && lastName) {
+                profile.lastName = lastName;
+                profileUpdated = true;
+            }
+            if (profileUpdated) await profile.save();
+        }
+
         res.status(200).json(formatUserResponse(userExists, profile));
         return;
     }
@@ -138,7 +158,7 @@ router.post('/recover', asyncHandler(async (req, res, next) => {
                 user = await User.create({
                     firebaseUid: firebaseUid,
                     email: decodedToken.email,
-                    phone: decodedToken.phone_number || '0000000000', // Placeholder
+                    phone: decodedToken.phone_number || undefined,
                     isEmailVerified: decodedToken.email_verified || false,
                     isPhoneVerified: false
                 });

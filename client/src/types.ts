@@ -1,3 +1,11 @@
+export interface Variant {
+    title: string;
+    price: number;
+    stock: number;
+    sku?: string;
+    options?: string[];
+}
+
 export interface Product {
     _id: string;
     name: string;
@@ -7,7 +15,7 @@ export interface Product {
     category: Category;
     stock: number;
     orderIndex: number;
-    variants: any[];
+    variants: Variant[];
     offers?: {
         quantity: number;
         price: number;

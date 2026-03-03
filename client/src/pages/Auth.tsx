@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
@@ -11,24 +11,34 @@ import {
     updateProfile,
     deleteUser
 } from 'firebase/auth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Auth = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, customer } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
-        phone: '', // Keep phone for backend profile only
+        phone: '',
         password: ''
     });
 
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        // Redirect if already logged in
+        if (customer) {
+            navigate('/profile');
+        }
+    }, [customer, navigate]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
             if (isLogin) {
@@ -39,22 +49,19 @@ const Auth = () => {
                 // Formatting phone number
                 let phoneNumber = formData.phone.trim();
 
-                // Validate phone number format (only digits, spaces, +, -, or ())
+                // Validate phone number format
                 const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
                 if (!phoneRegex.test(phoneNumber) || phoneNumber.replace(/\D/g, '').length < 8) {
                     setError('Le numéro de téléphone est invalide. Veuillez n\'utiliser que des chiffres.');
+                    setLoading(false);
                     return;
                 }
 
-                // Ensure the phone number has a country code, default to Algeria +213 for example if it starts with 0
                 if (phoneNumber.startsWith('0')) {
                     phoneNumber = '+213' + phoneNumber.substring(1).replace(/\s+/g, '');
                 } else if (!phoneNumber.startsWith('+')) {
                     phoneNumber = '+213' + phoneNumber.replace(/\s+/g, ''); // Fallback
                 }
-
-
-
 
                 let userCredential;
                 try {
@@ -93,7 +100,6 @@ const Auth = () => {
                 } catch (registrationErr: any) {
                     console.error("Registration Sync Error:", registrationErr);
 
-                    // If backend failed, but firebase succeeded, delete the firebase user to avoid ghost accounts
                     if (userCredential && userCredential.user) {
                         try {
                             await deleteUser(userCredential.user);
@@ -102,12 +108,11 @@ const Auth = () => {
                         }
                     }
 
-                    throw registrationErr; // Pass to the main catch block
+                    throw registrationErr;
                 }
             }
         } catch (err: any) {
             console.error("Auth Error:", err);
-            // Translate common Firebase errors
             if (err.code === 'auth/email-already-in-use') {
                 setError('Cette adresse e-mail est déjà utilisée.');
             } else if (err.code === 'auth/invalid-credential') {
@@ -117,137 +122,177 @@ const Auth = () => {
             } else {
                 setError(err.response?.data?.message || err.message || 'Une erreur est survenue');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
+    const inputClasses = "w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 text-gray-900 rounded-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black focus:bg-white transition-all duration-300";
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-serif text-gray-900">
-                    {isLogin ? 'Connexion' : 'Créer un compte'}
-                </h2>
+        <div className="min-h-screen flex">
+            {/* Left Side - Image/Branding (Hidden on mobile) */}
+            <div className="hidden lg:flex lg:w-1/2 bg-black relative overflow-hidden flex-col justify-center px-16">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2800&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+                <div className="relative z-10 max-w-lg">
+                    <h1 className="text-white text-5xl font-serif font-light leading-tight mb-6">
+                        L'élégance à portée de clic.
+                    </h1>
+                    <p className="text-gray-300 text-lg font-light leading-relaxed">
+                        Rejoignez notre espace exclusif pour accéder à des collections sur-mesure, suivre vos commandes en temps réel et profiter de nos offres personnalisées.
+                    </p>
+                </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
+            {/* Right Side - Form */}
+            <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-24 bg-white">
+                <div className="max-w-md w-full mx-auto">
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {!isLogin && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Prénom</label>
-                                    <div className="mt-1 relative rounded-md shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <User className="h-5 w-5 text-gray-400" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            required
-                                            className="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-                                            value={formData.firstName}
-                                            onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Nom</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="mt-1 focus:ring-black focus:border-black block w-full sm:text-sm border-gray-300 rounded-md py-2 border px-3"
-                                        value={formData.lastName}
-                                        onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        )}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={isLogin ? 'login' : 'register'}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                        >
+                            <h2 className="text-3xl font-serif text-gray-900 mb-2">
+                                {isLogin ? 'Bon retour' : 'Rejoindre le club'}
+                            </h2>
+                            <p className="text-gray-500 mb-8">
+                                {isLogin
+                                    ? "Connectez-vous pour accéder à votre compte."
+                                    : "Créez votre compte pour faire partie de la famille."}
+                            </p>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Adresse Email</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    type="email"
-                                    required
-                                    className="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-                                    value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
-                        </div>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="bg-red-50 text-red-700 p-4 rounded-sm border-l-4 border-red-500 mb-6 text-sm"
+                                >
+                                    {error}
+                                </motion.div>
+                            )}
 
-                        {!isLogin && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Téléphone</label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <AnimatePresence>
+                                    {!isLogin && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="grid grid-cols-2 gap-4"
+                                        >
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <User className="h-4 w-4 text-gray-400" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="Prénom"
+                                                    className={inputClasses}
+                                                    value={formData.firstName}
+                                                    onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    placeholder="Nom"
+                                                    className={`w-full px-4 py-3 bg-gray-50/50 border border-gray-200 text-gray-900 rounded-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black focus:bg-white transition-all duration-300`}
+                                                    value={formData.lastName}
+                                                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Phone className="h-5 w-5 text-gray-400" />
+                                        <Mail className="h-4 w-4 text-gray-400" />
                                     </div>
                                     <input
-                                        type="tel"
+                                        type="email"
                                         required
-                                        className="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-                                        value={formData.phone}
-                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="Adresse Email"
+                                        className={inputClasses}
+                                        value={formData.email}
+                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
                                     />
                                 </div>
-                            </div>
-                        )}
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-400" />
+                                <AnimatePresence>
+                                    {!isLogin && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="relative pt-5"
+                                        >
+                                            <div className="absolute inset-y-0 left-0 pl-3 pt-5 flex items-center pointer-events-none">
+                                                <Phone className="h-4 w-4 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="tel"
+                                                required
+                                                placeholder="Téléphone (+213...)"
+                                                className={inputClasses}
+                                                value={formData.phone}
+                                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Lock className="h-4 w-4 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        required
+                                        placeholder="Mot de passe"
+                                        className={inputClasses}
+                                        value={formData.password}
+                                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    />
                                 </div>
-                                <input
-                                    type="password"
-                                    required
-                                    className="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-                                    value={formData.password}
-                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                />
-                            </div>
-                        </div>
 
-                        <div>
-                            <button
-                                type="submit"
-                                id="sign-in-button"
-                                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors"
-                            >
-                                {isLogin ? 'Se connecter' : "S'inscrire"} <ArrowRight className="ml-2 h-4 w-4" />
-                            </button>
-                        </div>
-                    </form>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full flex justify-center items-center py-4 px-4 border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed mt-8"
+                                >
+                                    {loading ? (
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            {isLogin ? 'Se connecter' : "Créer le compte"}
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </>
+                                    )}
+                                </button>
+                            </form>
 
-                    <div className="mt-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300" />
+                            <div className="mt-8 relative flex justify-center text-sm">
+                                <button
+                                    onClick={() => {
+                                        setIsLogin(!isLogin);
+                                        setError('');
+                                    }}
+                                    className="text-gray-500 hover:text-black hover:underline transition-colors"
+                                >
+                                    {isLogin
+                                        ? "Pas encore de compte ? Créer un compte"
+                                        : "Déjà un compte ? Se connecter"}
+                                </button>
                             </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">
-                                    {isLogin ? 'Nouveau client ?' : 'Déjà un compte ?'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="mt-6">
-                            <button
-                                onClick={() => {
-                                    setIsLogin(!isLogin);
-                                    setError('');
-                                }}
-                                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                            >
-                                {isLogin ? 'Créer un compte' : 'Se connecter'}
-                            </button>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
         </div>
