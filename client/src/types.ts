@@ -4,6 +4,7 @@ export interface Variant {
     stock: number;
     sku?: string;
     options?: string[];
+    image?: string;
 }
 
 export interface Product {

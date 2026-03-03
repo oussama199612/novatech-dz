@@ -126,6 +126,45 @@ router.get('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
     }
 }));
 
+// @desc    Update customer profile (name, phone)
+// @route   PUT /api/customers/profile
+// @access  Private
+router.put('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.customer._id);
+    if (!user) {
+        res.status(404);
+        throw new Error('Utilisateur non trouvé');
+    }
+
+    const { firstName, lastName, phone } = req.body;
+
+    let updated = false;
+
+    // Update Phone (if provided and different)
+    if (phone && phone !== user.phone) {
+        user.phone = phone;
+        updated = true;
+    }
+    if (updated) await user.save();
+
+    // Update Profile Name
+    const profile = await CustomerProfile.findOne({ user: user._id });
+    if (profile) {
+        let profileUpdated = false;
+        if (firstName !== undefined && profile.firstName !== firstName) {
+            profile.firstName = firstName;
+            profileUpdated = true;
+        }
+        if (lastName !== undefined && profile.lastName !== lastName) {
+            profile.lastName = lastName;
+            profileUpdated = true;
+        }
+        if (profileUpdated) await profile.save();
+    }
+
+    res.json(formatUserResponse(user, profile));
+}));
+
 // @desc    Self-heal ghost Firebase account during login
 // @route   POST /api/customers/recover
 // @access  Public (needs Bearer Token manually verified)

@@ -9,7 +9,8 @@ import {
     createUserWithEmailAndPassword,
     sendEmailVerification,
     updateProfile,
-    deleteUser
+    deleteUser,
+    sendPasswordResetEmail
 } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,6 +28,7 @@ const Auth = () => {
     });
 
     const [error, setError] = useState('');
+    const [resetMsg, setResetMsg] = useState('');
 
     useEffect(() => {
         // Redirect if already logged in
@@ -127,6 +129,23 @@ const Auth = () => {
         }
     };
 
+    const handleForgotPassword = async () => {
+        if (!formData.email) {
+            setError('Veuillez saisir votre adresse e-mail pour réinitialiser le mot de passe.');
+            setResetMsg('');
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, formData.email);
+            setResetMsg('Un e-mail de réinitialisation vous a été envoyé. Vérifiez votre boîte de réception.');
+            setError('');
+        } catch (err: any) {
+            setError('Erreur lors de l\'envoi de l\'e-mail de réinitialisation. Vérifiez que l\'e-mail est correct.');
+            setResetMsg('');
+            console.error(err);
+        }
+    };
+
     const inputClasses = "w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 text-gray-900 rounded-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black focus:bg-white transition-all duration-300";
 
     return (
@@ -172,6 +191,16 @@ const Auth = () => {
                                     className="bg-red-50 text-red-700 p-4 rounded-sm border-l-4 border-red-500 mb-6 text-sm"
                                 >
                                     {error}
+                                </motion.div>
+                            )}
+
+                            {resetMsg && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="bg-green-50 text-green-700 p-4 rounded-sm border-l-4 border-green-500 mb-6 text-sm"
+                                >
+                                    {resetMsg}
                                 </motion.div>
                             )}
 
@@ -261,6 +290,18 @@ const Auth = () => {
                                         onChange={e => setFormData({ ...formData, password: e.target.value })}
                                     />
                                 </div>
+
+                                {isLogin && (
+                                    <div className="flex justify-end mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleForgotPassword}
+                                            className="text-xs text-gray-500 hover:text-black transition-colors"
+                                        >
+                                            Mot de passe oublié ?
+                                        </button>
+                                    </div>
+                                )}
 
                                 <button
                                     type="submit"

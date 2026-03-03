@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Package, CheckCircle, AlertTriangle, User, ShoppingBag, Clock, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LogOut, Package, CheckCircle, AlertTriangle, User, ShoppingBag, Clock, ArrowRight, Edit2, Save, X, Key } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { auth } from '../firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 interface OrderItem {
     _id: string;
@@ -21,15 +23,34 @@ interface Order {
 }
 
 const Profile = () => {
-    const { customer, logout, loading } = useAuth();
+    const { customer, logout, loading, updateCustomer } = useAuth();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(true);
 
+    // Profile Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({ firstName: '', lastName: '', phone: '' });
+    const [savingProfile, setSavingProfile] = useState(false);
+
+    // Password Reset State
+    const [resettingPwd, setResettingPwd] = useState(false);
+    const [resetSent, setResetSent] = useState(false);
+
+    useEffect(() => {
+        if (customer) {
+            setFormData({
+                firstName: customer.firstName || '',
+                lastName: customer.lastName || '',
+                phone: customer.phone !== '0000000000' ? (customer.phone || '') : ''
+            });
+        }
+    }, [customer]);
+
     useEffect(() => {
         if (!loading && !customer) {
             navigate('/auth');
-        } else if (customer) {
+        } else if (customer && !isEditing) { // avoid re-fetching blindly during edit
             // Fetch orders
             api.get('/orders/myorders')
                 .then(res => {
@@ -38,7 +59,35 @@ const Profile = () => {
                 .catch(err => console.error("Could not fetch orders", err))
                 .finally(() => setLoadingOrders(false));
         }
-    }, [customer, loading, navigate]);
+    }, [customer, loading, navigate, isEditing]);
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSavingProfile(true);
+        try {
+            const res = await api.put('/customers/profile', formData);
+            if (updateCustomer) updateCustomer(res.data);
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Could not update profile", error);
+        } finally {
+            setSavingProfile(false);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        if (!customer?.email) return;
+        setResettingPwd(true);
+        try {
+            await sendPasswordResetEmail(auth, customer.email);
+            setResetSent(true);
+            setTimeout(() => setResetSent(false), 5000);
+        } catch (err) {
+            console.error("Reset password failed", err);
+        } finally {
+            setResettingPwd(false);
+        }
+    };
 
     if (loading || !customer) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -75,7 +124,7 @@ const Profile = () => {
 
     const itemVariants = {
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
     };
 
     return (
@@ -114,38 +163,106 @@ const Profile = () => {
                         animate="visible"
                         className="lg:col-span-1 space-y-6"
                     >
-                        <motion.div variants={itemVariants} className="bg-white p-6 md:p-8 border border-gray-100 shadow-sm">
-                            <h2 className="text-lg font-serif mb-6 flex items-center gap-2">
-                                <User size={20} className="text-gray-400" /> Profil
+                        <motion.div variants={itemVariants} className="bg-white p-6 md:p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+                            <h2 className="text-lg font-serif mb-6 flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                    <User size={20} className="text-gray-400" /> Profil
+                                </span>
+                                {!isEditing && (
+                                    <button onClick={() => setIsEditing(true)} className="text-sm font-medium text-gray-500 hover:text-black flex items-center gap-1 transition-colors">
+                                        <Edit2 size={14} /> Éditer
+                                    </button>
+                                )}
                             </h2>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Nom Complet</p>
-                                    <p className="font-medium text-gray-900">{customer.firstName} {customer.lastName}</p>
-                                </div>
-
-                                <div>
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Adresse Email</p>
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-medium text-gray-900 truncate">{customer.email}</p>
-                                        {customer.isEmailVerified ? (
-                                            <CheckCircle size={16} className="text-green-500 shrink-0" />
-                                        ) : (
-                                            <div title="Email non vérifié">
-                                                <AlertTriangle size={16} className="text-amber-500 shrink-0" />
+                            <AnimatePresence mode="wait">
+                                {isEditing ? (
+                                    <motion.form
+                                        key="form"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        onSubmit={handleUpdateProfile}
+                                        className="space-y-4"
+                                    >
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-xs text-gray-400 uppercase tracking-wider">Prénom</label>
+                                                <input required type="text" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full text-sm border-b border-gray-200 outline-none pb-1 focus:border-black transition-colors" />
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-xs text-gray-400 uppercase tracking-wider">Nom</label>
+                                                <input required type="text" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full text-sm border-b border-gray-200 outline-none pb-1 focus:border-black transition-colors" />
+                                            </div>
+                                        </div>
 
-                                <div>
-                                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Téléphone</p>
-                                    <p className={`font-medium ${!customer.phone || customer.phone === '0000000000' ? 'text-gray-400 italic' : 'text-gray-900'}`}>
-                                        {(!customer.phone || customer.phone === '0000000000') ? 'Non renseigné' : customer.phone}
-                                    </p>
-                                </div>
-                            </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs text-gray-400 uppercase tracking-wider">Adresse Email <span className="text-[10px] lowercase text-gray-300">(Fixe)</span></label>
+                                            <input disabled type="text" value={customer.email} className="w-full text-sm border-b border-gray-100 text-gray-400 outline-none pb-1 bg-transparent cursor-not-allowed" />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="text-xs text-gray-400 uppercase tracking-wider">Téléphone</label>
+                                            <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="0550000000" className="w-full text-sm border-b border-gray-200 outline-none pb-1 focus:border-black transition-colors" />
+                                        </div>
+
+                                        <div className="pt-4 flex items-center justify-end gap-3">
+                                            <button type="button" onClick={() => setIsEditing(false)} className="text-sm font-medium text-gray-500 hover:text-black flex items-center gap-1">
+                                                <X size={14} /> Annuler
+                                            </button>
+                                            <button type="submit" disabled={savingProfile} className="text-sm font-medium bg-black text-white px-4 py-2 flex items-center gap-2 hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                                                {savingProfile ? <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={14} />}
+                                                Sauvegarder
+                                            </button>
+                                        </div>
+                                    </motion.form>
+                                ) : (
+                                    <motion.div
+                                        key="view"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="space-y-6"
+                                    >
+                                        <div>
+                                            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Nom Complet</p>
+                                            <p className="font-medium text-gray-900">{customer.firstName} {customer.lastName}</p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Adresse Email</p>
+                                            <div className="flex items-center justify-between">
+                                                <p className="font-medium text-gray-900 truncate">{customer.email}</p>
+                                                {customer.isEmailVerified ? (
+                                                    <CheckCircle size={16} className="text-green-500 shrink-0" />
+                                                ) : (
+                                                    <div title="Email non vérifié">
+                                                        <AlertTriangle size={16} className="text-amber-500 shrink-0" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Téléphone</p>
+                                            <p className={`font-medium ${!customer.phone || customer.phone === '0000000000' ? 'text-gray-400 italic' : 'text-gray-900'}`}>
+                                                {(!customer.phone || customer.phone === '0000000000') ? 'Non renseigné' : customer.phone}
+                                            </p>
+                                        </div>
+
+                                        <div className="pt-4 border-t border-gray-100">
+                                            <button
+                                                onClick={handleResetPassword}
+                                                disabled={resettingPwd || resetSent}
+                                                className="text-xs font-medium text-gray-500 hover:text-black flex items-center gap-2 transition-colors disabled:opacity-50"
+                                            >
+                                                <Key size={14} />
+                                                {resetSent ? 'Email envoyé !' : resettingPwd ? 'Envoi...' : 'Réinitialiser le mot de passe'}
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     </motion.div>
 
