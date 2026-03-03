@@ -66,8 +66,7 @@ const Cart = () => {
             const orderItems = cartItems.map(item => ({
                 product: item.productId,
                 qty: item.quantity,
-                variant: item.variant,
-                options: item.options // Pass options if backend needs them for record, though variant title usually suffices
+                variant: item.variant
             }));
 
             const orderData = {

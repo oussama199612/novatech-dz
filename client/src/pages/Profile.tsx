@@ -98,9 +98,9 @@ const Profile = () => {
                                             <div className="flex items-center gap-3 mb-2">
                                                 <span className="font-mono font-bold text-gray-900">{order.orderId}</span>
                                                 <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                                        order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
-                                                            order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                                'bg-amber-100 text-amber-800'
+                                                    order.status === 'paid' ? 'bg-blue-100 text-blue-800' :
+                                                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                                            'bg-amber-100 text-amber-800'
                                                     }`}>
                                                     {order.status === 'pending' ? 'En attente' :
                                                         order.status === 'paid' ? 'Payée' :
@@ -112,7 +112,7 @@ const Profile = () => {
                                                 hour: '2-digit', minute: '2-digit'
                                             })}</p>
                                             <div className="text-gray-600">
-                                                {order.products.length} article(s) - Paiement: {order.paymentMethodSnapshot?.name || 'Inconnu'}
+                                                {order.items?.length || 0} article(s) - Paiement: {order.payment?.provider || 'Inconnu'}
                                             </div>
                                         </div>
                                         <div className="text-left sm:text-right">

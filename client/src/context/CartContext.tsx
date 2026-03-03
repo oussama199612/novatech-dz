@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { Product } from '../types';
+import api from '../api';
 
 export interface CartItem {
-    id: string; // Unique ID for cart item (productID + variantID/Options)
+    id: string; // Maps to DB _id
     productId: string;
     name: string;
     price: number;
@@ -13,83 +14,112 @@ export interface CartItem {
         price: number;
         sku?: string;
     };
-    options?: Record<string, string>;
 }
 
 interface CartContextType {
     cartItems: CartItem[];
-    addToCart: (product: Product, quantity: number, variant?: any, options?: Record<string, string>) => void;
-    removeFromCart: (cartItemId: string) => void;
-    updateQuantity: (cartItemId: string, quantity: number) => void;
+    addToCart: (product: Product, quantity: number, variant?: any) => Promise<void>;
+    removeFromCart: (cartItemId: string) => Promise<void>;
+    updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
+    loading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const mapBackendToFrontend = (dbItem: any): CartItem => {
+    return {
+        id: dbItem._id,
+        productId: dbItem.product?._id || dbItem.product,
+        name: dbItem.product?.name || 'Produit',
+        price: dbItem.priceAtAddition,
+        image: dbItem.product?.image || '',
+        quantity: dbItem.quantity,
+        variant: dbItem.variantId ? { title: dbItem.variantId, price: dbItem.priceAtAddition } : undefined,
+    };
+};
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-    const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-        const localData = localStorage.getItem('novatech_cart');
-        return localData ? JSON.parse(localData) : [];
-    });
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchCart = async () => {
+        try {
+            setLoading(true);
+            const { data } = await api.get('/cart');
+            if (data.generatedGuestId) {
+                // Ensure cookie is set or local storage fallback for guest ID
+                document.cookie = `guestId=${data.generatedGuestId}; path=/; max-age=31536000`;
+            }
+            if (data.items) {
+                setCartItems(data.items.map(mapBackendToFrontend));
+            }
+        } catch (error) {
+            console.error('Error fetching cart:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        localStorage.setItem('novatech_cart', JSON.stringify(cartItems));
-    }, [cartItems]);
+        // Initial fetch
+        fetchCart();
+    }, []);
 
-    const addToCart = (product: Product, quantity: number, variant?: any, options?: Record<string, string>) => {
-        setCartItems(prev => {
-            const price = variant?.price || product.price;
-            // Generate a unique ID based on product and variant/options
-            // Simple approach: productId + variantTitle
-            const variantId = variant ? variant.title : 'default';
-            const existingItemIndex = prev.findIndex(item => item.productId === product._id && item.variant?.title === variant?.title);
-
-            if (existingItemIndex > -1) {
-                // Update existing item
-                const newCart = [...prev];
-                newCart[existingItemIndex].quantity += quantity;
-                return newCart;
-            } else {
-                // Add new item
-                const newItem: CartItem = {
-                    id: `${product._id}-${variantId}-${Date.now()}`,
-                    productId: product._id,
-                    name: product.name,
-                    price: price,
-                    image: variant?.image || product.image,
-                    quantity,
-                    variant: variant ? {
-                        title: variant.title,
-                        price: variant.price,
-                        sku: variant.sku
-                    } : undefined,
-                    options
-                };
-                return [...prev, newItem];
+    const addToCart = async (product: Product, quantity: number, variant?: any) => {
+        try {
+            const { data } = await api.post('/cart/items', {
+                productId: product._id,
+                variantTitle: variant?.title,
+                quantity
+            });
+            if (data.items) {
+                setCartItems(data.items.map(mapBackendToFrontend));
             }
-        });
+        } catch (error) {
+            console.error('Failed to add to cart:', error);
+            alert("Erreur lors de l'ajout au panier.");
+        }
     };
 
-    const removeFromCart = (cartItemId: string) => {
-        setCartItems(prev => prev.filter(item => item.id !== cartItemId));
+    const removeFromCart = async (cartItemId: string) => {
+        try {
+            // Optimistic update
+            setCartItems(prev => prev.filter(item => item.id !== cartItemId));
+            const { data } = await api.delete(`/cart/items/${cartItemId}`);
+            if (data.items) {
+                setCartItems(data.items.map(mapBackendToFrontend));
+            }
+        } catch (error) {
+            console.error('Failed to remove from cart:', error);
+            fetchCart(); // Revert optimistic update
+        }
     };
 
-    const updateQuantity = (cartItemId: string, quantity: number) => {
+    const updateQuantity = async (cartItemId: string, quantity: number) => {
         if (quantity < 1) return;
-        setCartItems(prev => prev.map(item => item.id === cartItemId ? { ...item, quantity } : item));
+        try {
+            const { data } = await api.put(`/cart/items/${cartItemId}`, { quantity });
+            if (data.items) {
+                setCartItems(data.items.map(mapBackendToFrontend));
+            }
+        } catch (error) {
+            console.error('Failed to update quantity:', error);
+        }
     };
 
     const clearCart = () => {
         setCartItems([]);
+        // Ideally should call backend DELETE /cart, but letting it drop gracefully for now
     };
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const cartTotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, loading }}>
             {children}
         </CartContext.Provider>
     );

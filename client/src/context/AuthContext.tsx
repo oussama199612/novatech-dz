@@ -45,6 +45,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     try {
                         const { data } = await api.get('/customers/profile');
                         setCustomer(data);
+
+                        // Merge guest cart if applicable
+                        const match = document.cookie.match(/(^| )guestId=([^;]+)/);
+                        if (match) {
+                            api.post('/cart/merge', { guestId: match[2] })
+                                .catch(err => console.error('Cart merge failed:', err));
+                        }
                     } catch (profileErr: any) {
                         // If the backend returns 404 (Not Found) or 401, the MongoDB profile might be missing (Ghost Account)
                         if (profileErr.response?.status === 404 || profileErr.response?.status === 401) {
@@ -52,6 +59,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             try {
                                 const { data: recoveredData } = await api.post('/customers/recover');
                                 setCustomer(recoveredData);
+
+                                // Merge guest cart if applicable
+                                const match = document.cookie.match(/(^| )guestId=([^;]+)/);
+                                if (match) {
+                                    api.post('/cart/merge', { guestId: match[2] })
+                                        .catch(err => console.error('Cart recovery merge failed:', err));
+                                }
                             } catch (recoverErr) {
                                 console.error('Failed to recover profile', recoverErr);
                                 setCustomer(null);

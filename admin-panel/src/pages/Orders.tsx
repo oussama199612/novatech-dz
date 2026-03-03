@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, CheckCircle, Clock, Printer } from 'lucide-react';
+import { CheckCircle, Clock } from 'lucide-react';
 import api from '../api';
 
 const Orders = () => {
@@ -80,7 +80,7 @@ const Orders = () => {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="font-medium text-white text-sm mb-0.5">{order.customerName}</div>
+                                            <div className="font-medium text-white text-sm mb-0.5">{order.contactEmail}</div>
                                             <div className="flex justify-between items-center text-xs text-slate-500">
                                                 <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                                                 <span className="text-emerald-400 font-bold">{order.totalAmount?.toLocaleString()} DA</span>
@@ -120,8 +120,8 @@ const Orders = () => {
                             <div className="grid grid-cols-2 gap-4 bg-slate-800/50 p-4 rounded-lg">
                                 <div>
                                     <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Client</p>
-                                    <p className="font-medium text-white">{selectedOrder.customerName}</p>
-                                    <p className="text-sm text-slate-400">{selectedOrder.customerPhone || 'N/A'}</p>
+                                    <p className="font-medium text-white">{selectedOrder.contactEmail}</p>
+                                    <p className="text-sm text-slate-400">{selectedOrder.contactPhone || 'N/A'}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Total</p>
@@ -133,50 +133,19 @@ const Orders = () => {
                             <div>
                                 <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Produits</h4>
                                 <div className="bg-slate-800/30 rounded-lg overflow-hidden border border-slate-800">
-                                    {/* Deduplicate items for display to handle legacy bad data */}
-                                    {selectedOrder.products.reduce((acc: any[], item: any) => {
-                                        // Create a unique key based on product ID and variant info
-                                        const variantKey = item.variant?.title || (item.options ? JSON.stringify(item.options) : 'standard');
-                                        const key = `${item.product}-${variantKey}`;
-
-                                        // Check if we already have this item (naive dedupe for exact duplicates)
-                                        // Note: If you have 2 identical items legitimately (unlikely in this context), this might merge them,
-                                        // but it's better than the current double-display bug.
-                                        // A better check is to see if one has 'variant' populated and the other doesn't (the bug case).
-
-                                        // The bug produced one entry with NO variant info, and one WITH variant info (or just duplicates).
-                                        // We prefer the one WITH keys if possible, or just unique ones.
-
-                                        // Simple Unique Filter by comparing properties:
-                                        const exists = acc.find(existing =>
-                                            existing.product._id === item.product._id &&
-                                            JSON.stringify(existing.variant) === JSON.stringify(item.variant) &&
-                                            JSON.stringify(existing.options) === JSON.stringify(item.options)
-                                        );
-
-                                        if (!exists) {
-                                            acc.push(item);
-                                        }
-                                        return acc;
-                                    }, []).map((item: any, idx: number) => (
+                                    {selectedOrder.items?.map((item: any, idx: number) => (
                                         <div key={idx} className="p-4 flex items-center gap-4 border-b border-slate-800 last:border-0">
-                                            {item.image && (
-                                                <img src={item.image} alt="" className="w-12 h-12 object-contain bg-white rounded" />
-                                            )}
                                             <div className="flex-1">
-                                                <p className="font-bold text-white mb-0.5">{item.name}</p>
-                                                {/* Enhanced Variant Display */}
-                                                {(item.variant?.title || (item.options && Object.keys(item.options).length > 0)) ? (
-                                                    <div className="text-sm text-novatech-blue font-medium bg-blue-900/20 px-2 py-1 rounded w-fit border border-blue-500/30">
-                                                        {item.variant?.title || Object.values(item.options).join(' / ')}
+                                                <p className="font-bold text-white mb-0.5">{item.productName}</p>
+                                                {item.variantTitle && (
+                                                    <div className="text-sm text-novatech-blue font-medium bg-blue-900/20 px-2 py-1 rounded w-fit border border-blue-500/30 mt-1">
+                                                        {item.variantTitle} {item.sku ? `(${item.sku})` : ''}
                                                     </div>
-                                                ) : (
-                                                    <p className="text-sm text-slate-500 italic">Standard</p>
                                                 )}
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-white font-mono">x{item.quantity}</p>
-                                                <p className="text-sm text-slate-400">{(item.totalItemPrice || item.price * item.quantity).toLocaleString()} DA</p>
+                                                <p className="text-sm text-slate-400">{(item.pricePaid * item.quantity).toLocaleString()} DA</p>
                                             </div>
                                         </div>
                                     ))}

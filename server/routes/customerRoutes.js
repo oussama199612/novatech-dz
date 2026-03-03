@@ -1,39 +1,57 @@
 const express = require('express');
 const router = express.Router();
-const Customer = require('../models/Customer');
+const User = require('../models/User');
+const CustomerProfile = require('../models/CustomerProfile');
 const asyncHandler = require('express-async-handler');
 const { protectCustomer } = require('../middleware/customerAuthMiddleware');
 
+// Helper to preserve frontend data contract
+const formatUserResponse = (user, profile) => {
+    return {
+        _id: user._id,
+        firebaseUid: user.firebaseUid,
+        email: user.email,
+        phone: user.phone,
+        firstName: profile ? profile.firstName : 'Utilisateur',
+        lastName: profile ? profile.lastName : '',
+        isEmailVerified: user.isEmailVerified,
+        isPhoneVerified: user.isPhoneVerified,
+        role: user.role
+    };
+};
 // @desc    Register a new customer (Sync from Firebase)
 // @route   POST /api/customers/register
 // @access  Public
 router.post('/register', asyncHandler(async (req, res, next) => {
     const { firebaseUid, firstName, lastName, email, phone } = req.body;
 
-    const customerExists = await Customer.findOne({ $or: [{ email }, { phone }, { firebaseUid }] });
+    const userExists = await User.findOne({ $or: [{ email }, { phone }, { firebaseUid }] });
 
-    if (customerExists) {
-        // If it exists, maybe just update the firebaseUid if missing
-        if (!customerExists.firebaseUid && firebaseUid) {
-            customerExists.firebaseUid = firebaseUid;
-            await customerExists.save();
+    if (userExists) {
+        if (!userExists.firebaseUid && firebaseUid) {
+            userExists.firebaseUid = firebaseUid;
+            await userExists.save();
         }
-        res.status(200).json(customerExists);
+        const profile = await CustomerProfile.findOne({ user: userExists._id });
+        res.status(200).json(formatUserResponse(userExists, profile));
         return;
     }
 
-    const customer = await Customer.create({
+    const user = await User.create({
         firebaseUid,
-        firstName,
-        lastName,
         email,
         phone,
         isEmailVerified: false,
         isPhoneVerified: false
     });
 
-    if (customer) {
-        res.status(201).json(customer);
+    if (user) {
+        const profile = await CustomerProfile.create({
+            user: user._id,
+            firstName,
+            lastName
+        });
+        res.status(201).json(formatUserResponse(user, profile));
     } else {
         res.status(400);
         throw new Error('Une erreur s\'est produite lors de la création de votre profil. Veuillez réessayer.');
@@ -44,15 +62,15 @@ router.post('/register', asyncHandler(async (req, res, next) => {
 // @route   POST /api/customers/verify-phone
 // @access  Private
 router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res, next) => {
-    const customer = await Customer.findById(req.customer._id);
+    const user = await User.findById(req.customer._id);
 
-    if (!customer) {
+    if (!user) {
         res.status(404);
-        throw new Error('Customer not found');
+        throw new Error('User not found');
     }
 
-    customer.isPhoneVerified = true;
-    await customer.save();
+    user.isPhoneVerified = true;
+    await user.save();
 
     res.json({ message: 'Phone verification status synced successfully' });
 }));
@@ -61,28 +79,29 @@ router.post('/verify-phone', protectCustomer, asyncHandler(async (req, res, next
 // @route   GET /api/customers/profile
 // @access  Private
 router.get('/profile', protectCustomer, asyncHandler(async (req, res, next) => {
-    const customer = await Customer.findById(req.customer._id).select('-password');
-    if (customer) {
+    const user = await User.findById(req.customer._id);
+    if (user) {
         // Sync email verification status from Firebase
         try {
             const admin = require('../config/firebase');
-            if (customer.firebaseUid) {
-                const firebaseUser = await admin.auth().getUser(customer.firebaseUid);
-                if (firebaseUser.emailVerified && !customer.isEmailVerified) {
-                    customer.isEmailVerified = true;
+            if (user.firebaseUid) {
+                const firebaseUser = await admin.auth().getUser(user.firebaseUid);
+                if (firebaseUser.emailVerified && !user.isEmailVerified) {
+                    user.isEmailVerified = true;
                     // Mongoose requires saving the updated document
-                    await customer.save();
+                    await user.save();
                 }
             }
         } catch (error) {
             console.error('Error fetching firebase user status:', error);
         }
-        res.json(customer);
+        const profile = await CustomerProfile.findOne({ user: user._id });
+        res.json(formatUserResponse(user, profile));
     } else {
         // AUTOSYNC RECOVERY: If Firebase Token is valid but MongoDB profile is missing, reconstruct it
-        if (req.customer) { // Wait, the middleware already throws 401 if it doesn't find it. Let's look at `protectCustomer`.
+        if (req.customer) {
             res.status(404);
-            throw new Error('Customer not found');
+            throw new Error('User not found');
         }
     }
 }));
@@ -99,32 +118,38 @@ router.post('/recover', asyncHandler(async (req, res, next) => {
             const decodedToken = await admin.auth().verifyIdToken(token);
             const firebaseUid = decodedToken.uid;
 
-            // Check if customer exists by email or uid
-            let customer = await Customer.findOne({ $or: [{ firebaseUid }, { email: decodedToken.email }] });
+            // Check if user exists by email or uid
+            let user = await User.findOne({ $or: [{ firebaseUid }, { email: decodedToken.email }] });
 
-            if (customer) {
+            if (user) {
                 // Return existing
-                if (!customer.firebaseUid) {
-                    customer.firebaseUid = firebaseUid;
-                    await customer.save();
+                if (!user.firebaseUid) {
+                    user.firebaseUid = firebaseUid;
+                    await user.save();
                 }
-                res.json(customer);
+                const profile = await CustomerProfile.findOne({ user: user._id });
+                res.json(formatUserResponse(user, profile));
             } else {
                 // Recover/Create new DB record based on Firebase Token info
                 const nameParts = decodedToken.name ? decodedToken.name.split(' ') : [];
                 const firstName = nameParts[0] || decodedToken.email.split('@')[0] || 'Utilisateur';
                 const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ' ';
 
-                customer = await Customer.create({
+                user = await User.create({
                     firebaseUid: firebaseUid,
                     email: decodedToken.email,
-                    firstName: firstName,
-                    lastName: lastName,
                     phone: decodedToken.phone_number || '0000000000', // Placeholder
                     isEmailVerified: decodedToken.email_verified || false,
                     isPhoneVerified: false
                 });
-                res.status(201).json(customer);
+
+                const profile = await CustomerProfile.create({
+                    user: user._id,
+                    firstName: firstName,
+                    lastName: lastName
+                });
+
+                res.status(201).json(formatUserResponse(user, profile));
             }
         } catch (error) {
             console.error(error);

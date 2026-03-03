@@ -3,9 +3,12 @@ const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 const Order = require('../models/Order');
+const OrderItem = require('../models/OrderItem');
+const Shipment = require('../models/Shipment');
+const Payment = require('../models/Payment');
 const Product = require('../models/Product');
 const PaymentMethod = require('../models/PaymentMethod');
-const Customer = require('../models/Customer');
+const User = require('../models/User');
 const admin = require('../config/firebase');
 const { protect } = require('../middleware/authMiddleware');
 const { protectCustomer } = require('../middleware/customerAuthMiddleware');
@@ -14,15 +17,17 @@ const { protectCustomer } = require('../middleware/customerAuthMiddleware');
 // @route   GET /api/orders/myorders
 // @access  Private (Customer)
 router.get('/myorders', protectCustomer, asyncHandler(async (req, res) => {
-    // Find all orders strictly assigned to this customer OR old unassigned orders matching their email
+    // Find all orders strictly assigned to this user OR old unassigned orders matching their email
     const orders = await Order.find({
         $or: [
-            { customer: req.customer._id },
-            { customer: { $exists: false }, customerEmail: req.customer.email },
-            { customer: null, customerEmail: req.customer.email }
+            { user: req.customer._id },
+            { user: { $exists: false }, contactEmail: req.customer.email },
+            { user: null, contactEmail: req.customer.email }
         ]
     })
-        .populate('products.product')
+        .populate('items')
+        .populate('payment')
+        .populate('shipment')
         .sort({ createdAt: -1 });
 
     res.json(orders);
@@ -130,14 +135,12 @@ router.post('/', asyncHandler(async (req, res) => {
             itemPrice += remainingQty * unitPrice;
 
             dbOrderItems.push({
-                product: product._id,
-                name: product.name,
-                price: unitPrice, // Save the actual unit price used
+                productRef: product._id,
+                productName: product.name,
+                pricePaid: unitPrice, // Save the actual unit price used
                 quantity: item.qty,
-                image: item.variant?.image || product.image, // Use variant image if available
-                variant: item.variant, // SAVE THE VARIANT
-                options: item.options, // SAVE THE OPTIONS
-                totalItemPrice: itemPrice
+                variantTitle: item.variant?.title || '',
+                sku: product.sku || '' // Assume product has sku or is empty
             });
             totalPrice += itemPrice;
         }
@@ -148,17 +151,20 @@ router.post('/', asyncHandler(async (req, res) => {
             throw new Error('Payment method not found');
         }
 
-        // Optional Structured Auth Check: strongly bind the order to a Customer DB Document if a valid token is provided
-        let customerId = null;
+        // Optional Structured Auth Check: strongly bind the order to a User DB Document if a valid token is provided
+        let userId = null;
+        let guestId = req.cookies?.guestId || `guest_${Date.now()}`;
+
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             try {
                 const token = req.headers.authorization.split(' ')[1];
                 const decodedToken = await admin.auth().verifyIdToken(token);
-                const userDoc = await Customer.findOne({
+                const userDoc = await User.findOne({
                     $or: [{ firebaseUid: decodedToken.uid }, { email: decodedToken.email }]
                 });
                 if (userDoc) {
-                    customerId = userDoc._id;
+                    userId = userDoc._id;
+                    guestId = undefined; // Wipe guest ID if logged in
                 }
             } catch (error) {
                 console.error("Optional Auth for Order linking failed:", error.message);
@@ -169,24 +175,55 @@ router.post('/', asyncHandler(async (req, res) => {
         // Generate Short Order ID
         const orderId = 'CMD-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 100);
 
+        // 1. Create the Main Order Shell
         const order = new Order({
             orderId,
-            customerName,
-            customerEmail,
-            customerPhone,
-            customer: customerId || undefined,
-            gameId,
-            products: dbOrderItems,
-            totalAmount: totalPrice,
-            paymentMethodId,
+            user: userId || undefined,
+            guestId: guestId,
+            contactEmail: customerEmail,
+            contactPhone: customerPhone,
             store: storeId || undefined,
-            paymentMethodSnapshot: {
-                name: paymentMethod.name,
-                accountLabel: paymentMethod.accountLabel,
-                accountValue: paymentMethod.accountValue
-            },
+            totalAmount: totalPrice,
             status: 'pending'
         });
+
+        // 2. Create Order Items Snapshot
+        const createdItems = await Promise.all(dbOrderItems.map(async (itemData) => {
+            const item = new OrderItem({
+                order: order._id,
+                ...itemData
+            });
+            await item.save();
+            return item._id;
+        }));
+
+        order.items = createdItems;
+
+        // 3. Create Shipment
+        const shipment = new Shipment({
+            order: order._id,
+            shippingAddress: {
+                street: 'A renseigner', // Need to pass this in payload eventually
+                city: 'A renseigner',
+                wilaya: 'A renseigner',
+                firstName: customerName, // Fallback
+                lastName: '',
+                phone: customerPhone
+            }
+        });
+        await shipment.save();
+        order.shipment = shipment._id;
+
+        // 4. Create Payment
+        const payment = new Payment({
+            order: order._id,
+            user: userId || undefined,
+            amount: totalPrice,
+            provider: paymentMethod.name,
+            status: 'pending'
+        });
+        await payment.save();
+        order.payment = payment._id;
 
         const createdOrder = await order.save();
         res.status(201).json(createdOrder);
@@ -203,6 +240,9 @@ router.get('/', protect, asyncHandler(async (req, res) => {
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
         .populate('store', 'name city')
+        .populate('items')
+        .populate('payment')
+        .populate('shipment')
         .sort({ createdAt: -1 })
         .limit(pageSize)
         .skip(pageSize * (page - 1));
@@ -217,9 +257,9 @@ router.get('/:id', asyncHandler(async (req, res) => {
     // :id can be mongo ID or orderId string
     let order;
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-        order = await Order.findById(req.params.id).populate('products.product').populate('store', 'name city address');
+        order = await Order.findById(req.params.id).populate('items').populate('payment').populate('shipment').populate('store', 'name city address');
     } else {
-        order = await Order.findOne({ orderId: req.params.id }).populate('products.product').populate('store', 'name city address');
+        order = await Order.findOne({ orderId: req.params.id }).populate('items').populate('payment').populate('shipment').populate('store', 'name city address');
     }
 
     if (order) {
