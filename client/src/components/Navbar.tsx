@@ -18,7 +18,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/10">
+            <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-8">
                         <Link to="/" onClick={() => setIsMenuOpen(false)}>
@@ -30,32 +30,32 @@ const Navbar = () => {
                         </Link>
                         <div className="hidden md:flex gap-6 text-sm font-medium tracking-tight">
                             <div className="hidden md:flex gap-6 text-sm font-medium tracking-tight">
-                                <Link to="/products" className="hover:text-primary transition-colors text-slate-900">MEN</Link>
-                                <Link to="/products" className="hover:text-primary transition-colors text-slate-900">WOMEN</Link>
-                                <Link to="/products" className="hover:text-primary transition-colors text-primary font-bold tracking-widest">LIMITED</Link>
+                                <Link to="/products" className="hover:text-gray-500 transition-colors text-gray-900">MEN</Link>
+                                <Link to="/products" className="hover:text-gray-500 transition-colors text-gray-900">WOMEN</Link>
+                                <Link to="/products" className="hover:text-gray-500 transition-colors text-black font-bold tracking-widest">LIMITED</Link>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
-                        <button className="hover:text-primary transition-colors text-slate-900">
-                            <Search size={24} />
+                        <button className="hover:text-gray-500 transition-colors text-gray-900">
+                            <Search size={22} strokeWidth={1.5} />
                         </button>
-                        <Link to={customer ? "/profile" : "/auth"} className="hover:text-primary transition-colors text-slate-900" onClick={() => setIsMenuOpen(false)}>
-                            <User size={24} />
+                        <Link to={customer ? "/profile" : "/auth"} className="hover:text-gray-500 transition-colors text-gray-900" onClick={() => setIsMenuOpen(false)}>
+                            <User size={22} strokeWidth={1.5} />
                         </Link>
-                        <Link to="/cart" className="hover:text-primary transition-colors relative text-slate-900" onClick={() => setIsMenuOpen(false)}>
-                            <ShoppingBag size={24} />
+                        <Link to="/cart" className="hover:text-gray-500 transition-colors relative text-gray-900" onClick={() => setIsMenuOpen(false)}>
+                            <ShoppingBag size={22} strokeWidth={1.5} />
                             {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-primary text-[10px] text-white font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 bg-black text-[10px] text-white font-medium w-4 h-4 flex items-center justify-center">
                                     {cartCount}
                                 </span>
                             )}
                         </Link>
                         <button
-                            className="md:hidden text-slate-900 z-50"
+                            className="md:hidden text-gray-900 z-50"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                         >
-                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            {isMenuOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
                         </button>
                     </div>
                 </div>
@@ -71,21 +71,21 @@ const Navbar = () => {
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed inset-0 z-40 bg-white md:hidden pt-24 px-6"
                     >
-                        <div className="flex flex-col gap-8 text-2xl font-bold tracking-tight">
-                            <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                HOME <ChevronRight size={20} className="text-slate-400" />
+                        <div className="flex flex-col gap-8 text-2xl font-serif tracking-tight text-gray-900">
+                            <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-gray-100 pb-4 hover:pl-2 transition-all">
+                                ACCUEIL <ChevronRight size={20} className="text-gray-400" />
                             </Link>
-                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                MEN <ChevronRight size={20} className="text-slate-400" />
+                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-gray-100 pb-4 hover:pl-2 transition-all">
+                                HOMME <ChevronRight size={20} className="text-gray-400" />
                             </Link>
-                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                WOMEN <ChevronRight size={20} className="text-slate-400" />
+                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-gray-100 pb-4 hover:pl-2 transition-all">
+                                FEMME <ChevronRight size={20} className="text-gray-400" />
                             </Link>
-                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-slate-100 pb-4 text-primary">
-                                LIMITED EDITION <ChevronRight size={20} className="text-primary" />
+                            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-gray-100 pb-4 text-black font-medium hover:pl-2 transition-all">
+                                ÉDITION LIMITÉE <ChevronRight size={20} className="text-black" />
                             </Link>
-                            <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                CART ({cartCount}) <ChevronRight size={20} className="text-slate-400" />
+                            <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between border-b border-gray-100 pb-4 hover:pl-2 transition-all">
+                                PANIER ({cartCount}) <ChevronRight size={20} className="text-gray-400" />
                             </Link>
                         </div>
                     </motion.div>

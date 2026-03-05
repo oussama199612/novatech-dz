@@ -39,15 +39,15 @@ const ProductLanding = () => {
         }
     }, [customer]);
 
-    const [stores, setStores] = useState<any[]>([]);
+    const [stores, setStores] = useState<{ _id: string; title?: string; name?: string; city?: string; address: string; isActive: boolean; isMain: boolean }[]>([]);
     const [selectedStoreId, setSelectedStoreId] = useState<string>('');
-    const [alternatives, setAlternatives] = useState<any[]>([]);
-    const [settings, setSettings] = useState<any>({});
+    const [alternatives, setAlternatives] = useState<Product[]>([]);
+    const [settings, setSettings] = useState<Record<string, unknown>>({});
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState<'desc' | 'features'>('desc');
 
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
-    const [currentVariant, setCurrentVariant] = useState<any>(null);
+    const [currentVariant, setCurrentVariant] = useState<{ _id?: string; title?: string; stock?: number; price?: number; image?: string; sku?: string; trackQuantity?: boolean } | null>(null);
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
@@ -75,12 +75,14 @@ const ProductLanding = () => {
                 }
 
                 // Init Variants
-                if (prod.hasVariants && prod.options?.length > 0) {
-                    const defaults: Record<string, string> = {};
-                    prod.options.forEach((opt: any) => {
-                        defaults[opt.name] = opt.values[0];
+                if (prod.hasVariants && prod.options) {
+                    const initial: Record<string, string> = {};
+                    prod.options.forEach((opt: { name: string; values: string[] }) => {
+                        if (opt.values && opt.values.length > 0) {
+                            initial[opt.name] = opt.values[0];
+                        }
                     });
-                    setSelectedOptions(defaults);
+                    setSelectedOptions(initial);
                 } else if (prod.image) {
                     setActiveImage(prod.image);
                 }
@@ -102,8 +104,8 @@ const ProductLanding = () => {
         // Variant title format: "Value1 / Value2" or just "Value1"
         // We need to match the combination.
         // Simplest way: Construct the title from selected options in order of product.options
-        const variantTitle = product.options.map(opt => selectedOptions[opt.name]).join(' / ');
-        const variant = product.variants.find((v: any) => v.title === variantTitle);
+        const variantTitle = product.options.map((opt: { name: string }) => selectedOptions[opt.name]).join(' / ');
+        const variant = product.variants.find((v: { title: string; trackQuantity?: boolean; stock?: number; price?: number; _id?: string; image?: string }) => v.title === variantTitle);
 
         setCurrentVariant(variant || null);
         if (variant && variant.image) {
@@ -147,9 +149,9 @@ const ProductLanding = () => {
             await api.post('/orders', orderData);
 
             navigate('/success');
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Erreur lors de la commande.');
+            alert((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erreur lors de la commande.');
         }
     };
 
@@ -163,8 +165,8 @@ const ProductLanding = () => {
         alert('Produit ajouté au panier !');
     };
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Chargement...</div>;
-    if (!product) return <div className="min-h-screen flex items-center justify-center text-white">Produit introuvable</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-500 font-light">Chargement...</div>;
+    if (!product) return <div className="min-h-screen flex items-center justify-center text-gray-500 font-light">Produit introuvable</div>;
 
     const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
 
@@ -174,7 +176,7 @@ const ProductLanding = () => {
     const stockStatus = isOutOfStock ? 'out_of_stock' : (isTracking && stockToDisplay !== undefined && stockToDisplay <= 5) ? 'low_stock' : 'in_stock';
 
     return (
-        <div className="min-h-screen pb-20 bg-luxury-black">
+        <div className="min-h-screen pb-20 bg-white font-sans text-gray-900 border-t border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -186,7 +188,7 @@ const ProductLanding = () => {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="hidden md:block aspect-[4/3] relative group overflow-hidden"
+                                className="hidden md:block aspect-[4/3] relative group overflow-hidden bg-[#FAFAFA] border border-gray-100"
                             >
                                 <img
                                     src={getImageUrl(activeImage)}
@@ -194,7 +196,7 @@ const ProductLanding = () => {
                                     className="w-full h-full object-contain hover:scale-105 transition-transform duration-700"
                                 />
                                 {product.compareAtPrice > (currentVariant?.price || product.price) && (
-                                    <div className="absolute top-0 left-0 bg-luxury-gold text-white text-xs font-bold px-3 py-1 uppercase tracking-widest shadow-lg">
+                                    <div className="absolute top-4 right-4 bg-black text-white text-[10px] font-medium px-3 py-1 uppercase tracking-widest">
                                         Privilège
                                     </div>
                                 )}
@@ -237,46 +239,46 @@ const ProductLanding = () => {
                                     <button
                                         key={idx}
                                         onClick={() => setActiveImage(img!)}
-                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 ${activeImage === img ? 'opacity-100 border-b-2 border-luxury-gold' : 'opacity-60 hover:opacity-100'}`}
+                                        className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 border bg-[#FAFAFA] ${activeImage === img ? 'opacity-100 border-black' : 'opacity-60 border-transparent hover:opacity-100'}`}
                                     >
-                                        <img src={getImageUrl(img!)} className="w-full h-full object-contain" />
+                                        <img src={getImageUrl(img!)} className="w-full h-full object-contain mix-blend-multiply" />
                                     </button>
                                 ))}
                             </div>
 
                             {/* Desktop: Details Below Image */}
-                            <div className="hidden lg:block mt-16 pt-8 border-t border-gray-200">
+                            <div className="hidden lg:block mt-16 pt-8 border-t border-gray-100">
                                 <div className="flex gap-12 mb-8">
                                     <button
                                         onClick={() => setActiveTab('desc')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'desc' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-black'}`}
+                                        className={`pb-2 text-sm font-sans tracking-widest uppercase transition-colors ${activeTab === 'desc' ? 'text-black border-b border-black' : 'text-gray-400 hover:text-gray-800'}`}
                                     >
                                         L'Expérience
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('features')}
-                                        className={`pb-2 text-sm font-serif italic tracking-wider transition-colors ${activeTab === 'features' ? 'text-luxury-gold border-b border-luxury-gold' : 'text-gray-500 hover:text-black'}`}
+                                        className={`pb-2 text-sm font-sans tracking-widest uppercase transition-colors ${activeTab === 'features' ? 'text-black border-b border-black' : 'text-gray-400 hover:text-gray-800'}`}
                                     >
                                         Détails Techniques
                                     </button>
                                 </div>
 
-                                <div className="prose prose-sm max-w-none text-gray-800">
+                                <div className="prose prose-sm max-w-none text-gray-600 font-light">
                                     {activeTab === 'desc' ? (
                                         <div
-                                            className="prose prose-headings:font-serif prose-headings:text-black prose-p:text-gray-800 prose-strong:text-black"
+                                            className="prose prose-headings:font-serif prose-headings:text-black prose-p:text-gray-600 prose-strong:text-black prose-strong:font-medium"
                                             dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
                                         />
                                     ) : (
                                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                             {product.features?.map((feat, i) => (
                                                 <li key={i} className="flex items-start gap-4">
-                                                    <div className="p-1 text-luxury-gold shrink-0 mt-1">
+                                                    <div className="p-1 text-black shrink-0 mt-1">
                                                         <Zap size={14} />
                                                     </div>
                                                     <div>
-                                                        <strong className="block text-black uppercase tracking-wider text-xs mb-1">{feat.title}</strong>
-                                                        <span className="text-sm text-gray-700">{feat.description}</span>
+                                                        <strong className="block text-black uppercase tracking-widest text-xs mb-1 font-medium">{feat.title}</strong>
+                                                        <span className="text-sm text-gray-500">{feat.description}</span>
                                                     </div>
                                                 </li>
                                             ))}
@@ -293,39 +295,39 @@ const ProductLanding = () => {
                         <div className="space-y-8">
 
                             {/* Header Info */}
-                            <div className="space-y-4 border-b border-gray-200 pb-8">
+                            <div className="space-y-4 border-b border-gray-100 pb-8">
                                 <div className="space-y-3">
                                     <div className="flex gap-2">
                                         {stockStatus === 'out_of_stock' && (
-                                            <span className="bg-red-50 text-red-600 text-xs font-bold px-3 py-1 rounded inline-block uppercase tracking-wider border border-red-100">
+                                            <span className="bg-white text-red-600 text-[10px] font-medium px-2 py-1 uppercase tracking-widest border border-red-100">
                                                 Victime de son succès (Rupture)
                                             </span>
                                         )}
                                         {stockStatus === 'low_stock' && (
-                                            <span className="bg-orange-50 text-orange-600 animate-pulse text-xs font-bold px-3 py-1 rounded inline-block uppercase tracking-wider border border-orange-100">
+                                            <span className="bg-white text-orange-600 animate-pulse text-[10px] font-medium px-2 py-1 uppercase tracking-widest border border-orange-100">
                                                 Stock très limité : plus que {stockToDisplay}
                                             </span>
                                         )}
                                     </div>
-                                    <h1 className="text-3xl md:text-4xl font-serif text-black leading-tight">{product.name}</h1>
+                                    <h1 className="text-3xl md:text-5xl font-serif text-black leading-tight uppercase tracking-tight">{product.name}</h1>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <div className="text-3xl font-bold text-black">
-                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-lg text-gray-600 font-medium">DZD</span>
+                                    <div className="text-2xl font-medium text-black">
+                                        {(currentVariant?.price || product.price).toLocaleString()} <span className="text-sm text-gray-400 font-light">DZD</span>
                                         {product.compareAtPrice > (currentVariant?.price || product.price) && (
-                                            <span className="text-lg text-gray-500 line-through ml-3">
+                                            <span className="text-sm text-gray-400 line-through ml-3">
                                                 {product.compareAtPrice.toLocaleString()} DZD
                                             </span>
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-1 text-luxury-gold">
-                                        <Star fill="currentColor" size={16} />
-                                        <Star fill="currentColor" size={16} />
-                                        <Star fill="currentColor" size={16} />
-                                        <Star fill="currentColor" size={16} />
-                                        <Star fill="currentColor" size={16} />
-                                        <span className="text-gray-500 text-sm ml-2">(4.9/5)</span>
+                                    <div className="flex items-center gap-1 text-black">
+                                        <Star fill="currentColor" size={14} />
+                                        <Star fill="currentColor" size={14} />
+                                        <Star fill="currentColor" size={14} />
+                                        <Star fill="currentColor" size={14} />
+                                        <Star fill="currentColor" size={14} />
+                                        <span className="text-gray-400 text-xs ml-2 font-light">(4.9/5)</span>
                                     </div>
                                 </div>
 
@@ -357,11 +359,11 @@ const ProductLanding = () => {
                                                                     <button
                                                                         key={val}
                                                                         onClick={() => handleOptionChange(option.name, val)}
-                                                                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shadow-sm ${isSelected ? 'border-luxury-gold scale-110' : 'border-gray-300 hover:border-gray-500'}`}
+                                                                        className={`w-8 h-8 rounded-none border flex items-center justify-center transition-all ${isSelected ? 'ring-1 ring-black border-black' : 'border-gray-200 hover:border-gray-400'}`}
                                                                         title={val}
-                                                                        style={{ backgroundColor: isValidHex ? colorHex : '#333' }}
+                                                                        style={{ backgroundColor: isValidHex ? colorHex : '#eee' }}
                                                                     >
-                                                                        {!isValidHex && <span className="text-xs text-black mix-blend-difference">{val.charAt(0)}</span>}
+                                                                        {!isValidHex && <span className="text-[10px] text-black">{val.charAt(0)}</span>}
                                                                     </button>
                                                                 );
                                                             }
@@ -370,9 +372,9 @@ const ProductLanding = () => {
                                                                 <button
                                                                     key={val}
                                                                     onClick={() => handleOptionChange(option.name, val)}
-                                                                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${isSelected
+                                                                    className={`px-4 py-2 border text-[11px] font-medium tracking-widest uppercase transition-all ${isSelected
                                                                         ? 'bg-black text-white border-black'
-                                                                        : 'bg-white text-gray-800 border-gray-300 hover:border-gray-500'
+                                                                        : 'bg-transparent text-gray-600 border-gray-200 hover:border-black hover:text-black'
                                                                         }`}
                                                                 >
                                                                     {val}
@@ -388,26 +390,26 @@ const ProductLanding = () => {
                             </div>
 
                             {/* Trust Badges */}
-                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-gray-600">
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
-                                    <Truck size={20} className="text-luxury-gold" />
-                                    <span className="font-medium">Livraison Rapide</span>
+                            <div className="grid grid-cols-3 gap-2 text-center text-[10px] text-gray-500 uppercase tracking-widest pt-4">
+                                <div className="p-3 border border-gray-100 flex flex-col items-center gap-2">
+                                    <Truck size={16} className="text-gray-900" />
+                                    <span>Livraison Rapide</span>
                                 </div>
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
-                                    <Shield size={20} className="text-luxury-gold" />
-                                    <span className="font-medium">Garantie 100%</span>
+                                <div className="p-3 border border-gray-100 flex flex-col items-center gap-2">
+                                    <Shield size={16} className="text-gray-900" />
+                                    <span>Garantie 100%</span>
                                 </div>
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-col items-center gap-1">
-                                    <Lock size={20} className="text-luxury-gold" />
-                                    <span className="font-medium">Paiement Sécurisé</span>
+                                <div className="p-3 border border-gray-100 flex flex-col items-center gap-2">
+                                    <Lock size={16} className="text-gray-900" />
+                                    <span>Paiement Sécurisé</span>
                                 </div>
                             </div>
 
                             {/* Order Form */}
-                            <div className="overflow-hidden">
-                                <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
-                                    <span className="font-bold uppercase tracking-wider text-sm flex items-center gap-2 text-black">
-                                        <CreditCard size={16} className="text-luxury-gold" />
+                            <div className="overflow-hidden mt-8">
+                                <div className="border-b border-gray-100 pb-4 mb-6 flex items-center justify-between">
+                                    <span className="font-medium uppercase tracking-widest text-[11px] flex items-center gap-2 text-black">
+                                        <CreditCard size={14} className="text-black" />
                                         Commander
                                     </span>
                                     {product.hasVariants && !currentVariant ? (
@@ -421,14 +423,14 @@ const ProductLanding = () => {
 
                                 <form onSubmit={handleSubmitOrder} className="space-y-6">
                                     <div className="space-y-4">
-                                        <label className="text-xs font-bold text-black uppercase tracking-widest">Vos Informations</label>
-                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold focus:outline-none focus:border-luxury-gold transition-all text-sm placeholder-gray-400" />
+                                        <label className="text-[10px] text-gray-400 uppercase tracking-widest">Vos Informations</label>
+                                        <input required placeholder="Nom complet" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium focus:outline-none focus:border-black transition-colors text-sm placeholder-gray-300" />
                                         <div className="grid grid-cols-2 gap-4">
-                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
-                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-white border-b-2 border-gray-200 px-0 py-3 text-black font-bold text-sm focus:outline-none focus:border-luxury-gold transition-all placeholder-gray-400" />
+                                            <input required type="email" placeholder="Email" value={formData.customerEmail} onChange={e => setFormData({ ...formData, customerEmail: e.target.value })} className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300" />
+                                            <input required type="tel" placeholder="Tél (WhatsApp)" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300" />
                                         </div>
 
-                                        {settings?.enableMultiStore && stores.length > 0 && (
+                                        {Boolean(settings?.enableMultiStore) && stores.length > 0 && (
                                             <div className="pt-2">
                                                 <label className="text-xs font-bold text-black uppercase tracking-widest block mb-2">Magasin de Traitement</label>
                                                 <select
@@ -447,10 +449,10 @@ const ProductLanding = () => {
 
                                     <div className="space-y-4 pt-4">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-black uppercase tracking-widest">Quantité & Offres</label>
+                                            <label className="text-[10px] text-gray-400 uppercase tracking-widest">Quantité & Offres</label>
                                             {product.offers && product.offers.length > 0 && (
-                                                <span className="text-xs text-luxury-gold font-bold animate-pulse">
-                                                    Offres disponibles !
+                                                <span className="text-[10px] text-black font-medium">
+                                                    Offres disponibles
                                                 </span>
                                             )}
                                         </div>
@@ -458,20 +460,20 @@ const ProductLanding = () => {
                                         {/* OFFERS SELECTION */}
                                         {product.offers && product.offers.length > 0 && (
                                             <div className="grid grid-cols-1 gap-3 mb-4">
-                                                {product.offers.sort((a: any, b: any) => a.quantity - b.quantity).map((offer: any, idx: number) => (
+                                                {product.offers.sort((a: { quantity: number; price: number }, b: { quantity: number; price: number }) => a.quantity - b.quantity).map((offer: { quantity: number; price: number; label?: string; isBestValue?: boolean }, idx: number) => (
                                                     <button
                                                         key={idx}
                                                         type="button"
                                                         onClick={() => setQuantity(offer.quantity)}
-                                                        className={`relative p-4 border flex items-center justify-between transition-all ${quantity === offer.quantity
-                                                            ? 'bg-luxury-gold/5 border-luxury-gold text-black shadow-sm'
-                                                            : 'bg-white border-gray-200 text-gray-800 hover:border-gray-400'
+                                                        className={`relative p-4 border flex items-center justify-between transition-colors ${quantity === offer.quantity
+                                                            ? 'border-black text-black'
+                                                            : 'bg-transparent border-gray-200 text-gray-600 hover:border-black'
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${quantity === offer.quantity ? 'bg-luxury-gold text-white' : 'bg-gray-200 text-gray-600'
+                                                            <div className={`w-4 h-4 rounded-none border flex items-center justify-center text-[10px] ${quantity === offer.quantity ? 'bg-black border-black text-white' : 'border-gray-300'
                                                                 }`}>
-                                                                {quantity === offer.quantity && <Check size={12} />}
+                                                                {quantity === offer.quantity && <Check size={10} />}
                                                             </div>
                                                             <div className="text-left">
                                                                 <div className={`font-bold text-sm ${quantity === offer.quantity ? 'text-black' : 'text-gray-900'}`}>
@@ -497,20 +499,20 @@ const ProductLanding = () => {
                                         )}
 
                                         {/* STANDARD QUANTITY SELECTOR */}
-                                        <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                                            <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-between border-b border-gray-100 pb-4 mt-6">
+                                            <div className="flex items-center border border-gray-200 w-fit">
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     -
                                                 </button>
-                                                <span className="w-8 text-center font-bold text-black text-lg">{quantity}</span>
+                                                <span className="w-10 text-center font-medium text-black text-sm">{quantity}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => setQuantity(quantity + 1)}
-                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                                                 >
                                                     +
                                                 </button>
@@ -525,7 +527,7 @@ const ProductLanding = () => {
 
                                                         // Calculate Best Price (Greedy Algorithm matching Backend)
                                                         if (product.offers && product.offers.length > 0) {
-                                                            const sortedOffers = [...product.offers].sort((a: any, b: any) => b.quantity - a.quantity);
+                                                            const sortedOffers = [...product.offers].sort((a: { quantity: number; price: number }, b: { quantity: number; price: number }) => b.quantity - a.quantity);
                                                             for (const offer of sortedOffers) {
                                                                 while (remaining >= offer.quantity) {
                                                                     finalPrice += offer.price;
@@ -543,19 +545,19 @@ const ProductLanding = () => {
                                     </div>
 
                                     <div className="space-y-4 pt-4">
-                                        <label className="text-xs font-bold text-black uppercase tracking-widest">Paiement</label>
+                                        <label className="text-[10px] text-gray-400 uppercase tracking-widest">Paiement</label>
                                         <div className="space-y-3">
                                             {methods.map(method => (
-                                                <div key={method._id} className={`border-b transition-all ${selectedMethodId === method._id ? 'border-luxury-gold pb-4' : 'border-gray-100 pb-2'}`}>
+                                                <div key={method._id} className={`border-b transition-all ${selectedMethodId === method._id ? 'border-black pb-4' : 'border-gray-100 pb-2'}`}>
                                                     <button
                                                         type="button"
                                                         onClick={() => setSelectedMethodId(method._id)}
                                                         className="w-full flex items-center gap-3 text-left py-2"
                                                     >
-                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-luxury-gold' : 'border-gray-300'}`}>
-                                                            {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-luxury-gold" />}
+                                                        <div className={`w-3 h-3 rounded-none border flex items-center justify-center ${selectedMethodId === method._id ? 'border-black' : 'border-gray-300'}`}>
+                                                            {selectedMethodId === method._id && <div className="w-1.5 h-1.5 bg-black" />}
                                                         </div>
-                                                        <span className={`font-bold text-sm ${selectedMethodId === method._id ? 'text-black' : 'text-gray-500'}`}>{method.name}</span>
+                                                        <span className={`font-medium text-sm ${selectedMethodId === method._id ? 'text-black' : 'text-gray-500'}`}>{method.name}</span>
                                                     </button>
 
                                                     <AnimatePresence>
@@ -585,10 +587,10 @@ const ProductLanding = () => {
                                     <button
                                         type="submit"
                                         disabled={!selectedMethodId || (product.hasVariants && !currentVariant) || isOutOfStock}
-                                        className="w-full py-5 font-bold text-white shadow-xl shadow-luxury-gold/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
+                                        className="w-full py-4 font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm hover:bg-gray-800 transition-colors uppercase tracking-widest"
                                         style={{ backgroundColor: 'black' }}
                                     >
-                                        Commander <ArrowRight size={18} />
+                                        Commander <ArrowRight size={16} />
                                     </button>
                                 </form>
                                 <div className="mt-4">
@@ -596,9 +598,9 @@ const ProductLanding = () => {
                                         type="button"
                                         onClick={handleAddToCart}
                                         disabled={(product.hasVariants && !currentVariant) || isOutOfStock}
-                                        className="w-full py-5 font-bold text-black border-2 border-black bg-white shadow-xl shadow-gray-200/20 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-95 transition-all text-lg hover:shadow-2xl hover:scale-105 uppercase tracking-widest text-sm"
+                                        className="w-full py-4 font-medium text-black border border-black bg-white disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm hover:bg-gray-50 transition-colors uppercase tracking-widest"
                                     >
-                                        Ajouter au panier <ShoppingBag size={18} />
+                                        Ajouter au panier <ShoppingBag size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -618,9 +620,9 @@ const ProductLanding = () => {
                                     <ul className="space-y-6">
                                         {product.features?.map((feat, i) => (
                                             <li key={i} className="flex flex-col gap-2">
-                                                <div className="flex items-center gap-2 text-luxury-gold">
+                                                <div className="flex items-center gap-2 text-black">
                                                     <Zap size={16} />
-                                                    <strong className="uppercase tracking-widest text-sm font-bold text-black">{feat.title}</strong>
+                                                    <strong className="uppercase tracking-widest text-sm font-medium text-black">{feat.title}</strong>
                                                 </div>
                                                 <span className="text-base text-black pl-7">{feat.description}</span>
                                             </li>
@@ -637,42 +639,42 @@ const ProductLanding = () => {
 
                 {/* ALTERNATIVES OR SIMILAR PRODUCTS */}
                 {stockStatus === 'out_of_stock' && alternatives.length > 0 ? (
-                    <div className="mt-24 border-t border-gray-200 pt-16">
-                        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 mb-8 text-center shadow-sm">
-                            <h2 className="text-3xl font-serif text-red-700 mb-2">Victime de son succès !</h2>
-                            <p className="text-red-600/80 font-medium">Ne vous inquiétez pas, voici d'excellentes alternatives actuellement disponibles :</p>
+                    <div className="mt-24 border-t border-gray-100 pt-16">
+                        <div className="bg-white border border-gray-100 p-8 mb-8 text-center">
+                            <h2 className="text-3xl font-serif text-gray-900 mb-2">Victime de son succès !</h2>
+                            <p className="text-gray-500 font-light text-sm">Ne vous inquiétez pas, voici d'excellentes alternatives actuellement disponibles :</p>
                         </div>
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                             {alternatives.map((p) => (
                                 <div key={p._id} className="group cursor-pointer" onClick={() => navigate(`/product/${p._id}`)}>
-                                    <div className="relative aspect-square bg-white rounded-xl overflow-hidden mb-4 border border-slate-100 shadow-sm">
+                                    <div className="relative aspect-[4/5] bg-white overflow-hidden mb-4 border border-gray-100">
                                         <img
                                             alt={p.name}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             src={getImageUrl(p.image)}
                                         />
                                     </div>
-                                    <h3 className="line-clamp-1 font-bold text-sm mb-1 group-hover:text-luxury-gold transition-colors">{p.name}</h3>
-                                    <p className="text-luxury-gold font-bold text-sm">{p.price.toLocaleString()} DZD</p>
+                                    <h3 className="line-clamp-1 font-medium text-sm mb-1 group-hover:text-gray-500 transition-colors">{p.name}</h3>
+                                    <p className="text-gray-900 font-medium text-sm">{p.price.toLocaleString()} DZD</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 ) : similarProducts.length > 0 && (
-                    <div className="mt-24 border-t border-gray-200 pt-16">
-                        <h2 className="text-3xl font-serif text-black mb-8 text-center">Vous aimerez aussi</h2>
+                    <div className="mt-24 border-t border-gray-100 pt-16">
+                        <h2 className="text-3xl font-serif text-black mb-12 text-center uppercase tracking-widest text-sm">Vous aimerez aussi</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                             {similarProducts.map((p) => (
                                 <div key={p._id} className="group cursor-pointer" onClick={() => navigate(`/product/${p._id}`)}>
-                                    <div className="relative aspect-square bg-white rounded-xl overflow-hidden mb-4 border border-slate-100 shadow-sm">
+                                    <div className="relative aspect-[4/5] bg-white overflow-hidden mb-4 border border-gray-100">
                                         <img
                                             alt={p.name}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             src={getImageUrl(p.image)}
                                         />
                                     </div>
-                                    <h3 className="line-clamp-1 font-bold text-sm mb-1 group-hover:text-luxury-gold transition-colors">{p.name}</h3>
-                                    <p className="text-luxury-gold font-bold text-sm">{p.price.toLocaleString()} DZD</p>
+                                    <h3 className="line-clamp-1 font-medium text-sm mb-1 group-hover:text-gray-500 transition-colors">{p.name}</h3>
+                                    <p className="text-gray-900 font-medium text-sm">{p.price.toLocaleString()} DZD</p>
                                 </div>
                             ))}
                         </div>

@@ -4,10 +4,11 @@ import { ShoppingBag, ChevronRight, Filter, X } from 'lucide-react';
 import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product } from '../types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Catalogue = () => {
     const [products, setProducts] = useState<Product[]>([]);
-    const [fetchedCategories, setFetchedCategories] = useState<any[]>([]);
+    const [fetchedCategories, setFetchedCategories] = useState<{ _id: string; title?: string; name: string; image?: string; parentCategory?: { _id: string } }[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const navigate = useNavigate();
@@ -153,37 +154,36 @@ const Catalogue = () => {
     };
 
     return (
-        <div className="bg-background-light font-display text-slate-900 min-h-screen">
+        <div className="bg-[#FAFAFA] font-sans text-gray-900 min-h-screen">
 
             {/* Header / Breadcrumbs */}
-            <header className="pt-12 pb-8 bg-white">
+            <header className="pt-12 pb-8 bg-white border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex items-center gap-2 text-xs text-slate-400 mb-4 tracking-widest uppercase">
-                        <Link to="/" className="hover:text-primary">Home</Link>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-4 tracking-widest uppercase">
+                        <Link to="/" className="hover:text-black transition-colors">Accueil</Link>
                         <ChevronRight size={12} />
-                        <span className="text-primary font-bold">Catalogue</span>
+                        <span className="text-black font-medium">Catalogue</span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold">ALL PRODUCTS</h1>
-                            <div className="h-1.5 w-24 bg-primary mt-4"></div>
+                            <h1 className="text-4xl md:text-5xl font-serif">TOUS LES PRODUITS</h1>
                         </div>
                         <div className="flex items-center gap-4">
                             <button
-                                className="lg:hidden flex items-center gap-2 text-sm font-bold"
+                                className="lg:hidden flex items-center gap-2 text-sm font-medium border border-gray-200 px-4 py-2"
                                 onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
                             >
                                 <Filter size={18} /> FILTERS
                             </button>
-                            <span className="hidden md:inline text-sm font-medium text-slate-500">SORT BY:</span>
+                            <span className="hidden md:inline text-sm font-light text-gray-500">TRIER PAR :</span>
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-transparent border-none text-sm font-bold focus:ring-0 cursor-pointer"
+                                className="bg-transparent border-none text-sm font-medium focus:ring-0 cursor-pointer text-black"
                             >
-                                <option value="newest">Newest Arrivals</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
+                                <option value="newest">Nouveautés</option>
+                                <option value="price-low">Prix Croissant</option>
+                                <option value="price-high">Prix Décroissant</option>
                             </select>
                         </div>
                     </div>
@@ -205,10 +205,9 @@ const Catalogue = () => {
                             </button>
                         </div>
 
-                        {/* Categories */}
                         <div>
-                            <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Category</h3>
-                            <div className="space-y-3">
+                            <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Catégorie</h3>
+                            <div className="space-y-4">
                                 {parentCategories.map(parentCat => {
                                     const subCats = fetchedCategories.filter(c => c.parentCategory?._id === parentCat._id);
                                     return (
@@ -218,21 +217,21 @@ const Catalogue = () => {
                                                     type="checkbox"
                                                     checked={selectedCategories.includes(parentCat.name)}
                                                     onChange={() => toggleFilter(parentCat.name, setSelectedCategories)}
-                                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                                    className="w-4 h-4 rounded-none border-gray-300 text-black focus:ring-black transition-colors"
                                                 />
-                                                <span className="text-sm font-bold group-hover:text-primary transition-colors">{parentCat.name}</span>
+                                                <span className="text-sm font-medium text-gray-800 group-hover:text-black transition-colors">{parentCat.name}</span>
                                             </label>
                                             {subCats.length > 0 && (
-                                                <div className="pl-6 space-y-2">
+                                                <div className="pl-7 space-y-2">
                                                     {subCats.map(subCat => (
                                                         <label key={subCat._id} className="flex items-center gap-3 cursor-pointer group">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={selectedCategories.includes(subCat.name)}
                                                                 onChange={() => toggleFilter(subCat.name, setSelectedCategories)}
-                                                                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                                                className="w-3 h-3 rounded-none border-gray-300 text-black focus:ring-black transition-colors"
                                                             />
-                                                            <span className="text-sm text-slate-500 group-hover:text-primary transition-colors">{subCat.name}</span>
+                                                            <span className="text-sm text-gray-500 font-light group-hover:text-black transition-colors">{subCat.name}</span>
                                                         </label>
                                                     ))}
                                                 </div>
@@ -245,8 +244,8 @@ const Catalogue = () => {
 
                         {/* Vendors / Brands */}
                         {allVendors.length > 0 && (
-                            <div className="mt-10">
-                                <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Marque</h3>
+                            <div className="mt-8">
+                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Marque</h3>
                                 <div className="space-y-3">
                                     {allVendors.map(vendor => (
                                         <label key={vendor} className="flex items-center gap-3 cursor-pointer group">
@@ -254,9 +253,9 @@ const Catalogue = () => {
                                                 type="checkbox"
                                                 checked={selectedVendors.includes(vendor)}
                                                 onChange={() => toggleFilter(vendor, setSelectedVendors)}
-                                                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                                className="w-4 h-4 rounded-none border-gray-300 text-black focus:ring-black transition-colors"
                                             />
-                                            <span className="text-sm group-hover:text-primary transition-colors">{vendor}</span>
+                                            <span className="text-sm font-light text-gray-600 group-hover:text-black transition-colors">{vendor}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -264,15 +263,15 @@ const Catalogue = () => {
                         )}
 
                         {/* In Stock Only */}
-                        <div className="mt-10 mb-2">
+                        <div className="mt-8 mb-2">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input
                                     type="checkbox"
                                     checked={inStockOnly}
                                     onChange={(e) => setInStockOnly(e.target.checked)}
-                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary transition-colors"
+                                    className="w-4 h-4 rounded-none border-gray-300 text-black focus:ring-black transition-colors"
                                 />
-                                <span className="font-bold text-sm tracking-widest uppercase group-hover:text-primary transition-colors">
+                                <span className="font-medium text-sm tracking-widest uppercase text-gray-800 group-hover:text-black transition-colors">
                                     En Stock Uniquement
                                 </span>
                             </label>
@@ -280,7 +279,7 @@ const Catalogue = () => {
 
                         {/* Price Range */}
                         <div className="mt-10">
-                            <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Price Range</h3>
+                            <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Prix Max</h3>
                             <div className="px-2">
                                 <input
                                     type="range"
@@ -289,9 +288,9 @@ const Catalogue = () => {
                                     step="500"
                                     value={priceRange[1]}
                                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                                    className="w-full h-1.5 bg-slate-200 accent-primary rounded-lg appearance-none cursor-pointer"
+                                    className="w-full h-1 bg-gray-200 accent-black rounded-none appearance-none cursor-pointer"
                                 />
-                                <div className="flex justify-between mt-4 text-xs font-bold text-slate-500">
+                                <div className="flex justify-between mt-4 text-xs font-medium text-gray-500">
                                     <span>{priceRange[0]} DA</span>
                                     <span>{priceRange[1].toLocaleString()} DA</span>
                                 </div>
@@ -300,16 +299,16 @@ const Catalogue = () => {
 
                         {/* Size (US) */}
                         {allSizes.length > 0 && (
-                            <div className="mt-10">
-                                <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Size (US)</h3>
+                            <div className="mt-8">
+                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Pointure / Taille</h3>
                                 <div className="grid grid-cols-4 gap-2">
                                     {allSizes.map(size => (
                                         <button
                                             key={size}
                                             onClick={() => toggleFilter(size, setSelectedSizes)}
-                                            className={`aspect-square flex items-center justify-center border text-xs font-bold transition-colors ${selectedSizes.includes(size)
-                                                ? 'border-primary bg-primary/5 text-primary'
-                                                : 'border-slate-200 hover:border-primary'
+                                            className={`aspect-square flex items-center justify-center border text-xs font-medium transition-colors ${selectedSizes.includes(size)
+                                                ? 'border-black bg-black text-white'
+                                                : 'border-gray-200 text-gray-600 hover:border-black hover:text-black'
                                                 }`}
                                         >
                                             {size}
@@ -321,8 +320,8 @@ const Catalogue = () => {
 
                         {/* Colors */}
                         {allColors.length > 0 && (
-                            <div className="mt-10 mb-10">
-                                <h3 className="font-bold text-sm tracking-widest mb-6 uppercase">Colors</h3>
+                            <div className="mt-8 mb-10">
+                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Couleurs</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {allColors.map(color => {
                                         const PREDEFINED_COLORS: Record<string, string> = {
@@ -338,7 +337,7 @@ const Catalogue = () => {
                                             <button
                                                 key={color}
                                                 onClick={() => toggleFilter(color, setSelectedColors)}
-                                                className={`w-8 h-8 rounded-full border ring-offset-2 transition-all ${selectedColors.includes(color) ? 'ring-2 ring-primary border-primary' : 'border-slate-200'
+                                                className={`w-8 h-8 rounded-none border ring-offset-2 transition-all ${selectedColors.includes(color) ? 'ring-1 ring-black border-black' : 'border-gray-200'
                                                     }`}
                                                 style={{ backgroundColor: isValidHex ? bg : '#eee' }}
                                                 title={color}
@@ -360,18 +359,18 @@ const Catalogue = () => {
                                 setSelectedSizes([]);
                                 setSelectedColors([]);
                             }}
-                            className="w-full py-3 bg-slate-900 text-white text-xs font-bold tracking-widest uppercase rounded-lg hover:bg-primary transition-colors"
+                            className="w-full py-3 bg-black text-white text-xs font-medium tracking-widest uppercase rounded-none hover:bg-gray-800 transition-colors"
                         >
-                            Clear All
+                            Réinitialiser
                         </button>
 
                         {/* Mobile: Apply Button */}
                         <div className="lg:hidden mt-4">
                             <button
                                 onClick={() => setIsMobileFiltersOpen(false)}
-                                className="w-full py-3 border border-slate-900 text-slate-900 text-xs font-bold tracking-widest uppercase rounded-lg hover:bg-slate-50 transition-colors"
+                                className="w-full py-3 border border-gray-900 text-gray-900 text-xs font-medium tracking-widest uppercase rounded-none hover:bg-gray-50 transition-colors"
                             >
-                                Apply Filters
+                                Appliquer les filtres
                             </button>
                         </div>
                     </aside>
@@ -381,47 +380,69 @@ const Catalogue = () => {
                         {loading ? (
                             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-12 animate-pulse">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="aspect-square bg-slate-100 rounded-xl"></div>
+                                    <div key={i} className="aspect-[4/5] bg-gray-200 mb-4"></div>
                                 ))}
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-12">
-                                    {sortedProducts.map((product) => (
-                                        <div key={product._id} className="group">
-                                            <div className="relative aspect-square bg-white rounded-xl overflow-hidden mb-5 border border-slate-100 shadow-sm cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>
-                                                <img
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    src={getImageUrl(product.image)}
-                                                />
-                                                <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                                    <button className="bg-white text-slate-900 px-4 py-2 text-xs font-bold rounded-full shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2 hover:bg-primary hover:text-white">
-                                                        <span>VIEW</span>
+                                <motion.div
+                                    layout
+                                    className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-12"
+                                >
+                                    <AnimatePresence mode="popLayout">
+                                        {sortedProducts.map((product) => (
+                                            <motion.div
+                                                layout
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                                key={product._id}
+                                                className="group"
+                                            >
+                                                <div
+                                                    className="relative aspect-[4/5] bg-white overflow-hidden mb-5 border border-gray-100 cursor-pointer"
+                                                    onClick={() => navigate(`/product/${product._id}`)}
+                                                >
+                                                    <img
+                                                        alt={product.name || ''}
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                        src={getImageUrl(product.image || '')}
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/opacity-0 group-hover:bg-black/5 transition-colors duration-500"></div>
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/product/${product._id}`);
+                                                        }}
+                                                        className="absolute bottom-4 left-4 right-4 bg-white text-black py-3 text-sm font-medium opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10 hover:bg-black hover:text-white flex items-center justify-center gap-2"
+                                                    >
+                                                        <ShoppingBag size={16} /> Aperçu
                                                     </button>
+
+                                                    {product.stock === 0 && (
+                                                        <span className="absolute top-4 left-4 bg-white/90 text-red-600 text-[10px] font-medium tracking-widest px-2 py-1 z-20 uppercase border border-red-100">Rupture</span>
+                                                    )}
+                                                    {product.stock <= 5 && product.stock > 0 && (
+                                                        <span className="absolute top-4 left-4 bg-white/90 text-orange-600 text-[10px] font-medium tracking-widest px-2 py-1 z-20 uppercase border border-orange-100">Stock Faible</span>
+                                                    )}
+                                                    {product.compareAtPrice > product.price && (
+                                                        <span className="absolute top-4 right-4 bg-black/90 text-white text-[10px] font-medium tracking-widest px-2 py-1 z-20 uppercase">Promo</span>
+                                                    )}
                                                 </div>
-                                                <button className="absolute bottom-4 right-4 bg-primary text-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10">
-                                                    <ShoppingBag size={20} />
-                                                </button>
-                                                {product.stock === 0 && (
-                                                    <span className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">RUPTURE</span>
-                                                )}
-                                                {product.stock <= 5 && product.stock > 0 && (
-                                                    <span className="absolute top-4 left-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">STOCK FAIBLE</span>
-                                                )}
-                                                {product.compareAtPrice > product.price && (
-                                                    <span className="absolute top-4 right-4 bg-luxury-gold text-white text-[10px] font-bold px-2 py-1 rounded shadow-md z-20">PROMO</span>
-                                                )}
-                                            </div>
-                                            <h3 className="font-bold text-base mb-1 group-hover:text-primary transition-colors cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h3>
-                                            <p className="text-slate-500 text-xs mb-3 uppercase tracking-tighter">{product.category?.name || 'Vêtements'}</p>
-                                            <p className="text-primary font-bold text-lg">{product.price.toLocaleString()} DZD</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                                <h3 className="font-medium text-base mb-1 text-gray-900 group-hover:text-black transition-colors cursor-pointer" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h3>
+                                                <p className="text-gray-400 font-light text-xs mb-3 flex items-center justify-between">
+                                                    <span>{product.category?.name || 'Vêtements'}</span>
+                                                    <span className="text-gray-900 font-medium text-base">{product.price.toLocaleString()} DZD</span>
+                                                </p>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </motion.div>
                                 {sortedProducts.length === 0 && (
                                     <div className="text-center py-24">
-                                        <p className="text-lg text-slate-400">Aucun produit ne correspond à vos critères.</p>
+                                        <p className="text-lg text-gray-500 font-light">Aucun produit ne correspond à vos critères.</p>
                                         <button onClick={() => {
                                             setSelectedCategories([]);
                                             setSelectedVendors([]);
@@ -429,7 +450,7 @@ const Catalogue = () => {
                                             setPriceRange([0, 1000000]);
                                             setSelectedSizes([]);
                                             setSelectedColors([]);
-                                        }} className="mt-4 text-primary font-bold underline">Effacer les filtres</button>
+                                        }} className="mt-4 text-black font-medium underline hover:text-gray-700 transition-colors">Effacer les filtres</button>
                                     </div>
                                 )}
                             </>

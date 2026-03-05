@@ -18,8 +18,8 @@ export interface CartItem {
 
 interface CartContextType {
     cartItems: CartItem[];
-    addToCart: (product: Product, quantity: number, variant?: any) => Promise<void>;
-    removeFromCart: (cartItemId: string) => Promise<void>;
+    addToCart: (product: Product, quantity: number, variant?: { title?: string } | null) => Promise<void>;
+    removeFromCart: (itemId: string) => Promise<void>;
     updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
     clearCart: () => void;
     cartCount: number;
@@ -29,15 +29,17 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const mapBackendToFrontend = (dbItem: any): CartItem => {
+// Helper to map backend item to local standard format
+const mapBackendToFrontend = (dbItem: { _id: string; product: Product | string; quantity: number; priceAtAddition: number; variantId?: { title?: string } | null; variant?: { title?: string } | null }): CartItem => {
+    const isProductObj = typeof dbItem.product !== 'string' && dbItem.product !== null;
     return {
         id: dbItem._id,
-        productId: dbItem.product?._id || dbItem.product,
-        name: dbItem.product?.name || 'Produit',
+        productId: isProductObj ? (dbItem.product as Product)._id! : (dbItem.product as string),
+        name: isProductObj ? (dbItem.product as Product).name : 'Produit',
         price: dbItem.priceAtAddition,
-        image: dbItem.product?.image || '',
+        image: isProductObj ? (dbItem.product as Product).image[0] || '' : '',
         quantity: dbItem.quantity,
-        variant: dbItem.variantId ? { title: dbItem.variantId, price: dbItem.priceAtAddition } : undefined,
+        variant: dbItem.variant ? { title: dbItem.variant.title || 'Standard', price: dbItem.priceAtAddition } : undefined,
     };
 };
 
@@ -68,7 +70,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         fetchCart();
     }, []);
 
-    const addToCart = async (product: Product, quantity: number, variant?: any) => {
+    const addToCart = async (product: Product, quantity: number, variant?: { title?: string } | null) => {
         try {
             const { data } = await api.post('/cart/items', {
                 productId: product._id,
@@ -84,11 +86,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const removeFromCart = async (cartItemId: string) => {
+    const removeFromCart = async (itemId: string) => {
         try {
             // Optimistic update
-            setCartItems(prev => prev.filter(item => item.id !== cartItemId));
-            const { data } = await api.delete(`/cart/items/${cartItemId}`);
+            setCartItems(prev => prev.filter(item => item.id !== itemId));
+            const { data } = await api.delete(`/cart/items/${itemId}`);
             if (data.items) {
                 setCartItems(data.items.map(mapBackendToFrontend));
             }
@@ -125,6 +127,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
     const context = useContext(CartContext);
     if (!context) throw new Error('useCart must be used within a CartProvider');

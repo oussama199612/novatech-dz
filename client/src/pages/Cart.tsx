@@ -80,25 +80,24 @@ const Cart = () => {
             clearCart();
             navigate('/success');
 
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Erreur lors de la commande.');
+            alert((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erreur lors de la commande.');
         }
     };
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center font-light text-gray-500">Chargement...</div>;
 
     return (
-        <div className="bg-background-light font-display text-slate-900 min-h-screen">
+        <div className="bg-[#FAFAFA] font-sans text-gray-900 min-h-screen border-t border-gray-100">
             <main className="py-12 lg:py-20">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h1 className="text-4xl font-bold mb-2">SHOPPING BAG</h1>
-                    <div className="h-1 w-20 bg-primary mb-12"></div>
+                    <h1 className="text-4xl font-serif text-black mb-8 uppercase tracking-widest text-center">SHOPPING BAG</h1>
 
                     {cartItems.length === 0 ? (
-                        <div className="text-center py-20">
-                            <p className="text-xl text-slate-500 mb-8">Votre panier est vide.</p>
-                            <Link to="/products" className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                        <div className="text-center py-20 bg-white border border-gray-100">
+                            <p className="text-gray-500 mb-8 font-light">Votre panier est vide.</p>
+                            <Link to="/products" className="inline-block bg-black text-white px-8 py-3 text-sm font-medium uppercase tracking-widest hover:bg-gray-800 transition-colors">
                                 DÉCOUVRIR NOS PRODUITS
                             </Link>
                         </div>
@@ -106,47 +105,55 @@ const Cart = () => {
                         <div className="grid lg:grid-cols-12 gap-12 items-start">
                             {/* Cart Items List */}
                             <div className="lg:col-span-8 space-y-8">
-                                {cartItems.map((item) => (
-                                    <div key={item.id} className="flex flex-col sm:flex-row gap-6 pb-8 border-b border-slate-200">
-                                        <div className="w-full sm:w-48 aspect-square bg-white rounded-xl overflow-hidden shrink-0">
-                                            <img
-                                                alt={item.name}
-                                                className="w-full h-full object-cover"
-                                                src={getImageUrl(item.image)}
-                                            />
-                                        </div>
-                                        <div className="flex flex-col justify-between flex-grow">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h3 className="text-xl font-bold mb-1">{item.name}</h3>
-                                                    {item.variant ? (
-                                                        <p className="text-slate-500 text-sm mb-4">Variant: {item.variant.title}</p>
-                                                    ) : (
-                                                        <p className="text-slate-500 text-sm mb-4">Standard</p>
-                                                    )}
-                                                </div>
-                                                <button onClick={() => removeFromCart(item.id)} className="text-slate-400 hover:text-red-500 transition-colors">
-                                                    <Trash2 size={24} />
-                                                </button>
+                                <AnimatePresence mode="popLayout">
+                                    {cartItems.map((item) => (
+                                        <motion.div
+                                            layout
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            transition={{ duration: 0.3 }}
+                                            key={item.id}
+                                            className="flex flex-col sm:flex-row gap-6 pb-8 border-b border-gray-200"
+                                        >
+                                            <div className="w-full sm:w-32 lg:w-40 aspect-[4/5] bg-white border border-gray-100 shrink-0">
+                                                <img
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                    src={getImageUrl(item.image)}
+                                                />
                                             </div>
-                                            <div className="flex justify-between items-center mt-4 sm:mt-0">
-                                                <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden">
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 hover:bg-slate-100 transition-colors border-r border-slate-200">
-                                                        <Minus size={16} />
-                                                    </button>
-                                                    <span className="w-12 text-center text-sm font-bold block py-1">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 hover:bg-slate-100 transition-colors border-l border-slate-200">
-                                                        <Plus size={16} />
+                                            <div className="flex flex-col justify-between flex-grow">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="text-lg font-serif text-black uppercase tracking-wider mb-1">{item.name}</h3>
+                                                        <p className="text-gray-500 text-sm mb-4 font-light">
+                                                            {item.variant ? `Variant: ${item.variant.title}` : 'Standard'}
+                                                        </p>
+                                                    </div>
+                                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-black transition-colors" title="Retirer">
+                                                        <Trash2 size={20} />
                                                     </button>
                                                 </div>
-                                                <p className="text-xl font-bold">{(item.price * item.quantity).toLocaleString()} DZD</p>
+                                                <div className="flex justify-between items-end mt-4 sm:mt-0">
+                                                    <div className="flex items-center border border-gray-200 w-fit">
+                                                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-black transition-colors border-r border-gray-200">
+                                                            <Minus size={14} />
+                                                        </button>
+                                                        <span className="w-10 text-center text-sm font-medium text-black block">{item.quantity}</span>
+                                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-black transition-colors border-l border-gray-200">
+                                                            <Plus size={14} />
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-lg font-medium text-black">{(item.price * item.quantity).toLocaleString()} <span className="text-[10px] text-gray-400 font-light">DZD</span></p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
 
                                 <div className="pt-4">
-                                    <Link to="/products" className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all">
+                                    <Link to="/products" className="inline-flex items-center gap-2 text-black text-xs font-medium uppercase tracking-widest hover:text-gray-600 transition-colors">
                                         <ArrowLeft size={16} />
                                         CONTINUE SHOPPING
                                     </Link>
@@ -155,21 +162,21 @@ const Cart = () => {
 
                             {/* Order Summary & Checkout Form */}
                             <aside className="lg:col-span-4">
-                                <div className="bg-white border border-primary/10 rounded-2xl p-8 sticky top-28 shadow-xl shadow-primary/5">
-                                    <h2 className="text-2xl font-bold mb-8">ORDER SUMMARY</h2>
+                                <div className="bg-white border border-gray-100 p-8 sticky top-28">
+                                    <h2 className="text-sm font-bold mb-8 uppercase tracking-widest text-black">ORDER SUMMARY</h2>
                                     <div className="space-y-4 mb-8">
-                                        <div className="flex justify-between text-slate-500">
+                                        <div className="flex justify-between text-gray-500 text-sm">
                                             <span>Subtotal</span>
-                                            <span className="font-medium text-slate-900">{cartTotal.toLocaleString()} DZD</span>
+                                            <span className="font-medium text-black">{cartTotal.toLocaleString()} DZD</span>
                                         </div>
-                                        <div className="flex justify-between text-slate-500">
+                                        <div className="flex justify-between text-gray-500 text-sm">
                                             <span>Estimated Shipping</span>
-                                            <span className="font-medium text-slate-900">Calculated later</span>
+                                            <span className="font-medium text-black">Calculated later</span>
                                         </div>
-                                        <div className="h-px bg-slate-200 my-4"></div>
-                                        <div className="flex justify-between text-xl font-bold">
+                                        <div className="h-px bg-gray-100 my-4"></div>
+                                        <div className="flex justify-between text-lg font-medium text-black">
                                             <span>Grand Total</span>
-                                            <span className="text-primary">{cartTotal.toLocaleString()} DZD</span>
+                                            <span>{cartTotal.toLocaleString()} DZD</span>
                                         </div>
                                     </div>
 
@@ -177,25 +184,30 @@ const Cart = () => {
                                         <div className="space-y-4">
                                             <button
                                                 onClick={() => setShowCheckout(true)}
-                                                className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-lg font-bold transition-all transform hover:scale-[1.02] shadow-lg shadow-primary/20"
+                                                className="w-full bg-black text-white hover:bg-gray-800 py-4 text-xs font-bold uppercase tracking-widest transition-colors"
                                             >
                                                 CHECKOUT NOW
                                             </button>
-                                            <div className="flex items-center justify-center gap-4 py-2 opacity-50 grayscale hover:grayscale-0 transition-all text-slate-400">
-                                                <Banknote size={24} />
-                                                <CreditCard size={24} />
-                                                <Wallet size={24} />
+                                            <div className="flex items-center justify-center gap-4 py-2 opacity-50 grayscale hover:grayscale-0 transition-all text-gray-400">
+                                                <Banknote size={20} />
+                                                <CreditCard size={20} />
+                                                <Wallet size={20} />
                                             </div>
                                         </div>
                                     ) : (
-                                        <form onSubmit={handleCheckout} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                                            <div className="space-y-3">
+                                        <motion.form
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            onSubmit={handleCheckout}
+                                            className="space-y-6 pt-4 border-t border-gray-100"
+                                        >
+                                            <div className="space-y-4">
                                                 <input
                                                     required
                                                     placeholder="Nom complet"
                                                     value={formData.customerName}
                                                     onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                                    className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium focus:outline-none focus:border-black transition-colors text-sm placeholder-gray-400"
                                                 />
                                                 <input
                                                     required
@@ -203,7 +215,7 @@ const Cart = () => {
                                                     placeholder="Email"
                                                     value={formData.customerEmail}
                                                     onChange={e => setFormData({ ...formData, customerEmail: e.target.value })}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                                    className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium focus:outline-none focus:border-black transition-colors text-sm placeholder-gray-400"
                                                 />
                                                 <input
                                                     required
@@ -211,35 +223,44 @@ const Cart = () => {
                                                     placeholder="Téléphone (WhatsApp)"
                                                     value={formData.customerPhone}
                                                     onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                                    className="w-full bg-transparent border-b border-gray-200 px-0 py-3 text-black font-medium focus:outline-none focus:border-black transition-colors text-sm placeholder-gray-400"
                                                 />
                                             </div>
 
-                                            <div className="space-y-2 pt-2">
-                                                <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Paiement</label>
-                                                <div className="space-y-2">
+                                            <div className="space-y-4 pt-2">
+                                                <label className="text-[10px] text-gray-400 uppercase tracking-widest">Paiement</label>
+                                                <div className="space-y-3">
                                                     {methods.map(method => (
-                                                        <div key={method._id} className={`border rounded-lg transition-all ${selectedMethodId === method._id ? 'border-primary bg-primary/5' : 'border-slate-200'}`}>
+                                                        <div key={method._id} className={`border-b transition-all ${selectedMethodId === method._id ? 'border-black pb-4' : 'border-gray-100 pb-2'}`}>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setSelectedMethodId(method._id)}
-                                                                className="w-full flex items-center gap-3 text-left p-3"
+                                                                className="w-full flex items-center gap-3 text-left py-2"
                                                             >
-                                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selectedMethodId === method._id ? 'border-primary' : 'border-slate-300'}`}>
-                                                                    {selectedMethodId === method._id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                                                                <div className={`w-3 h-3 rounded-none border flex items-center justify-center ${selectedMethodId === method._id ? 'border-black' : 'border-gray-300'}`}>
+                                                                    {selectedMethodId === method._id && <div className="w-1.5 h-1.5 bg-black" />}
                                                                 </div>
-                                                                <span className={`font-bold text-sm ${selectedMethodId === method._id ? 'text-slate-900' : 'text-slate-500'}`}>{method.name}</span>
+                                                                <span className={`font-medium text-sm ${selectedMethodId === method._id ? 'text-black' : 'text-gray-500'}`}>{method.name}</span>
                                                             </button>
-                                                            {selectedMethodId === method._id && (
-                                                                <div className="px-3 pb-3 pt-0">
-                                                                    <div className="p-2 bg-white rounded border border-slate-100 flex justify-between items-center text-xs">
-                                                                        <code className="text-slate-900 font-mono font-bold">{method.accountValue}</code>
-                                                                        <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-slate-400 hover:text-primary transition-colors">
-                                                                            {copied ? <Check size={14} /> : <Copy size={14} />}
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            )}
+                                                            <AnimatePresence>
+                                                                {selectedMethodId === method._id && (
+                                                                    <motion.div
+                                                                        initial={{ height: 0, opacity: 0 }}
+                                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                                        exit={{ height: 0, opacity: 0 }}
+                                                                        className="overflow-hidden"
+                                                                    >
+                                                                        <div className="pl-6 pt-2">
+                                                                            <div className="p-3 bg-gray-50 flex justify-between items-center text-xs">
+                                                                                <code className="text-black font-mono font-medium">{method.accountValue}</code>
+                                                                                <button type="button" onClick={() => handleCopy(method.accountValue)} className="text-gray-500 hover:text-black transition-colors">
+                                                                                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -248,11 +269,11 @@ const Cart = () => {
                                             <button
                                                 type="submit"
                                                 disabled={!selectedMethodId}
-                                                className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-lg font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                                                className="w-full bg-black hover:bg-gray-800 text-white py-4 text-xs font-bold uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                                             >
                                                 CONFIRMER LA COMMANDE
                                             </button>
-                                        </form>
+                                        </motion.form>
                                     )}
                                 </div>
                             </aside>

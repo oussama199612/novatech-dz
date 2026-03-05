@@ -9,8 +9,8 @@ import {
     createUserWithEmailAndPassword,
     sendEmailVerification,
     updateProfile,
-    deleteUser,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    signOut
 } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -99,47 +99,50 @@ const Auth = () => {
                         navigate('/profile');
                     }, 1000);
 
-                } catch (registrationErr: any) {
+                } catch (registrationErr: unknown) { // Changed to unknown
                     console.error("Registration Sync Error:", registrationErr);
 
                     if (userCredential && userCredential.user) {
-                        try {
-                            await deleteUser(userCredential.user);
-                        } catch (deleteErr) {
-                            console.error("Failed to cleanup firebase user", deleteErr);
-                        }
+                        await userCredential.user.delete(); // Changed from deleteUser(userCredential.user)
                     }
 
+                    setError('Erreur lors de la finalisation de l\'inscription. Veuillez réessayer.');
+                    if (auth.currentUser) {
+                        try {
+                            await signOut(auth);
+                        } catch (signOutErr: unknown) { // Changed to unknown
+                            console.error("Error signing out after failed sync:", signOutErr);
+                        }
+                    }
                     throw registrationErr;
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) { // Changed to unknown
             console.error("Auth Error:", err);
-            if (err.code === 'auth/email-already-in-use') {
+            const authError = err as { code?: string; message?: string }; // Added typecast
+            if (authError.code === 'auth/email-already-in-use') {
                 setError('Cette adresse e-mail est déjà utilisée.');
-            } else if (err.code === 'auth/invalid-credential') {
+            } else if (authError.code === 'auth/invalid-credential' || authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password') { // Updated conditions
                 setError('Identifiants incorrects.');
-            } else if (err.code === 'auth/invalid-phone-number') {
-                setError('Le numéro de téléphone fourni est invalide.');
             } else {
-                setError(err.response?.data?.message || err.message || 'Une erreur est survenue');
+                setError(authError.message || 'Une erreur s\'est produite. Veuillez réessayer.'); // Updated message
             }
         } finally {
             setLoading(false);
         }
     };
 
-    const handleForgotPassword = async () => {
+    const handlePasswordReset = async () => { // Renamed function
         if (!formData.email) {
-            setError('Veuillez saisir votre adresse e-mail pour réinitialiser le mot de passe.');
-            setResetMsg('');
+            setError('Veuillez entrer votre adresse e-mail pour réinitialiser le mot de passe.'); // Updated message
+            setResetMsg(''); // Added to clear resetMsg
             return;
         }
         try {
             await sendPasswordResetEmail(auth, formData.email);
             setResetMsg('Un e-mail de réinitialisation vous a été envoyé. Vérifiez votre boîte de réception.');
             setError('');
-        } catch (err: any) {
+        } catch (err: unknown) { // Changed to unknown
             setError('Erreur lors de l\'envoi de l\'e-mail de réinitialisation. Vérifiez que l\'e-mail est correct.');
             setResetMsg('');
             console.error(err);
@@ -295,8 +298,8 @@ const Auth = () => {
                                     <div className="flex justify-end mt-2">
                                         <button
                                             type="button"
-                                            onClick={handleForgotPassword}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors"
+                                            onClick={handlePasswordReset}
+                                            className="text-sm font-semibold text-luxury-gold hover:text-black transition-colors"
                                         >
                                             Mot de passe oublié ?
                                         </button>
