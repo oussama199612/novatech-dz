@@ -9,6 +9,7 @@ export interface CartItem {
     price: number;
     image: string;
     quantity: number;
+    lineTotal: number;
     variant?: {
         title: string;
         price: number;
@@ -30,14 +31,33 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Helper to map backend item to local standard format
-const mapBackendToFrontend = (dbItem: { _id: string; product: Product | string; quantity: number; priceAtAddition: number; variantId?: { title?: string } | null; variant?: { title?: string } | null }): CartItem => {
+const mapBackendToFrontend = (dbItem: { _id: string; product: Product | string; quantity: number; priceAtAddition: number; variant?: { title?: string } | null }): CartItem => {
     const isProductObj = typeof dbItem.product !== 'string' && dbItem.product !== null;
+    const productObj = isProductObj ? (dbItem.product as Product) : null;
+
+    let lineTotal = dbItem.priceAtAddition * dbItem.quantity;
+
+    if (productObj && productObj.offers && productObj.offers.length > 0) {
+        let remaining = dbItem.quantity;
+        let finalPrice = 0;
+        const sortedOffers = [...productObj.offers].sort((a, b) => b.quantity - a.quantity);
+        for (const offer of sortedOffers) {
+            while (remaining >= offer.quantity) {
+                finalPrice += offer.price;
+                remaining -= offer.quantity;
+            }
+        }
+        finalPrice += remaining * dbItem.priceAtAddition;
+        lineTotal = finalPrice;
+    }
+
     return {
         id: dbItem._id,
-        productId: isProductObj ? (dbItem.product as Product)._id! : (dbItem.product as string),
-        name: isProductObj ? (dbItem.product as Product).name : 'Produit',
+        productId: productObj ? productObj._id! : (dbItem.product as string),
+        name: productObj ? productObj.name : 'Produit',
         price: dbItem.priceAtAddition,
-        image: isProductObj ? (dbItem.product as Product).image[0] || '' : '',
+        lineTotal,
+        image: productObj ? productObj.image || '' : '',
         quantity: dbItem.quantity,
         variant: dbItem.variant ? { title: dbItem.variant.title || 'Standard', price: dbItem.priceAtAddition } : undefined,
     };
@@ -118,7 +138,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    const cartTotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const cartTotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
 
     return (
         <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, loading }}>

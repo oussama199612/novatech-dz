@@ -63,7 +63,7 @@ const getActiveCartDocument = async (context) => {
 // @access  Public (Guest/User)
 router.get('/', authOrGuest, asyncHandler(async (req, res) => {
     const cart = await getActiveCartDocument(req.cartContext);
-    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants');
+    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants offers');
 
     res.json({
         cartId: cart._id,
@@ -115,7 +115,7 @@ router.post('/items', authOrGuest, asyncHandler(async (req, res) => {
         });
     }
 
-    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants');
+    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants offers');
     res.status(201).json({ items, generatedGuestId: req.generatedGuestId || null });
 }));
 
@@ -139,7 +139,7 @@ router.put('/items/:itemId', authOrGuest, asyncHandler(async (req, res) => {
         await cartItem.save();
     }
 
-    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants');
+    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants offers');
     res.json({ items });
 }));
 
@@ -154,7 +154,7 @@ router.delete('/items/:itemId', authOrGuest, asyncHandler(async (req, res) => {
         await cartItem.deleteOne();
     }
 
-    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants');
+    const items = await CartItem.find({ cart: cart._id }).populate('product', 'name price image variants offers');
     res.json({ items });
 }));
 

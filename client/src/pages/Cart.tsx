@@ -145,7 +145,7 @@ const Cart = () => {
                                                             <Plus size={14} />
                                                         </button>
                                                     </div>
-                                                    <p className="text-lg font-medium text-black">{(item.price * item.quantity).toLocaleString()} <span className="text-[10px] text-gray-400 font-light">DZD</span></p>
+                                                    <p className="text-lg font-medium text-black">{item.lineTotal.toLocaleString()} <span className="text-[10px] text-gray-400 font-light">DZD</span></p>
                                                 </div>
                                             </div>
                                         </motion.div>

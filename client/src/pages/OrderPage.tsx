@@ -51,6 +51,23 @@ const OrderPage = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    let finalPrice = 0;
+    if (product) {
+        let remaining = quantity;
+        const basePrice = variant?.price || product.price;
+
+        if (product.offers && product.offers.length > 0) {
+            const sortedOffers = [...product.offers].sort((a, b) => b.quantity - a.quantity);
+            for (const offer of sortedOffers) {
+                while (remaining >= offer.quantity) {
+                    finalPrice += offer.price;
+                    remaining -= offer.quantity;
+                }
+            }
+        }
+        finalPrice += remaining * basePrice;
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!product || !selectedMethodId) return;
@@ -83,7 +100,7 @@ const OrderPage = () => {
 ------------------
 *Produit:* ${product.name} ${variantText}
 *Qté:* ${quantity}
-*Prix:* ${variant?.price || product.price} DZD
+*Total:* ${finalPrice.toLocaleString()} DZD
 *Client:* ${formData.customerName}
 *ID Commande:* ${order.orderId}
 ------------------
@@ -119,7 +136,7 @@ Merci de confirmer ma commande !
                 <div>
                     <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
                     <p className="text-gray-400 mb-4">{product.description}</p>
-                    <div className="text-4xl font-bold text-novatech-gold">{product.price.toLocaleString()} DZD</div>
+                    <div className="text-4xl font-bold text-novatech-gold">{finalPrice.toLocaleString()} DZD</div>
                 </div>
             </div>
 
