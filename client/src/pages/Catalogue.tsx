@@ -25,6 +25,7 @@ const Catalogue = () => {
     const [selectedColors, setSelectedColors] = useState<string[]>(searchParams.get('color')?.split(',').filter(Boolean) || []);
     const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === 'true');
     const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
     // URL Sync Effect
     useEffect(() => {
@@ -37,9 +38,10 @@ const Catalogue = () => {
         if (selectedColors.length) params.set('color', selectedColors.join(','));
         if (inStockOnly) params.set('stock', 'true');
         if (sortBy !== 'newest') params.set('sort', sortBy);
+        if (searchQuery.trim() !== '') params.set('search', searchQuery.trim());
 
         setSearchParams(params, { replace: true });
-    }, [selectedCategories, selectedVendors, priceRange, selectedSizes, selectedColors, inStockOnly, sortBy, setSearchParams]);
+    }, [selectedCategories, selectedVendors, priceRange, selectedSizes, selectedColors, inStockOnly, sortBy, searchQuery, setSearchParams]);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -77,6 +79,16 @@ const Catalogue = () => {
 
     // Filter Logic
     const filteredProducts = products.filter(product => {
+        // Search
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            const matchName = product.name?.toLowerCase().includes(query);
+            const matchDesc = product.description?.toLowerCase().includes(query);
+            if (!matchName && !matchDesc) {
+                return false;
+            }
+        }
+
         // Category
         if (selectedCategories.length > 0 && (!product.category || !selectedCategories.includes(product.category.name))) {
             return false;
@@ -377,6 +389,18 @@ const Catalogue = () => {
 
                     {/* Product Grid */}
                     <div className="flex-1">
+                        {/* Search Filter Pill */}
+                        {searchQuery && (
+                            <div className="mb-6 flex gap-2 items-center text-sm font-medium tracking-widest uppercase">
+                                <span className="text-gray-500">Recherche:</span>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="flex items-center gap-2 bg-black text-white px-3 py-1.5 hover:bg-gray-800 transition-colors"
+                                >
+                                    "{searchQuery}" <X size={14} />
+                                </button>
+                            </div>
+                        )}
                         {loading ? (
                             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-12 animate-pulse">
                                 {[...Array(6)].map((_, i) => (

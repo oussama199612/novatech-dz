@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Upload, X } from 'lucide-react';
 import api from '../api';
 
 const Settings = () => {
@@ -24,6 +24,22 @@ const Settings = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, type, checked, value } = e.target;
         setSettings({ ...settings, [name]: type === 'checkbox' ? checked : value });
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const data = new FormData();
+        data.append('image', file);
+        try {
+            const res = await api.post('/upload', data, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            setSettings({ ...settings, logoUrl: res.data });
+        } catch (error: any) {
+            alert('Erreur upload: ' + (error.response?.data?.message || error.message));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +76,43 @@ const Settings = () => {
                         <div>
                             <label className="block text-sm text-slate-400 mb-1">Devise (Suffixe)</label>
                             <input name="currency" value={settings.currency || ''} onChange={handleChange} className="input-field w-full" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* General Info */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Logo de la Marque</h3>
+                    <div className="flex items-center gap-6">
+                        <div className="w-32 h-32 bg-slate-800 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center relative overflow-hidden group">
+                            {settings.logoUrl ? (
+                                <>
+                                    <img src={`https://novatech-backend-bov0.onrender.com${settings.logoUrl}`} alt="Logo" className="w-full h-full object-contain p-2" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings({ ...settings, logoUrl: '' })}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </>
+                            ) : (
+                                <div className="text-center text-slate-500 flex flex-col items-center">
+                                    <Upload size={24} className="mb-2" />
+                                    <span className="text-xs">Uploader</span>
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                title="Changer le logo"
+                            />
+                        </div>
+                        <div className="text-sm text-slate-400 space-y-1">
+                            <p>Importez le logo officiel (PNG transparent recommandé).</p>
+                            <p>Taille optimale: <strong className="text-white">500x200px</strong></p>
                         </div>
                     </div>
                 </div>
