@@ -7,6 +7,7 @@ import { getImageUrl } from '../utils';
 import api from '../api';
 import { type PaymentMethod } from '../types';
 import { AnimatePresence, motion } from 'framer-motion';
+import ReactGA from 'react-ga4';
 
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
@@ -78,20 +79,18 @@ const Cart = () => {
             const { data: orderResponse } = await api.post('/orders', orderData);
 
             // GA4 purchase event
-            if (typeof window.gtag === 'function') {
-                window.gtag('event', 'purchase', {
-                    transaction_id: String(orderResponse.orderId),
-                    value: Number(cartTotal),
-                    currency: 'DZD',
-                    items: cartItems.map(item => ({
-                        item_id: String(item.productId),
-                        item_name: String(item.name),
-                        item_variant: item.variant?.title ? String(item.variant.title) : undefined,
-                        price: Number(item.price),
-                        quantity: Number(item.quantity)
-                    }))
-                });
-            }
+            ReactGA.event('purchase', {
+                transaction_id: String(orderResponse.orderId),
+                value: Number(cartTotal),
+                currency: 'DZD',
+                items: cartItems.map(item => ({
+                    item_id: String(item.productId),
+                    item_name: String(item.name),
+                    item_variant: item.variant?.title ? String(item.variant.title) : undefined,
+                    price: Number(item.price),
+                    quantity: Number(item.quantity)
+                }))
+            });
 
             clearCart();
             navigate('/success');

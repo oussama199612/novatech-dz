@@ -117,8 +117,8 @@ const ProductLanding = () => {
 
     // GA4 view_item event hook
     useEffect(() => {
-        if (product && typeof window.gtag === 'function') {
-            window.gtag('event', 'view_item', {
+        if (product) {
+            ReactGA.event('view_item', {
                 currency: 'DZD',
                 value: Number(currentVariant?.price || product.price),
                 items: [
@@ -180,22 +180,20 @@ const ProductLanding = () => {
         addToCart(product, quantity, currentVariant, selectedOptions);
 
         // GA4 add_to_cart event
-        if (typeof window.gtag === 'function') {
-            window.gtag('event', 'add_to_cart', {
-                currency: 'DZD',
-                value: Number((currentVariant?.price || product.price) * quantity),
-                items: [
-                    {
-                        item_id: String(product._id),
-                        item_name: String(product.name),
-                        item_category: String(product.category?.name || ''),
-                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
-                        price: Number(currentVariant?.price || product.price),
-                        quantity: Number(quantity)
-                    }
-                ]
-            });
-        }
+        ReactGA.event('add_to_cart', {
+            currency: 'DZD',
+            value: Number((currentVariant?.price || product.price) * quantity),
+            items: [
+                {
+                    item_id: String(product._id),
+                    item_name: String(product.name),
+                    item_category: String(product.category?.name || ''),
+                    item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                    price: Number(currentVariant?.price || product.price),
+                    quantity: Number(quantity)
+                }
+            ]
+        });
 
         alert('Produit ajouté au panier !');
     };
