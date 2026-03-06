@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { Product } from '../types';
 import api from '../api';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
     id: string; // Maps to DB _id
@@ -64,6 +65,7 @@ const mapBackendToFrontend = (dbItem: { _id: string; product: Product | string; 
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+    const { token, loading: authLoading } = useAuth();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -87,9 +89,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        // Initial fetch
-        fetchCart();
-    }, []);
+        // Wait for auth to resolve before fetching the cart initial state
+        if (!authLoading) {
+            fetchCart();
+        }
+    }, [authLoading, token]);
 
     const addToCart = async (product: Product, quantity: number, variant?: { title?: string } | null) => {
         try {
