@@ -74,6 +74,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             if (data.generatedGuestId) {
                 // Ensure cookie is set or local storage fallback for guest ID
                 document.cookie = `guestId=${data.generatedGuestId}; path=/; max-age=31536000`;
+                localStorage.setItem('guestId', data.generatedGuestId);
             }
             if (data.items) {
                 setCartItems(data.items.map(mapBackendToFrontend));

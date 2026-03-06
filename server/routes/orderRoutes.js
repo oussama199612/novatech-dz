@@ -153,7 +153,7 @@ router.post('/', asyncHandler(async (req, res) => {
 
         // Optional Structured Auth Check: strongly bind the order to a User DB Document if a valid token is provided
         let userId = null;
-        let guestId = req.cookies?.guestId || `guest_${Date.now()}`;
+        let guestId = req.headers['x-guest-id'] || req.cookies?.guestId || `guest_${Date.now()}`;
 
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             try {

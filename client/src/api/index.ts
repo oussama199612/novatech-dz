@@ -7,4 +7,18 @@ const api = axios.create({
     },
 });
 
+api.interceptors.request.use((config) => {
+    let guestId = localStorage.getItem('guestId');
+    if (!guestId) {
+        // Fallback to cookie if it exists
+        const match = document.cookie.match(/(?:^|; )guestId=([^;]*)/);
+        if (match) guestId = match[1];
+    }
+
+    if (guestId) {
+        config.headers['x-guest-id'] = guestId;
+    }
+    return config;
+});
+
 export default api;
