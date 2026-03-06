@@ -5,7 +5,7 @@ const Footer = () => {
     return (
         <footer className="bg-white border-t border-gray-100 pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-20">
                     <div className="space-y-6">
                         <img
                             alt="SOLACE Logo"
@@ -27,15 +27,7 @@ const Footer = () => {
                             </a>
                         </div>
                     </div>
-                    <div>
-                        <h4 className="font-serif mb-6 tracking-wider text-gray-900">BOUTIQUE</h4>
-                        <ul className="space-y-4 text-sm text-gray-500 font-light">
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Homme</a></li>
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Femme</a></li>
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Éditions Limitées</a></li>
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Accessoires</a></li>
-                        </ul>
-                    </div>
+                    {/* BOUTIQUE segment removed */}
                     <div>
                         <h4 className="font-serif mb-6 tracking-wider text-gray-900">SUPPORT</h4>
                         <ul className="space-y-4 text-sm text-gray-500 font-light">
