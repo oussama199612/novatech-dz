@@ -13,6 +13,12 @@ const settingsSchema = mongoose.Schema({
     contactEmail: { type: String },
     contactPhone: { type: String },
 
+    // Informational Pages (HTML Content)
+    termsOfService: { type: String, default: '' },
+    privacyPolicy: { type: String, default: '' },
+    contactInfo: { type: String, default: '' }, // Can be used for a rich text contact page
+    aboutUs: { type: String, default: '' },
+
     enableMultiStore: { type: Boolean, default: false }, // Toggle for multi-store logic
 }, {
     timestamps: true

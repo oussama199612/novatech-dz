@@ -11,6 +11,7 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
+import InfoPage from './pages/InfoPage';
 
 function App() {
   return (
@@ -30,6 +31,12 @@ function App() {
                 <Route path="/success" element={<SuccessPage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/profile" element={<Profile />} />
+
+                {/* Informational Pages */}
+                <Route path="/about" element={<InfoPage title="Notre Histoire" field="aboutUs" />} />
+                <Route path="/contact" element={<InfoPage title="Nous Contacter" field="contactInfo" />} />
+                <Route path="/terms" element={<InfoPage title="Conditions d'Utilisation" field="termsOfService" />} />
+                <Route path="/privacy" element={<InfoPage title="Politique de Confidentialité" field="privacyPolicy" />} />
               </Routes>
             </main>
             <Footer />

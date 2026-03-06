@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Save, Upload, X } from 'lucide-react';
 import api from '../api';
+import RichTextEditor from '../components/RichTextEditor';
 
 const Settings = () => {
     const [settings, setSettings] = useState<any>({});
@@ -170,6 +171,41 @@ const Settings = () => {
                         <div>
                             <label className="block text-sm text-slate-400 mb-1">Telegram URL</label>
                             <input name="telegramUrl" value={settings.telegramUrl || ''} onChange={handleChange} className="input-field w-full" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Information Pages */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Pages d'Information (Mentions Légales, etc.)</h3>
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm text-slate-400 mb-2">Description du service (À Propos)</label>
+                            <RichTextEditor
+                                value={settings.aboutUs || ''}
+                                onChange={(content) => setSettings({ ...settings, aboutUs: content })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm text-slate-400 mb-2">Contact Info (Page dédiée)</label>
+                            <RichTextEditor
+                                value={settings.contactInfo || ''}
+                                onChange={(content) => setSettings({ ...settings, contactInfo: content })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm text-slate-400 mb-2">Conditions Générales de Vente & d'Utilisation (Terms of Service)</label>
+                            <RichTextEditor
+                                value={settings.termsOfService || ''}
+                                onChange={(content) => setSettings({ ...settings, termsOfService: content })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm text-slate-400 mb-2">Politique de Confidentialité (Privacy Policy)</label>
+                            <RichTextEditor
+                                value={settings.privacyPolicy || ''}
+                                onChange={(content) => setSettings({ ...settings, privacyPolicy: content })}
+                            />
                         </div>
                     </div>
                 </div>

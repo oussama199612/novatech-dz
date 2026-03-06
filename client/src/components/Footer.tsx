@@ -1,4 +1,5 @@
 import { Facebook, Mail, Camera } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -40,8 +41,8 @@ const Footer = () => {
                         <ul className="space-y-4 text-sm text-gray-500 font-light">
                             <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Guide des Tailles</a></li>
                             <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Livraison & Retours</a></li>
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Politique de Confidentialité</a></li>
-                            <li><a href="#" className="hover:text-black hover:pl-1 transition-all">Nous Contacter</a></li>
+                            <li><Link to="/privacy" className="hover:text-black hover:pl-1 transition-all">Politique de Confidentialité</Link></li>
+                            <li><Link to="/contact" className="hover:text-black hover:pl-1 transition-all">Nous Contacter</Link></li>
                         </ul>
                     </div>
                     <div>
@@ -60,8 +61,8 @@ const Footer = () => {
                 <div className="border-t border-gray-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 font-light">
                     <p>© 2026 LA CASA TECHNOLOGY. TOUS DROITS RÉSERVÉS.</p>
                     <div className="flex gap-8">
-                        <span className="cursor-pointer hover:text-black transition-colors">CONDITIONS D'UTILISATION</span>
-                        <span className="cursor-pointer hover:text-black transition-colors">POLITIQUE DE COOKIES</span>
+                        <Link to="/about" className="hover:text-black transition-colors uppercase">À Propos</Link>
+                        <Link to="/terms" className="hover:text-black transition-colors uppercase">Conditions d'Utilisation</Link>
                     </div>
                 </div>
             </div>
