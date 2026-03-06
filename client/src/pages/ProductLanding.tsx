@@ -117,26 +117,21 @@ const ProductLanding = () => {
 
     // GA4 view_item event hook
     useEffect(() => {
-        if (product) {
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({ ecommerce: null }); // Clear previous
-            window.dataLayer.push({
-                event: 'view_item',
-                ecommerce: {
-                    currency: 'DZD',
-                    value: currentVariant?.price || product.price,
-                    items: [
-                        {
-                            item_id: product._id,
-                            item_name: product.name,
-                            item_category: product.category?.name,
-                            item_variant: currentVariant?.title,
-                            price: currentVariant?.price || product.price,
-                            currency: 'DZD',
-                            quantity: 1
-                        }
-                    ]
-                }
+        if (product && typeof window.gtag === 'function') {
+            window.gtag('event', 'view_item', {
+                currency: 'DZD',
+                value: currentVariant?.price || product.price,
+                items: [
+                    {
+                        item_id: product._id,
+                        item_name: product.name,
+                        item_category: product.category?.name,
+                        item_variant: currentVariant?.title,
+                        price: currentVariant?.price || product.price,
+                        currency: 'DZD',
+                        quantity: 1
+                    }
+                ]
             });
         }
     }, [product, currentVariant]);
@@ -186,11 +181,8 @@ const ProductLanding = () => {
         addToCart(product, quantity, currentVariant, selectedOptions);
 
         // GA4 add_to_cart event
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ ecommerce: null }); // Clear previous
-        window.dataLayer.push({
-            event: 'add_to_cart',
-            ecommerce: {
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', 'add_to_cart', {
                 currency: 'DZD',
                 value: (currentVariant?.price || product.price) * quantity,
                 items: [
@@ -204,8 +196,8 @@ const ProductLanding = () => {
                         quantity: quantity
                     }
                 ]
-            }
-        });
+            });
+        }
 
         alert('Produit ajouté au panier !');
     };
