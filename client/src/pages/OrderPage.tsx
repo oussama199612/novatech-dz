@@ -112,6 +112,29 @@ Merci de confirmer ma commande !
             // Replace with real number from settings if available
             const whatsappUrl = `https://wa.me/213550000000?text=${encodedMsg}`;
 
+            // GA4 purchase event
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ ecommerce: null }); // Clear previous
+            window.dataLayer.push({
+                event: 'purchase',
+                ecommerce: {
+                    transaction_id: order.orderId,
+                    value: finalPrice,
+                    currency: 'DZD',
+                    items: [
+                        {
+                            item_id: product._id,
+                            item_name: product.name,
+                            item_category: product.category?.name,
+                            item_variant: variantText.replace(/[()]/g, '') || undefined,
+                            price: variant?.price || product.price,
+                            currency: 'DZD',
+                            quantity: quantity
+                        }
+                    ]
+                }
+            });
+
             window.open(whatsappUrl, '_blank');
             navigate('/success');
         } catch (error) {

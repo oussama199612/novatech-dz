@@ -115,6 +115,32 @@ const ProductLanding = () => {
         }
     }, [selectedOptions, product]);
 
+    // GA4 view_item event hook
+    useEffect(() => {
+        if (product) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ ecommerce: null }); // Clear previous
+            window.dataLayer.push({
+                event: 'view_item',
+                ecommerce: {
+                    currency: 'DZD',
+                    value: currentVariant?.price || product.price,
+                    items: [
+                        {
+                            item_id: product._id,
+                            item_name: product.name,
+                            item_category: product.category?.name,
+                            item_variant: currentVariant?.title,
+                            price: currentVariant?.price || product.price,
+                            currency: 'DZD',
+                            quantity: 1
+                        }
+                    ]
+                }
+            });
+        }
+    }, [product, currentVariant]);
+
     const handleOptionChange = (option: string, value: string) => {
         setSelectedOptions(prev => ({ ...prev, [option]: value }));
     };
@@ -158,10 +184,29 @@ const ProductLanding = () => {
     const handleAddToCart = () => {
         if (!product) return;
         addToCart(product, quantity, currentVariant, selectedOptions);
-        // Optional: show toast/notification
-        // For now, maybe just a simple alert or visual feedback?
-        // Let's assume the navbar updates is enough visual feedback for "Add to Cart" usually, 
-        // but a small alert is better.
+
+        // GA4 add_to_cart event
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null }); // Clear previous
+        window.dataLayer.push({
+            event: 'add_to_cart',
+            ecommerce: {
+                currency: 'DZD',
+                value: (currentVariant?.price || product.price) * quantity,
+                items: [
+                    {
+                        item_id: product._id,
+                        item_name: product.name,
+                        item_category: product.category?.name,
+                        item_variant: currentVariant?.title,
+                        price: currentVariant?.price || product.price,
+                        currency: 'DZD',
+                        quantity: quantity
+                    }
+                ]
+            }
+        });
+
         alert('Produit ajouté au panier !');
     };
 

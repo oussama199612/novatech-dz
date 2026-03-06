@@ -66,3 +66,9 @@ export interface Settings {
     contactEmail?: string;
     contactPhone?: string;
 }
+
+declare global {
+    interface Window {
+        dataLayer: Record<string, unknown>[];
+    }
+}
