@@ -87,31 +87,6 @@ const OrderPage = () => {
 
             const { data: order } = await api.post('/orders', orderData);
 
-            // 2. Generate WhatsApp Message
-            const method = methods.find(m => m._id === selectedMethodId);
-
-            // Format variant text for WA
-            let variantText = '';
-            if (variant?.title) variantText = `(${variant.title})`;
-            else if (options) variantText = `(${Object.values(options).join('/')})`;
-
-            const message = `
-*NOUVELLE COMMANDE* 🛍️
-------------------
-*Produit:* ${product.name} ${variantText}
-*Qté:* ${quantity}
-*Total:* ${finalPrice.toLocaleString()} DZD
-*Client:* ${formData.customerName}
-*ID Commande:* ${order.orderId}
-------------------
-*Paiement:* ${method?.name}
-Merci de confirmer ma commande !
-      `.trim();
-
-            const encodedMsg = encodeURIComponent(message);
-            // Replace with real number from settings if available
-            const whatsappUrl = `https://wa.me/213550000000?text=${encodedMsg}`;
-
             // GA4 purchase event
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'purchase', {
@@ -123,7 +98,7 @@ Merci de confirmer ma commande !
                             item_id: product._id,
                             item_name: product.name,
                             item_category: product.category?.name,
-                            item_variant: variantText.replace(/[()]/g, '') || undefined,
+                            item_variant: variant?.title || undefined,
                             price: variant?.price || product.price,
                             currency: 'DZD',
                             quantity: quantity
@@ -132,7 +107,7 @@ Merci de confirmer ma commande !
                 });
             }
 
-            window.open(whatsappUrl, '_blank');
+            navigate('/success');
             navigate('/success');
         } catch (error) {
             alert('Erreur lors de la commande.');

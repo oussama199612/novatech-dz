@@ -75,7 +75,24 @@ const Cart = () => {
                 paymentMethodId: selectedMethodId
             };
 
-            await api.post('/orders', orderData);
+            const { data: orderResponse } = await api.post('/orders', orderData);
+
+            // GA4 purchase event
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'purchase', {
+                    transaction_id: orderResponse.orderId,
+                    value: cartTotal,
+                    currency: 'DZD',
+                    items: cartItems.map(item => ({
+                        item_id: item.productId,
+                        item_name: item.name,
+                        item_variant: item.variant?.title || undefined,
+                        price: item.price,
+                        currency: 'DZD',
+                        quantity: item.quantity
+                    }))
+                });
+            }
 
             clearCart();
             navigate('/success');
