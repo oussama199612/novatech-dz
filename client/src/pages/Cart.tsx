@@ -92,8 +92,11 @@ const Cart = () => {
                 }))
             });
 
-            clearCart();
-            navigate('/success');
+            // Brief pause to guarantee GA4 beacon dispatch before React unmounts
+            setTimeout(() => {
+                clearCart();
+                navigate('/success');
+            }, 300);
 
         } catch (error) {
             console.error(error);

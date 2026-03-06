@@ -167,9 +167,29 @@ const ProductLanding = () => {
                 ...(settings?.enableMultiStore ? { storeId: selectedStoreId } : {})
             };
 
-            await api.post('/orders', orderData);
+            const { data: order } = await api.post('/orders', orderData);
 
-            navigate('/success');
+            // GA4 purchase event for direct checkout
+            ReactGA.event('purchase', {
+                transaction_id: String(order.orderId),
+                value: Number(orderData.orderItems[0].qty * (orderData.orderItems[0].variant?.price || product.price)),
+                currency: 'DZD',
+                items: [
+                    {
+                        item_id: String(product._id),
+                        item_name: String(product.name),
+                        item_category: String(product.category?.name || ''),
+                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                        price: Number(currentVariant?.price || product.price),
+                        quantity: Number(quantity)
+                    }
+                ]
+            });
+
+            // Brief pause to guarantee GA4 beacon dispatch before React unmounts
+            setTimeout(() => {
+                navigate('/success');
+            }, 300);
         } catch (error) {
             console.error(error);
             alert((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erreur lors de la commande.');

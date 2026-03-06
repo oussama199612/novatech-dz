@@ -105,8 +105,10 @@ const OrderPage = () => {
                 ]
             });
 
-            navigate('/success');
-            navigate('/success');
+            // Brief pause to guarantee GA4 beacon dispatch before React unmounts
+            setTimeout(() => {
+                navigate('/success');
+            }, 300);
         } catch (error) {
             alert('Erreur lors de la commande.');
             console.error(error);
