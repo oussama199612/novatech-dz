@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Analytics from './components/Analytics';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ProductLanding from './pages/ProductLanding';
@@ -12,6 +13,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
+        <Analytics />
         <div className="min-h-screen bg-background-light text-slate-900 font-display selection:bg-primary selection:text-white">
           <Navbar />
           {/* Removed padding/max-w wrapper to allow full-width heroes */}

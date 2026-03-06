@@ -7,6 +7,7 @@ import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import ReactGA from 'react-ga4';
 
 const ProductLanding = () => {
     const { productId } = useParams();
