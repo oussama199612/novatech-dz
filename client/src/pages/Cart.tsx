@@ -80,16 +80,15 @@ const Cart = () => {
             // GA4 purchase event
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'purchase', {
-                    transaction_id: orderResponse.orderId,
-                    value: cartTotal,
+                    transaction_id: String(orderResponse.orderId),
+                    value: Number(cartTotal),
                     currency: 'DZD',
                     items: cartItems.map(item => ({
-                        item_id: item.productId,
-                        item_name: item.name,
-                        item_variant: item.variant?.title || undefined,
-                        price: item.price,
-                        currency: 'DZD',
-                        quantity: item.quantity
+                        item_id: String(item.productId),
+                        item_name: String(item.name),
+                        item_variant: item.variant?.title ? String(item.variant.title) : undefined,
+                        price: Number(item.price),
+                        quantity: Number(item.quantity)
                     }))
                 });
             }

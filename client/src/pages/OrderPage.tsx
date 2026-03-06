@@ -90,18 +90,17 @@ const OrderPage = () => {
             // GA4 purchase event
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'purchase', {
-                    transaction_id: order.orderId,
-                    value: finalPrice,
+                    transaction_id: String(order.orderId),
+                    value: Number(finalPrice),
                     currency: 'DZD',
                     items: [
                         {
-                            item_id: product._id,
-                            item_name: product.name,
-                            item_category: product.category?.name,
-                            item_variant: variant?.title || undefined,
-                            price: variant?.price || product.price,
-                            currency: 'DZD',
-                            quantity: quantity
+                            item_id: String(product._id),
+                            item_name: String(product.name),
+                            item_category: String(product.category?.name || ''),
+                            item_variant: variant?.title ? String(variant.title) : undefined,
+                            price: Number(variant?.price || product.price),
+                            quantity: Number(quantity)
                         }
                     ]
                 });

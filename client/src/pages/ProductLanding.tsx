@@ -120,15 +120,14 @@ const ProductLanding = () => {
         if (product && typeof window.gtag === 'function') {
             window.gtag('event', 'view_item', {
                 currency: 'DZD',
-                value: currentVariant?.price || product.price,
+                value: Number(currentVariant?.price || product.price),
                 items: [
                     {
-                        item_id: product._id,
-                        item_name: product.name,
-                        item_category: product.category?.name,
-                        item_variant: currentVariant?.title,
-                        price: currentVariant?.price || product.price,
-                        currency: 'DZD',
+                        item_id: String(product._id),
+                        item_name: String(product.name),
+                        item_category: String(product.category?.name || ''),
+                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                        price: Number(currentVariant?.price || product.price),
                         quantity: 1
                     }
                 ]
@@ -184,16 +183,15 @@ const ProductLanding = () => {
         if (typeof window.gtag === 'function') {
             window.gtag('event', 'add_to_cart', {
                 currency: 'DZD',
-                value: (currentVariant?.price || product.price) * quantity,
+                value: Number((currentVariant?.price || product.price) * quantity),
                 items: [
                     {
-                        item_id: product._id,
-                        item_name: product.name,
-                        item_category: product.category?.name,
-                        item_variant: currentVariant?.title,
-                        price: currentVariant?.price || product.price,
-                        currency: 'DZD',
-                        quantity: quantity
+                        item_id: String(product._id),
+                        item_name: String(product.name),
+                        item_category: String(product.category?.name || ''),
+                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                        price: Number(currentVariant?.price || product.price),
+                        quantity: Number(quantity)
                     }
                 ]
             });
