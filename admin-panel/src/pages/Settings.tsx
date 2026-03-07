@@ -24,7 +24,7 @@ const Settings = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, type, checked, value } = e.target;
-        setSettings({ ...settings, [name]: type === 'checkbox' ? checked : value });
+        setSettings((prev: any) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,28 +183,28 @@ const Settings = () => {
                             <label className="block text-sm text-slate-400 mb-2">Description du service (À Propos)</label>
                             <RichTextEditor
                                 value={settings.aboutUs || ''}
-                                onChange={(content) => setSettings({ ...settings, aboutUs: content })}
+                                onChange={(content) => setSettings((prev: any) => ({ ...prev, aboutUs: content }))}
                             />
                         </div>
                         <div>
                             <label className="block text-sm text-slate-400 mb-2">Contact Info (Page dédiée)</label>
                             <RichTextEditor
                                 value={settings.contactInfo || ''}
-                                onChange={(content) => setSettings({ ...settings, contactInfo: content })}
+                                onChange={(content) => setSettings((prev: any) => ({ ...prev, contactInfo: content }))}
                             />
                         </div>
                         <div>
                             <label className="block text-sm text-slate-400 mb-2">Conditions Générales de Vente & d'Utilisation (Terms of Service)</label>
                             <RichTextEditor
                                 value={settings.termsOfService || ''}
-                                onChange={(content) => setSettings({ ...settings, termsOfService: content })}
+                                onChange={(content) => setSettings((prev: any) => ({ ...prev, termsOfService: content }))}
                             />
                         </div>
                         <div>
                             <label className="block text-sm text-slate-400 mb-2">Politique de Confidentialité (Privacy Policy)</label>
                             <RichTextEditor
                                 value={settings.privacyPolicy || ''}
-                                onChange={(content) => setSettings({ ...settings, privacyPolicy: content })}
+                                onChange={(content) => setSettings((prev: any) => ({ ...prev, privacyPolicy: content }))}
                             />
                         </div>
                     </div>
