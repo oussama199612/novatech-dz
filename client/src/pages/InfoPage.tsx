@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import 'quill/dist/quill.snow.css';
 
 interface InfoPageProps {
     title: string;
@@ -42,10 +43,12 @@ const InfoPage = ({ title, field }: InfoPageProps) => {
             <div className="max-w-3xl mx-auto px-6 bg-white p-8 md:p-12 border border-gray-100 shadow-sm rounded-none">
                 <h1 className="text-3xl md:text-4xl font-serif text-black mb-12 text-center uppercase tracking-widest">{title}</h1>
 
-                <div
-                    className="prose prose-base max-w-none text-gray-700 prose-p:text-gray-600 prose-headings:font-serif prose-headings:text-black prose-headings:tracking-wide prose-a:text-black prose-a:underline hover:prose-a:text-gray-600 selection:bg-black selection:text-white marker:text-black"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                />
+                <div className="ql-snow w-full">
+                    <div
+                        className="ql-editor p-0 text-gray-800"
+                        dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                </div>
             </div>
         </div>
     );
