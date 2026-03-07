@@ -43,9 +43,9 @@ const InfoPage = ({ title, field }: InfoPageProps) => {
             <div className="max-w-3xl mx-auto px-6 bg-white p-8 md:p-12 border border-gray-100 shadow-sm rounded-none">
                 <h1 className="text-3xl md:text-4xl font-serif text-black mb-12 text-center uppercase tracking-widest">{title}</h1>
 
-                <div className="ql-snow w-full">
+                <div className="ql-container ql-snow !border-none w-full !font-sans">
                     <div
-                        className="ql-editor p-0 text-gray-800"
+                        className="ql-editor !p-0 text-gray-800 text-base leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: content }}
                     />
                 </div>
