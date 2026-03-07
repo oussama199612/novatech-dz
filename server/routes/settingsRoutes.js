@@ -38,6 +38,11 @@ router.put('/', protect, asyncHandler(async (req, res) => {
         settings.contactEmail = req.body.contactEmail || settings.contactEmail;
         settings.contactPhone = req.body.contactPhone || settings.contactPhone;
 
+        if (req.body.termsOfService !== undefined) settings.termsOfService = req.body.termsOfService;
+        if (req.body.privacyPolicy !== undefined) settings.privacyPolicy = req.body.privacyPolicy;
+        if (req.body.contactInfo !== undefined) settings.contactInfo = req.body.contactInfo;
+        if (req.body.aboutUs !== undefined) settings.aboutUs = req.body.aboutUs;
+
         if (req.body.enableMultiStore !== undefined) {
             settings.enableMultiStore = req.body.enableMultiStore;
         }
