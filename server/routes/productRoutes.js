@@ -185,6 +185,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         offers, locationsStock
     } = req.body;
 
+    const familyId = family === '' ? null : family;
+
     const product = new Product({
         name,
         price,
@@ -197,7 +199,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         longDescription,
         accentColor,
         vendor,
-        family,
+        family: familyId,
         productType,
         tags,
         status,
@@ -253,7 +255,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
 
         // Phase 1, 2, 3 Updates
         if (vendor !== undefined) product.vendor = vendor;
-        if (family !== undefined) product.family = family;
+        if (family !== undefined) product.family = family === '' ? null : family;
         if (productType !== undefined) product.productType = productType;
         if (tags !== undefined) product.tags = tags;
         if (status !== undefined) product.status = status;

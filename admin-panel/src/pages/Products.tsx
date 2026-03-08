@@ -214,7 +214,7 @@ const Products = () => {
             locationsStock: product.locationsStock || [],
             active: product.active,
             vendor: product.vendor || '',
-            family: product.family || '',
+            family: product.family?._id || '',
             productType: product.productType || '',
             tags: product.tags || [],
             status: product.status || 'active',
