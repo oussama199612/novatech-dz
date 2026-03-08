@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import api from '../api';
 import { getImageUrl } from '../utils';
 
@@ -24,7 +25,7 @@ const itemVariants = {
 };
 
 export default function BrandsSection() {
-    const [brands, setBrands] = useState<{ name: string, logoUrl: string }[]>([]);
+    const [brands, setBrands] = useState<{ id: string, name: string, logoUrl: string }[]>([]); // Updated type to include id
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -35,6 +36,7 @@ export default function BrandsSection() {
                     // Filter families that are marked to show in home bar and have an image
                     const visibleFamilies = data.filter((family: any) => family.showInHomeBar && family.image);
                     const formattedBrands = visibleFamilies.map((family: any) => ({
+                        id: family._id, // Added id field
                         name: family.name,
                         logoUrl: family.image
                     }));
@@ -87,16 +89,19 @@ export default function BrandsSection() {
                                 <motion.div
                                     key={`${stripIdx}-${index}`}
                                     variants={itemVariants}
-                                    className="group/brand flex flex-col items-center justify-center cursor-default shrink-0"
+                                    className="group/brand flex flex-col items-center justify-center shrink-0"
                                 >
-                                    <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover/brand:-translate-y-2 group-hover/brand:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500">
+                                    <Link
+                                        to={`/catalogue?family=${brand.id}`} // Link added here
+                                        className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover/brand:-translate-y-2 group-hover/brand:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500"
+                                        title={brand.name}
+                                    >
                                         <img
                                             src={getImageUrl(brand.logoUrl)}
                                             alt={brand.name}
-                                            title={brand.name}
                                             className="w-full h-full object-contain transition-all duration-500"
                                         />
-                                    </div>
+                                    </Link>
                                     <span className="mt-4 text-xs font-medium text-gray-400 opacity-0 group-hover/brand:opacity-100 transform translate-y-2 group-hover/brand:translate-y-0 transition-all duration-300">
                                         {brand.name}
                                     </span>
