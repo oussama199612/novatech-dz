@@ -92,7 +92,7 @@ export default function BrandsSection() {
                                     className="group/brand flex flex-col items-center justify-center shrink-0"
                                 >
                                     <Link
-                                        to={`/catalogue?family=${brand.id}`} // Link added here
+                                        to={`/products?family=${brand.id}`} // Link added here
                                         className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover/brand:-translate-y-2 group-hover/brand:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500"
                                         title={brand.name}
                                     >
