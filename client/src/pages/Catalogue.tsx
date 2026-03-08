@@ -76,12 +76,12 @@ const Catalogue = () => {
     // Extract sizes and colors from variants/options
     const allSizes = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
-            ['taille', 'size', 'pointure'].some(keyword => o.name.toLowerCase().includes(keyword))
+            ['taille', 'size', 'pointure'].some(keyword => o.name?.toLowerCase().includes(keyword))
         )?.values || []
     ))).sort((a, b) => Number(a) - Number(b));
 
     const allColors = Array.from(new Set(products.flatMap(p =>
-        p.options?.find(o => o.name.toLowerCase().includes('couleur') || o.name.toLowerCase().includes('color') || o.name.toLowerCase().includes('coloris'))?.values || []
+        p.options?.find(o => o.name?.toLowerCase().includes('couleur') || o.name?.toLowerCase().includes('color') || o.name?.toLowerCase().includes('coloris'))?.values || []
     )));
 
     // Filter Logic
@@ -139,7 +139,7 @@ const Catalogue = () => {
 
                 // Check Size
                 if (selectedSizes.length > 0) {
-                    const sizeIndex = product.options?.findIndex(o => ['taille', 'size', 'pointure'].some(k => o.name.toLowerCase().includes(k))) ?? -1;
+                    const sizeIndex = product.options?.findIndex(o => ['taille', 'size', 'pointure'].some(k => o.name?.toLowerCase().includes(k))) ?? -1;
                     if (sizeIndex !== -1 && parts[sizeIndex]) {
                         matchesSize = selectedSizes.some(s => String(s).trim() === String(parts[sizeIndex]).trim());
                     } else {
@@ -149,7 +149,7 @@ const Catalogue = () => {
 
                 // Check Color
                 if (selectedColors.length > 0) {
-                    const colorIndex = product.options?.findIndex(o => ['couleur', 'color', 'coloris'].some(k => o.name.toLowerCase().includes(k))) ?? -1;
+                    const colorIndex = product.options?.findIndex(o => ['couleur', 'color', 'coloris'].some(k => o.name?.toLowerCase().includes(k))) ?? -1;
                     if (colorIndex !== -1 && parts[colorIndex]) {
                         matchesColor = selectedColors.some(c => String(c).trim() === String(parts[colorIndex]).trim());
                     } else {
