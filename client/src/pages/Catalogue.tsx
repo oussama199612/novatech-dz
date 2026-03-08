@@ -77,11 +77,11 @@ const Catalogue = () => {
     const allSizes = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
             ['taille', 'size', 'pointure'].some(keyword => o.name?.toLowerCase().includes(keyword))
-        )?.values || []
+        )?.values?.filter(v => v !== null && v !== undefined) || []
     ))).sort((a, b) => Number(a) - Number(b));
 
     const allColors = Array.from(new Set(products.flatMap(p =>
-        p.options?.find(o => o.name?.toLowerCase().includes('couleur') || o.name?.toLowerCase().includes('color') || o.name?.toLowerCase().includes('coloris'))?.values || []
+        p.options?.find(o => o.name?.toLowerCase().includes('couleur') || o.name?.toLowerCase().includes('color') || o.name?.toLowerCase().includes('coloris'))?.values?.filter(v => v !== null && v !== undefined) || []
     )));
 
     // Filter Logic
@@ -133,7 +133,7 @@ const Catalogue = () => {
 
             // Find valid variant matching ALL selected filter groups
             const hasValidVariant = product.variants?.some(variant => {
-                const parts = variant.title.split(' / ');
+                const parts = variant.title ? variant.title.split(' / ') : [];
                 let matchesSize = true;
                 let matchesColor = true;
 
