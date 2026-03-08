@@ -17,6 +17,7 @@ const Catalogue = () => {
     // Filters State initialized from URL
     const [selectedCategories, setSelectedCategories] = useState<string[]>(searchParams.get('cat')?.split(',').filter(Boolean) || []);
     const [selectedVendors, setSelectedVendors] = useState<string[]>(searchParams.get('vendor')?.split(',').filter(Boolean) || []);
+    const [selectedFamilies, setSelectedFamilies] = useState<string[]>(searchParams.get('family')?.split(',').filter(Boolean) || []);
     const [priceRange, setPriceRange] = useState<[number, number]>([
         Number(searchParams.get('minP')) || 0,
         Number(searchParams.get('maxP')) || 1000000
@@ -32,6 +33,7 @@ const Catalogue = () => {
         const params = new URLSearchParams();
         if (selectedCategories.length) params.set('cat', selectedCategories.join(','));
         if (selectedVendors.length) params.set('vendor', selectedVendors.join(','));
+        if (selectedFamilies.length) params.set('family', selectedFamilies.join(','));
         if (priceRange[0] > 0) params.set('minP', priceRange[0].toString());
         if (priceRange[1] < 1000000) params.set('maxP', priceRange[1].toString());
         if (selectedSizes.length) params.set('size', selectedSizes.join(','));
@@ -41,7 +43,7 @@ const Catalogue = () => {
         if (searchQuery.trim() !== '') params.set('search', searchQuery.trim());
 
         setSearchParams(params, { replace: true });
-    }, [selectedCategories, selectedVendors, priceRange, selectedSizes, selectedColors, inStockOnly, sortBy, searchQuery, setSearchParams]);
+    }, [selectedCategories, selectedVendors, selectedFamilies, priceRange, selectedSizes, selectedColors, inStockOnly, sortBy, searchQuery, setSearchParams]);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -64,6 +66,15 @@ const Catalogue = () => {
     // Organized categories
     const parentCategories = fetchedCategories.filter(cat => !cat.parentCategory);
     const allVendors = Array.from(new Set(products.map(p => p.vendor).filter((v): v is string => !!v)));
+
+    // Extract unique Family objects
+    const familyMap = new Map<string, { _id: string, name: string }>();
+    products.forEach(p => {
+        if (p.family && p.family._id) {
+            familyMap.set(p.family._id, { _id: p.family._id, name: p.family.name });
+        }
+    });
+    const allFamilies = Array.from(familyMap.values());
     // Extract sizes and colors from variants/options
     // Extract sizes and colors from variants/options
     // Extract sizes and colors from variants/options
@@ -93,9 +104,15 @@ const Catalogue = () => {
         if (selectedCategories.length > 0 && (!product.category || !selectedCategories.includes(product.category.name))) {
             return false;
         }
-        // Vendor
+        // Vendor (Marque Libre)
         if (selectedVendors.length > 0 && (!product.vendor || !selectedVendors.includes(product.vendor))) {
             return false;
+        }
+        // Family (Marque Partenaire)
+        if (selectedFamilies.length > 0) {
+            if (!product.family || !product.family._id || !selectedFamilies.includes(product.family._id)) {
+                return false;
+            }
         }
         // Price
         if (product.price < priceRange[0] || product.price > priceRange[1]) {
@@ -254,10 +271,30 @@ const Catalogue = () => {
                             </div>
                         </div>
 
-                        {/* Vendors / Brands */}
+                        {/* Families / Marques Partenaires */}
+                        {allFamilies.length > 0 && (
+                            <div className="mt-8">
+                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Marque Partenaire</h3>
+                                <div className="space-y-3">
+                                    {allFamilies.map(family => (
+                                        <label key={family._id} className="flex items-center gap-3 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedFamilies.includes(family._id)}
+                                                onChange={() => toggleFilter(family._id, setSelectedFamilies)}
+                                                className="w-4 h-4 rounded-none border-gray-300 text-black focus:ring-black transition-colors"
+                                            />
+                                            <span className="text-sm font-light text-gray-600 group-hover:text-black transition-colors">{family.name}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Vendors (Marque Libre) */}
                         {allVendors.length > 0 && (
                             <div className="mt-8">
-                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Marque</h3>
+                                <h3 className="font-serif text-sm tracking-widest mb-6 uppercase text-gray-900 border-b border-gray-100 pb-2">Vendeur</h3>
                                 <div className="space-y-3">
                                     {allVendors.map(vendor => (
                                         <label key={vendor} className="flex items-center gap-3 cursor-pointer group">

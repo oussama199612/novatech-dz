@@ -15,6 +15,7 @@ const productSchema = mongoose.Schema({
     }],
     // Phase 1: Core & Organization
     vendor: { type: String },
+    family: { type: mongoose.Schema.Types.ObjectId, ref: 'Family' }, // Autonmous Entity
     productType: { type: String },
     tags: [{ type: String }],
     status: { type: String, enum: ['active', 'draft', 'archived'], default: 'active' },

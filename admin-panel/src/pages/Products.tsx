@@ -82,6 +82,7 @@ const PREDEFINED_COLORS: Record<string, string> = {
 const Products = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
+    const [families, setFamilies] = useState<any[]>([]);
     const [stores, setStores] = useState<Store[]>([]);
     const [settings, setSettings] = useState<any>({});
     const [loading, setLoading] = useState(true);
@@ -103,6 +104,7 @@ const Products = () => {
         active: true,
         // Phase 1: Organization
         vendor: '',
+        family: '',
         productType: '',
         tags: [] as string[],
         status: 'active',
@@ -134,14 +136,16 @@ const Products = () => {
 
     const fetchData = async () => {
         try {
-            const [productsRes, categoriesRes, storesRes, settingsRes] = await Promise.all([
+            const [productsRes, categoriesRes, familiesRes, storesRes, settingsRes] = await Promise.all([
                 api.get('/products'),
                 api.get('/categories'),
+                api.get('/families'),
                 api.get('/stores/active'),
                 api.get('/settings')
             ]);
             setProducts(productsRes.data);
             setCategories(categoriesRes.data);
+            setFamilies(familiesRes.data);
             setStores(storesRes.data);
             setSettings(settingsRes.data);
         } catch (error) {
@@ -168,6 +172,7 @@ const Products = () => {
             locationsStock: [],
             active: true,
             vendor: '',
+            family: '',
             productType: '',
             tags: [],
             status: 'active',
@@ -209,6 +214,7 @@ const Products = () => {
             locationsStock: product.locationsStock || [],
             active: product.active,
             vendor: product.vendor || '',
+            family: product.family || '',
             productType: product.productType || '',
             tags: product.tags || [],
             status: product.status || 'active',
@@ -1075,8 +1081,18 @@ const Products = () => {
                                                 </div>
 
                                                 <div>
-                                                    <label className="label">Vendeur (Marque)</label>
+                                                    <label className="label">Vendeur (Marque Libre)</label>
                                                     <input value={formData.vendor} onChange={e => setFormData({ ...formData, vendor: e.target.value })} className="input-field w-full" placeholder="Ex: Nike" />
+                                                </div>
+
+                                                <div>
+                                                    <label className="label">Famille (Marque Partenaire)</label>
+                                                    <select value={formData.family} onChange={e => setFormData({ ...formData, family: e.target.value })} className="input-field w-full">
+                                                        <option value="">Aucune</option>
+                                                        {families.map((family: any) => (
+                                                            <option key={family._id} value={family._id}>{family.name}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>

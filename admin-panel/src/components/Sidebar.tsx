@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, Package, ShoppingBag, Settings, LogOut, CreditCard, Layers, Store } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Settings, LogOut, CreditCard, Layers, Store, Component } from 'lucide-react';
 
 import api from '../api';
 
@@ -22,6 +22,7 @@ const Sidebar = () => {
         { path: '/orders', icon: ShoppingBag, label: 'Commandes' },
         { path: '/products', icon: Package, label: 'Produits' },
         { path: '/categories', icon: Layers, label: 'Catégories' },
+        { path: '/families', icon: Component, label: 'Familles (Marques)' },
         ...(settings.enableMultiStore ? [{ path: '/stores', icon: Store, label: 'Magasins' }] : []),
         { path: '/payments', icon: CreditCard, label: 'Paiements' },
         { path: '/settings', icon: Settings, label: 'Paramètres' },

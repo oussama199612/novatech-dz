@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
+const Category = require('../models/Category');
 const { protect } = require('../middleware/authMiddleware');
 
 // @desc    Fetch all products
@@ -46,7 +47,22 @@ router.get('/', asyncHandler(async (req, res) => {
     }
 
     if (req.query.category && req.query.category !== 'all') {
-        filters.category = req.query.category;
+        // Support parent-child category filtering.
+        // If the category passed is a parent, we want to find all products that belong to it OR its children.
+        const categoryId = req.query.category;
+
+        // Find all categories that have this category as parent
+        const childCategories = await Category.find({ parentCategory: categoryId }).select('_id');
+        const childCategoryIds = childCategories.map(c => c._id);
+
+        // Include the target category itself plus any children
+        filters.category = { $in: [categoryId, ...childCategoryIds] };
+    }
+
+    // Family filter (can be comma-separated IDs)
+    if (req.query.family) {
+        const familyIds = req.query.family.split(',').filter(id => id.trim() !== '');
+        filters.family = { $in: familyIds };
     }
 
     // Handle "active" status for public view if needed, but for now we show all or filter by status if passed
@@ -54,7 +70,7 @@ router.get('/', asyncHandler(async (req, res) => {
         filters.status = req.query.status;
     }
 
-    const products = await Product.find(filters).populate('category').sort({ orderIndex: 1, createdAt: -1 });
+    const products = await Product.find(filters).populate('category').populate('family').sort({ orderIndex: 1, createdAt: -1 });
     res.json(products);
 }));
 
@@ -133,6 +149,7 @@ router.get('/:id/alternatives', asyncHandler(async (req, res) => {
 
     const alternatives = await Product.find(filters)
         .populate('category')
+        .populate('family')
         .sort({ stock: -1 })
         .limit(4);
 
@@ -143,7 +160,9 @@ router.get('/:id/alternatives', asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 router.get('/:id', asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('category');
+    const product = await Product.findById(req.params.id)
+        .populate('category')
+        .populate('family');
 
     if (product) {
         res.json(product);
@@ -160,7 +179,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
     const {
         name, price, description, image, category, stock,
         gallery, features, longDescription, accentColor,
-        vendor, productType, tags, status, compareAtPrice,
+        vendor, family, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
         hasVariants, options, variants,
         offers, locationsStock
@@ -178,6 +197,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         longDescription,
         accentColor,
         vendor,
+        family,
         productType,
         tags,
         status,
@@ -207,7 +227,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
     const {
         name, price, description, image, category, active, stock, orderIndex,
         gallery, features, longDescription, accentColor,
-        vendor, productType, tags, status, compareAtPrice,
+        vendor, family, productType, tags, status, compareAtPrice,
         costPerItem, sku, barcode, trackQuantity, continueSellingWhenOutOfStock, weight, weightUnit,
         hasVariants, options, variants,
         offers, locationsStock
@@ -233,6 +253,7 @@ router.put('/:id', protect, asyncHandler(async (req, res) => {
 
         // Phase 1, 2, 3 Updates
         if (vendor !== undefined) product.vendor = vendor;
+        if (family !== undefined) product.family = family;
         if (productType !== undefined) product.productType = productType;
         if (tags !== undefined) product.tags = tags;
         if (status !== undefined) product.status = status;

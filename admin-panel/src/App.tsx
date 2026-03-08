@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Categories from './pages/Categories';
+import Families from './pages/Families';
 import Stores from './pages/Stores';
 import Payments from './pages/Payments';
 import Settings from './pages/Settings';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/families" element={<Families />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/payments" element={<Payments />} />
           <Route path="/settings" element={<Settings />} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Upload, X, Trash2 } from 'lucide-react';
+import { Save, Upload, X } from 'lucide-react';
 import api from '../api';
 import RichTextEditor from '../components/RichTextEditor';
 
@@ -7,10 +7,6 @@ const Settings = () => {
     const [settings, setSettings] = useState<any>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-
-    // Brand management state
-    const [newBrandName, setNewBrandName] = useState('');
-    const [isUploadingBrand, setIsUploadingBrand] = useState(false);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -45,45 +41,6 @@ const Settings = () => {
         } catch (error: any) {
             alert('Erreur upload: ' + (error.response?.data?.message || error.message));
         }
-    };
-
-    const handleAddBrandLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (!newBrandName.trim()) {
-            alert('Veuillez entrer le nom de la marque avant d\'ajouter son logo.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('image', file);
-        setIsUploadingBrand(true);
-
-        try {
-            const { data } = await api.post('/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            const newBrand = { name: newBrandName, logoUrl: data };
-            setSettings((prev: any) => ({
-                ...prev,
-                brands: [...(prev.brands || []), newBrand]
-            }));
-            setNewBrandName(''); // Reset input
-        } catch (error) {
-            console.error('Erreur lors du téléchargement du logo de la marque:', error);
-            alert('Erreur lors du téléchargement. Veuillez réessayer.');
-        } finally {
-            setIsUploadingBrand(false);
-            if (e.target) e.target.value = ''; // Reset file input
-        }
-    };
-
-    const handleRemoveBrand = (indexToRemove: number) => {
-        setSettings((prev: any) => ({
-            ...prev,
-            brands: prev.brands.filter((_: any, index: number) => index !== indexToRemove)
-        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -214,63 +171,6 @@ const Settings = () => {
                         <div>
                             <label className="block text-sm text-slate-400 mb-1">Telegram URL</label>
                             <input name="telegramUrl" value={settings.telegramUrl || ''} onChange={handleChange} className="input-field w-full" />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Marques Partenaires (Brands) */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Marques Partenaires (Page d'Accueil)</h3>
-                    <div className="space-y-6">
-                        {/* List current brands */}
-                        {settings.brands && settings.brands.length > 0 && (
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                {settings.brands.map((brand: any, index: number) => (
-                                    <div key={index} className="relative group bg-slate-800 rounded-lg p-4 border border-slate-700 flex flex-col items-center justify-center text-center h-32">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveBrand(index)}
-                                            className="absolute top-2 right-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            title="Supprimer"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                        <img src={`https://novatech-backend-bov0.onrender.com${brand.logoUrl}`} alt={brand.name} className="h-12 w-auto object-contain mb-2 opacity-80 group-hover:opacity-100 transition-opacity" />
-                                        <span className="text-xs text-slate-400">{brand.name}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Add new brand form */}
-                        <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
-                            <h4 className="text-sm font-medium text-slate-300 mb-4">Ajouter une nouvelle marque</h4>
-                            <div className="flex flex-col sm:flex-row gap-4 items-end">
-                                <div className="flex-1">
-                                    <label className="block text-xs text-slate-400 mb-1">Nom de la marque</label>
-                                    <input
-                                        type="text"
-                                        value={newBrandName}
-                                        onChange={(e) => setNewBrandName(e.target.value)}
-                                        className="input-field w-full"
-                                        placeholder="Ex: Coca-Cola"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-slate-400 mb-1">Logo (Image transparente PNG de préférence)</label>
-                                    <label className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-700 cursor-pointer transition-colors w-full sm:w-auto justify-center">
-                                        <Upload size={18} />
-                                        <span className="text-sm">{isUploadingBrand ? 'Téléchargement...' : 'Choisir & Ajouter'}</span>
-                                        <input
-                                            type="file"
-                                            className="hidden"
-                                            accept="image/*"
-                                            onChange={handleAddBrandLogo}
-                                            disabled={isUploadingBrand}
-                                        />
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

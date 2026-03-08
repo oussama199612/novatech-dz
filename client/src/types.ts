@@ -7,6 +7,13 @@ export interface Variant {
     image?: string;
 }
 
+export interface Family {
+    _id: string;
+    name: string;
+    slug: string;
+    image?: string;
+}
+
 export interface Product {
     _id: string;
     name: string;
@@ -34,6 +41,7 @@ export interface Product {
     longDescription?: string;
     accentColor?: string;
     vendor?: string;
+    family?: Family;
     productType?: string;
     tags?: string[];
 }
