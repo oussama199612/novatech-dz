@@ -64,20 +64,20 @@ export default function BrandsSection() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
-                    className="flex flex-wrap justify-center items-center gap-10 md:gap-16"
+                    className="flex items-center gap-6 md:gap-10 overflow-x-auto pb-8 pt-4 px-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 >
                     {brands.map((brand, index) => (
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            className="group flex flex-col items-center justify-center cursor-default"
+                            className="group flex flex-col items-center justify-center cursor-default shrink-0 snap-center"
                         >
                             <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover:-translate-y-2 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500">
                                 <img
                                     src={getImageUrl(brand.logoUrl)}
                                     alt={brand.name}
                                     title={brand.name}
-                                    className="w-full h-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                    className="w-full h-full object-contain transition-all duration-500"
                                 />
                             </div>
                             <span className="mt-4 text-xs font-medium text-gray-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
