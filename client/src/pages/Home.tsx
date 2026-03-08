@@ -5,7 +5,7 @@ import api from '../api';
 import { getImageUrl } from '../utils';
 import { type Product } from '../types';
 import { motion } from 'framer-motion';
-import FeaturesSection from '../components/FeaturesSection';
+import BrandsSection from '../components/BrandsSection';
 
 const Home = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -85,8 +85,8 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Features/Badges Section */}
-            <FeaturesSection />
+            {/* Brands/Partners Section */}
+            <BrandsSection />
 
             {/* New Arrivals Product Grid */}
             <section className="py-24" id="products">

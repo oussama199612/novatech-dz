@@ -19,6 +19,11 @@ const settingsSchema = mongoose.Schema({
     contactInfo: { type: String, default: '' }, // Can be used for a rich text contact page
     aboutUs: { type: String, default: '' },
 
+    brands: [{
+        name: { type: String, required: true },
+        logoUrl: { type: String, required: true }
+    }],
+
     enableMultiStore: { type: Boolean, default: false }, // Toggle for multi-store logic
 }, {
     timestamps: true
