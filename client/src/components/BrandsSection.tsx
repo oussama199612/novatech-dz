@@ -64,26 +64,39 @@ export default function BrandsSection() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
-                    className="flex items-center gap-6 md:gap-10 overflow-x-auto pb-8 pt-4 px-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    className="relative flex overflow-hidden group py-4 w-full"
                 >
-                    {brands.map((brand, index) => (
-                        <motion.div
-                            key={index}
-                            variants={itemVariants}
-                            className="group flex flex-col items-center justify-center cursor-default shrink-0 snap-center"
+                    {/* Gradient Fade Masks */}
+                    <div className="absolute left-0 top-0 w-16 md:w-32 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                    <div className="absolute right-0 top-0 w-16 md:w-32 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
+                    {/* Infinite Marquee Loop (duplicated for seamless scrolling) */}
+                    {[1, 2].map((stripIdx) => (
+                        <div
+                            key={stripIdx}
+                            className="flex items-center gap-6 md:gap-10 animate-marquee shrink-0 px-3 md:px-5 group-hover:[animation-play-state:paused]"
+                            aria-hidden={stripIdx === 2 ? "true" : undefined}
                         >
-                            <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover:-translate-y-2 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500">
-                                <img
-                                    src={getImageUrl(brand.logoUrl)}
-                                    alt={brand.name}
-                                    title={brand.name}
-                                    className="w-full h-full object-contain transition-all duration-500"
-                                />
-                            </div>
-                            <span className="mt-4 text-xs font-medium text-gray-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                {brand.name}
-                            </span>
-                        </motion.div>
+                            {brands.map((brand, index) => (
+                                <motion.div
+                                    key={`${stripIdx}-${index}`}
+                                    variants={itemVariants}
+                                    className="group/brand flex flex-col items-center justify-center cursor-default shrink-0"
+                                >
+                                    <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center p-4 md:p-6 shadow-sm border border-gray-100 transform group-hover/brand:-translate-y-2 group-hover/brand:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500">
+                                        <img
+                                            src={getImageUrl(brand.logoUrl)}
+                                            alt={brand.name}
+                                            title={brand.name}
+                                            className="w-full h-full object-contain transition-all duration-500"
+                                        />
+                                    </div>
+                                    <span className="mt-4 text-xs font-medium text-gray-400 opacity-0 group-hover/brand:opacity-100 transform translate-y-2 group-hover/brand:translate-y-0 transition-all duration-300">
+                                        {brand.name}
+                                    </span>
+                                </motion.div>
+                            ))}
+                        </div>
                     ))}
                 </motion.div>
             </div>
