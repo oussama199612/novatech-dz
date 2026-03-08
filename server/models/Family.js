@@ -15,6 +15,10 @@ const familySchema = mongoose.Schema(
         image: {
             type: String, // optionnel, pour afficher des miniatures de familles si besoin plus tard
         },
+        showInHomeBar: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

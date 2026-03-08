@@ -28,19 +28,25 @@ export default function BrandsSection() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchSettings = async () => {
+        const fetchFamilies = async () => {
             try {
-                const { data } = await api.get('/settings');
-                if (data && data.brands) {
-                    setBrands(data.brands);
+                const { data } = await api.get('/families');
+                if (data && Array.isArray(data)) {
+                    // Filter families that are marked to show in home bar and have an image
+                    const visibleFamilies = data.filter((family: any) => family.showInHomeBar && family.image);
+                    const formattedBrands = visibleFamilies.map((family: any) => ({
+                        name: family.name,
+                        logoUrl: family.image
+                    }));
+                    setBrands(formattedBrands);
                 }
             } catch (error) {
-                console.error("Failed to fetch brands", error);
+                console.error("Failed to fetch families for brands section", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchSettings();
+        fetchFamilies();
     }, []);
 
     if (loading || brands.length === 0) return null;

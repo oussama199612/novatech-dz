@@ -6,6 +6,8 @@ interface Family {
     _id: string;
     name: string;
     slug: string;
+    image?: string;
+    showInHomeBar?: boolean;
 }
 
 const Families = () => {
@@ -15,6 +17,13 @@ const Families = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentFamily, setCurrentFamily] = useState<Partial<Family> | null>(null);
     const [error, setError] = useState('');
+    const [uploading, setUploading] = useState(false);
+
+    const getImageUrl = (path: string | undefined) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${import.meta.env.VITE_API_URL}${path}`;
+    };
 
     const fetchFamilies = async () => {
         try {
@@ -60,9 +69,29 @@ const Families = () => {
     };
 
     const openModal = (family: Partial<Family> | null = null) => {
-        setCurrentFamily(family || { name: '' });
+        setCurrentFamily(family || { name: '', showInHomeBar: false, image: '' });
         setIsModalOpen(true);
         setError('');
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const res = await api.post('/upload', formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            setCurrentFamily(prev => prev ? { ...prev, image: res.data } : null);
+        } catch (err: any) {
+            setError('Erreur lors du téléchargement de l\'image: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setUploading(false);
+        }
     };
 
     const filteredFamilies = families.filter(family =>
@@ -98,8 +127,9 @@ const Families = () => {
                     <table className="w-full">
                         <thead className="bg-gray-50/50">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom de la Famille</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Image / Nom</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sur l'Accueil</th>
                                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -107,10 +137,30 @@ const Families = () => {
                             {filteredFamilies.map((family) => (
                                 <tr key={family._id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="font-medium text-gray-900">{family.name}</div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 flex-shrink-0 bg-gray-100 rounded overflow-hidden border border-gray-200">
+                                                {family.image ? (
+                                                    <img className="h-full w-full object-contain" src={getImageUrl(family.image)} alt="" />
+                                                ) : (
+                                                    <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">N/A</div>
+                                                )}
+                                            </div>
+                                            <div className="font-medium text-gray-900">{family.name}</div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {family.slug}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {family.showInHomeBar ? (
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Oui
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                Non
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right">
                                         <div className="flex items-center justify-end gap-3">
@@ -166,6 +216,38 @@ const Families = () => {
                                     className="input-field w-full"
                                     placeholder="Ex: Coca-Cola"
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Image (Logo de la marque)
+                                </label>
+                                <div className="mt-1 flex items-center gap-4">
+                                    <div className="h-16 w-16 bg-gray-100 border border-gray-200 rounded overflow-hidden flex-shrink-0">
+                                        {currentFamily?.image ? (
+                                            <img src={getImageUrl(currentFamily.image)} alt="Aperçu" className="h-full w-full object-contain" />
+                                        ) : (
+                                            <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">Aucune</div>
+                                        )}
+                                    </div>
+                                    <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                        {uploading ? 'Chargement...' : 'Changer'}
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <input
+                                    id="showInHomeBar"
+                                    type="checkbox"
+                                    checked={currentFamily?.showInHomeBar || false}
+                                    onChange={(e) => setCurrentFamily({ ...currentFamily, showInHomeBar: e.target.checked })}
+                                    className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                                />
+                                <label htmlFor="showInHomeBar" className="ml-2 block text-sm text-gray-900">
+                                    Afficher dans la barre des marques de l'accueil
+                                </label>
                             </div>
 
                             <div className="flex gap-3 pt-4 border-t border-gray-100">

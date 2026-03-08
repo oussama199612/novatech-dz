@@ -30,7 +30,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // @route   POST /api/families
 // @access  Private/Admin
 router.post('/', protect, admin, asyncHandler(async (req, res) => {
-    const { name, image } = req.body;
+    const { name, image, showInHomeBar } = req.body;
 
     const familyExists = await Family.findOne({ name });
 
@@ -42,6 +42,7 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
     const family = new Family({
         name,
         image,
+        showInHomeBar: showInHomeBar || false,
     });
 
     const createdFamily = await family.save();
@@ -52,7 +53,7 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
 // @route   PUT /api/families/:id
 // @access  Private/Admin
 router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
-    const { name, image } = req.body;
+    const { name, image, showInHomeBar } = req.body;
 
     const family = await Family.findById(req.params.id);
 
@@ -60,6 +61,7 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
         family.name = name || family.name;
         // Automatically reculcuates slug via pre-save hook
         family.image = image !== undefined ? image : family.image;
+        family.showInHomeBar = showInHomeBar !== undefined ? showInHomeBar : family.showInHomeBar;
 
         const updatedFamily = await family.save();
         res.json(updatedFamily);
