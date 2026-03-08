@@ -22,13 +22,10 @@ const familySchema = mongoose.Schema(
 );
 
 // Auto-generate slug before validation if modified
-familySchema.pre('validate', function (next) {
-    if (!this.isModified('name')) {
-        next();
-        return;
+familySchema.pre('validate', function () {
+    if (this.isModified('name') && this.name) {
+        this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-    this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    next();
 });
 
 const Family = mongoose.model('Family', familySchema);
