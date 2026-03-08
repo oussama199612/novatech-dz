@@ -235,7 +235,7 @@ const Settings = () => {
                                         >
                                             <Trash2 size={16} />
                                         </button>
-                                        <img src={`http://localhost:5000${brand.logoUrl}`} alt={brand.name} className="h-12 w-auto object-contain mb-2 opacity-80 group-hover:opacity-100 transition-opacity" />
+                                        <img src={`https://novatech-backend-bov0.onrender.com${brand.logoUrl}`} alt={brand.name} className="h-12 w-auto object-contain mb-2 opacity-80 group-hover:opacity-100 transition-opacity" />
                                         <span className="text-xs text-slate-400">{brand.name}</span>
                                     </div>
                                 ))}
