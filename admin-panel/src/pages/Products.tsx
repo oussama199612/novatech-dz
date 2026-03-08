@@ -315,7 +315,10 @@ const Products = () => {
     const getImageUrl = (path: string) => {
         if (!path) return '';
         if (path.startsWith('http')) return path;
-        return `${import.meta.env.VITE_API_URL}${path}`;
+        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const host = apiBase.replace(/\/api\/?$/, '');
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        return `${host}${cleanPath}`;
     };
 
     // Calculate Profit & Margin

@@ -52,6 +52,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment-methods', require('./routes/paymentMethodRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/images', require('./routes/imageRoutes'));
 app.use('/api/health', require('./routes/healthRoutes'));
 
 // Static Folder for Uploads
