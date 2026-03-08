@@ -34,6 +34,7 @@ const Stores = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         fetchStores();
     }, []);
 
@@ -124,8 +125,8 @@ const Stores = () => {
                                     <td className="p-4 text-slate-600">{store.phone}</td>
                                     <td className="p-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${store.active
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-slate-100 text-slate-600'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-slate-100 text-slate-600'
                                             }`}>
                                             {store.active ? 'Actif' : 'Inactif'}
                                         </span>

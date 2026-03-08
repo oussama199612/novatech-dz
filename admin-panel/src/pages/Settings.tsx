@@ -64,7 +64,7 @@ const Settings = () => {
             const { data } = await api.post('/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const newBrand = { name: newBrandName, logoUrl: data.imageUrl };
+            const newBrand = { name: newBrandName, logoUrl: data };
             setSettings((prev: any) => ({
                 ...prev,
                 brands: [...(prev.brands || []), newBrand]
