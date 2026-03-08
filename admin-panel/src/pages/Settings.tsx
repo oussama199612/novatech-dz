@@ -88,7 +88,7 @@ const Settings = () => {
                         <div className="w-32 h-32 bg-slate-800 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center relative overflow-hidden group">
                             {settings.logoUrl ? (
                                 <>
-                                    <img src={`https://novatech-backend-bov0.onrender.com${settings.logoUrl}`} alt="Logo" className="w-full h-full object-contain p-2" />
+                                    <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${settings.logoUrl}`} alt="Logo" className="w-full h-full object-contain p-2" />
                                     <button
                                         type="button"
                                         onClick={() => setSettings({ ...settings, logoUrl: '' })}

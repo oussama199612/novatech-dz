@@ -5,8 +5,8 @@ export const getImageUrl = (path: string) => {
     // Clean path separators
     const cleanPath = path.replace(/\\/g, '/');
 
-    // Ensure it doesn't double slash if path starts with /
-    const baseUrl = 'https://novatech-backend-bov0.onrender.com';
+    // Get the base URL from the environment or use empty string for relative paths
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     // If path starts with 'uploads/', prepend /
     if (!cleanPath.startsWith('/')) {

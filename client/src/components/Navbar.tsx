@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import api from '../api';
+import { getImageUrl } from '../utils';
 
 const Navbar = () => {
     const { cartCount } = useCart();
@@ -67,7 +68,7 @@ const Navbar = () => {
                                 <img
                                     alt="Store Logo"
                                     className="h-8 w-auto object-contain"
-                                    src={`https://novatech-backend-bov0.onrender.com${settings.logoUrl}`}
+                                    src={getImageUrl(settings.logoUrl)}
                                 />
                             ) : (
                                 <img
