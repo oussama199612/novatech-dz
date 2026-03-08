@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Catalogue = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [fetchedCategories, setFetchedCategories] = useState<{ _id: string; title?: string; name: string; image?: string; parentCategory?: { _id: string } }[]>([]);
+    const [fetchedFamilies, setFetchedFamilies] = useState<{ _id: string; name: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const navigate = useNavigate();
@@ -48,12 +49,14 @@ const Catalogue = () => {
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                const [productsRes, categoriesRes] = await Promise.all([
+                const [productsRes, categoriesRes, familiesRes] = await Promise.all([
                     api.get('/products'),
-                    api.get('/categories')
+                    api.get('/categories'),
+                    api.get('/families')
                 ]);
                 setProducts(productsRes.data);
                 setFetchedCategories(categoriesRes.data);
+                setFetchedFamilies(familiesRes.data);
             } catch (error) {
                 console.error('Failed to fetch data', error);
             } finally {
@@ -67,16 +70,9 @@ const Catalogue = () => {
     const parentCategories = fetchedCategories.filter(cat => !cat.parentCategory);
     const allVendors = Array.from(new Set(products.map(p => p.vendor).filter((v): v is string => !!v)));
 
-    // Extract unique Family objects
-    const familyMap = new Map<string, { _id: string, name: string }>();
-    products.forEach(p => {
-        if (p.family && p.family._id) {
-            familyMap.set(p.family._id, { _id: p.family._id, name: p.family.name });
-        }
-    });
-    const allFamilies = Array.from(familyMap.values());
-    // Extract sizes and colors from variants/options
-    // Extract sizes and colors from variants/options
+    // Use fetched families directly so that families with 0 products still show up
+    const allFamilies = fetchedFamilies;
+
     // Extract sizes and colors from variants/options
     const allSizes = Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
