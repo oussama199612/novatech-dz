@@ -88,19 +88,26 @@ const Families = () => {
         if (!file) return;
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            const res = await api.post('/upload', formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            setCurrentFamily(prev => prev ? { ...prev, image: res.data } : null);
-        } catch (err: any) {
-            setError('Erreur lors du téléchargement de l\'image: ' + (err.response?.data?.message || err.message));
-        } finally {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            try {
+                const base64Image = reader.result;
+                const res = await api.post('/upload', { image: base64Image }, {
+                    headers: { "Content-Type": "application/json" }
+                });
+                setCurrentFamily(prev => prev ? { ...prev, image: res.data } : null);
+            } catch (error: any) {
+                console.error('Upload Error:', error);
+                alert('Échec du téléchargement de l\'image: ' + (error.response?.data?.message || error.message));
+            } finally {
+                setUploading(false);
+            }
+        };
+        reader.onerror = (error) => {
+            alert('Erreur lors de la lecture du fichier: ' + error);
             setUploading(false);
-        }
+        };
     };
 
     const filteredFamilies = families.filter(family =>

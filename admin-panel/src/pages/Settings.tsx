@@ -31,16 +31,22 @@ const Settings = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const data = new FormData();
-        data.append('image', file);
-        try {
-            const res = await api.post('/upload', data, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            setSettings({ ...settings, logoUrl: res.data });
-        } catch (error: any) {
-            alert('Erreur upload: ' + (error.response?.data?.message || error.message));
-        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            try {
+                const base64Image = reader.result;
+                const res = await api.post('/upload', { image: base64Image }, {
+                    headers: { "Content-Type": "application/json" }
+                });
+                setSettings({ ...settings, logoUrl: res.data });
+            } catch (error: any) {
+                alert('Erreur upload: ' + (error.response?.data?.message || error.message));
+            }
+        };
+        reader.onerror = (error) => {
+            alert('Erreur lors de la lecture du fichier: ' + error);
+        };
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
