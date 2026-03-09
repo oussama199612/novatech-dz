@@ -315,7 +315,13 @@ const Products = () => {
     const getImageUrl = (path: string) => {
         if (!path) return '';
         if (path.startsWith('http')) return path;
-        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+        const isProd = import.meta.env.PROD;
+        const defaultApiUrl = isProd
+            ? 'https://novatech-backend-bov0.onrender.com/api'
+            : 'http://localhost:5000/api';
+
+        const apiBase = import.meta.env.VITE_API_URL || defaultApiUrl;
         const host = apiBase.replace(/\/api\/?$/, '');
         const cleanPath = path.startsWith('/') ? path : `/${path}`;
         return `${host}${cleanPath}`;

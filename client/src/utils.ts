@@ -6,7 +6,12 @@ export const getImageUrl = (path: string) => {
     const cleanPath = path.replace(/\\/g, '/');
 
     // Get the base URL from the environment or use empty string for relative paths
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const isProd = import.meta.env.PROD;
+    const defaultApiUrl = isProd
+        ? 'https://novatech-backend-bov0.onrender.com/api'
+        : 'http://localhost:5000/api';
+
+    const apiBase = import.meta.env.VITE_API_URL || defaultApiUrl;
     const host = apiBase.replace(/\/api\/?$/, '');
 
     // Ensure it starts with /
