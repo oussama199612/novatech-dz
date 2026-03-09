@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const compression = require('compression');
 const path = require('path');
 
 dotenv.config();
@@ -17,6 +18,7 @@ connectDB();
 const app = express();
 
 // Middleware
+app.use(compression()); // Compress all HTTP responses
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(morgan('dev'));

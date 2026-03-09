@@ -32,6 +32,9 @@ familySchema.pre('validate', function () {
     }
 });
 
+// Indexes for better read performance
+familySchema.index({ showInHomeBar: 1 });
+
 const Family = mongoose.model('Family', familySchema);
 
 module.exports = Family;

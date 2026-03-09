@@ -10,6 +10,9 @@ const categorySchema = mongoose.Schema({
     timestamps: true
 });
 
+// Indexes for better read performance
+categorySchema.index({ parentCategory: 1 });
+
 const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;

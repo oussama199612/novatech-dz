@@ -70,7 +70,11 @@ router.get('/', asyncHandler(async (req, res) => {
         filters.status = req.query.status;
     }
 
-    const products = await Product.find(filters).populate('category').populate('family').sort({ orderIndex: 1, createdAt: -1 });
+    const products = await Product.find(filters)
+        .select('-longDescription -features -offers') // Optimize payload size
+        .populate('category')
+        .populate('family')
+        .sort({ orderIndex: 1, createdAt: -1 });
     res.json(products);
 }));
 

@@ -72,6 +72,13 @@ const productSchema = mongoose.Schema({
     timestamps: true
 });
 
+// Indexes for better read performance
+productSchema.index({ category: 1 });
+productSchema.index({ family: 1 });
+productSchema.index({ vendor: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ active: 1, status: 1 });
+
 const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

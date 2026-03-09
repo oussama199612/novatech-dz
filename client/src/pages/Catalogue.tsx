@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ShoppingBag, ChevronRight, Filter, X } from 'lucide-react';
 import api from '../api';
@@ -67,25 +67,25 @@ const Catalogue = () => {
     }, []);
 
     // Organized categories
-    const parentCategories = fetchedCategories.filter(cat => !cat.parentCategory);
-    const allVendors = Array.from(new Set(products.map(p => p.vendor).filter((v): v is string => !!v)));
+    const parentCategories = useMemo(() => fetchedCategories.filter(cat => !cat.parentCategory), [fetchedCategories]);
+    const allVendors = useMemo(() => Array.from(new Set(products.map(p => p.vendor).filter((v): v is string => !!v))), [products]);
 
     // Use fetched families directly so that families with 0 products still show up
     const allFamilies = fetchedFamilies;
 
     // Extract sizes and colors from variants/options
-    const allSizes = Array.from(new Set(products.flatMap(p =>
+    const allSizes = useMemo(() => Array.from(new Set(products.flatMap(p =>
         p.options?.find(o =>
             ['taille', 'size', 'pointure'].some(keyword => o.name?.toLowerCase().includes(keyword))
         )?.values?.filter(v => v !== null && v !== undefined) || []
-    ))).sort((a, b) => Number(a) - Number(b));
+    ))).sort((a, b) => Number(a) - Number(b)), [products]);
 
-    const allColors = Array.from(new Set(products.flatMap(p =>
+    const allColors = useMemo(() => Array.from(new Set(products.flatMap(p =>
         p.options?.find(o => o.name?.toLowerCase().includes('couleur') || o.name?.toLowerCase().includes('color') || o.name?.toLowerCase().includes('coloris'))?.values?.filter(v => v !== null && v !== undefined) || []
-    )));
+    ))), [products]);
 
     // Filter Logic
-    const filteredProducts = products.filter(product => {
+    const filteredProducts = useMemo(() => products.filter(product => {
         // Search
         if (searchQuery.trim() !== '') {
             const query = searchQuery.toLowerCase();
@@ -164,19 +164,24 @@ const Catalogue = () => {
         }
 
         return true;
-    });
+    }), [
+        products, searchQuery, selectedCategories, selectedVendors,
+        selectedFamilies, priceRange, inStockOnly, selectedSizes, selectedColors
+    ]);
 
     // Sort Logic
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
-        if (sortBy === 'price-low') return a.price - b.price;
-        if (sortBy === 'price-high') return b.price - a.price;
-        // if (sortBy === 'popular') return b.sales - a.sales; // Assuming sales field exists, else ignore
-        return 0; // 'newest' is default from API usually
-    });
+    const sortedProducts = useMemo(() => {
+        return [...filteredProducts].sort((a, b) => {
+            if (sortBy === 'price-low') return a.price - b.price;
+            if (sortBy === 'price-high') return b.price - a.price;
+            // if (sortBy === 'popular') return b.sales - a.sales; // Assuming sales field exists, else ignore
+            return 0; // 'newest' is default from API usually
+        });
+    }, [filteredProducts, sortBy]);
 
-    const toggleFilter = (item: string, setFn: React.Dispatch<React.SetStateAction<string[]>>) => {
+    const toggleFilter = useCallback((item: string, setFn: React.Dispatch<React.SetStateAction<string[]>>) => {
         setFn(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
-    };
+    }, []);
 
     return (
         <div className="bg-[#FAFAFA] font-sans text-gray-900 min-h-screen">
