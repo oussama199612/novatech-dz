@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShoppingBag, DollarSign, ArrowUpRight } from 'lucide-react';
+import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import api from '../api';
 
 const Dashboard = () => {
@@ -31,34 +33,50 @@ const Dashboard = () => {
         fetchStats();
     }, []);
 
-    const StatCard = ({ title, value, icon: Icon, percentage, isPositive }: any) => (
-        <div style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 rounded-2xl p-6 relative overflow-hidden group hover:border-[#a855f7]/50 transition-colors duration-300">
-            {/* Watermark Icon */}
-            <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-300">
-                <Icon size={120} />
-            </div>
+    const StatCard = ({ title, value, icon: Icon, percentage, isPositive }: any) => {
+        const colorHex = isPositive ? '#22c55e' : '#ef4444'; // green-500 or red-500
 
-            <div className="relative z-10 flex justify-between items-start">
-                <div>
+        return (
+            <div style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 rounded-2xl p-6 relative overflow-hidden group hover:border-[#a855f7]/50 transition-colors duration-300 flex justify-between items-center">
+                {/* Watermark Icon */}
+                <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-300">
+                    <Icon size={120} />
+                </div>
+
+                <div className="relative z-10">
                     <h3 className="text-gray-400 text-sm font-medium mb-3">{title}</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold text-white tracking-tight">{value}</span>
                     </div>
-                    {percentage && (
-                        <div className="mt-4 flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded bg-opacity-10 text-xs font-bold flex items-center gap-1 ${isPositive ? 'bg-green-500 text-green-400' : 'bg-red-500 text-red-500'}`}>
-                                {isPositive ? '↗' : '↘'} {percentage}%
-                            </span>
-                            <span className="text-gray-500 text-xs">vs last month</span>
-                        </div>
-                    )}
                 </div>
-                <div className="p-3 bg-white/5 rounded-xl border border-white/5 shadow-inner">
-                    <Icon size={24} className="text-purple-400 opacity-80" />
-                </div>
+
+                {/* Progress Circle right aligned */}
+                {percentage && (
+                    <div className="relative z-10 w-20 h-20 ml-4 flex-shrink-0 drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]">
+                        <CircularProgressbarWithChildren
+                            value={parseFloat(percentage)}
+                            styles={buildStyles({
+                                rotation: 0.50, // Start from bottom
+                                strokeLinecap: 'round',
+                                pathTransitionDuration: 1.5,
+                                pathColor: colorHex,
+                                trailColor: 'rgba(255,255,255,0.05)',
+                            })}
+                        >
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <span className={`text-sm font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                    {isPositive ? '↗' : '↘'}
+                                </span>
+                                <span className="text-[10px] font-bold text-white tracking-tighter shadow-black drop-shadow-md">
+                                    {percentage}%
+                                </span>
+                            </div>
+                        </CircularProgressbarWithChildren>
+                    </div>
+                )}
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
