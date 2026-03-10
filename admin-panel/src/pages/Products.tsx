@@ -353,41 +353,44 @@ const Products = () => {
             </div>
 
             {/* List */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 rounded-2xl overflow-hidden shadow-xl shadow-purple-900/5">
                 <table className="w-full text-left">
-                    <thead className="bg-slate-950 text-slate-400 text-xs uppercase font-bold">
+                    <thead>
                         <tr>
-                            <th className="p-4">Image</th>
-                            <th className="p-4">Nom</th>
-                            <th className="p-4">Catégorie</th>
-                            <th className="p-4">Prix</th>
-                            <th className="p-4">Stock</th>
-                            <th className="p-4">Statut</th>
-                            <th className="p-4">Actions</th>
+                            <th className="table-header">Image</th>
+                            <th className="table-header">Nom</th>
+                            <th className="table-header">Catégorie</th>
+                            <th className="table-header">Prix</th>
+                            <th className="table-header">Stock</th>
+                            <th className="table-header">Statut</th>
+                            <th className="table-header text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800">
+                    <tbody className="divide-y divide-purple-900/20">
                         {products.map((product) => (
-                            <tr key={product._id} className="hover:bg-slate-800/50 transition-colors">
-                                <td className="p-4">
-                                    <div className="h-12 w-12 bg-slate-800 rounded overflow-hidden flex items-center justify-center">
+                            <tr key={product._id} className="hover:bg-purple-900/10 transition-colors group">
+                                <td className="table-cell">
+                                    <div className="h-12 w-12 bg-[#110c18] border border-purple-900/30 rounded-lg overflow-hidden flex items-center justify-center">
                                         {product.image ? (
                                             <img src={getImageUrl(product.image)} className="w-full h-full object-cover" />
-                                        ) : <ImageIcon size={20} className="text-slate-600" />}
+                                        ) : <ImageIcon size={20} className="text-gray-600" />}
                                     </div>
                                 </td>
-                                <td className="p-4 font-medium text-white">{product.name}</td>
-                                <td className="p-4 text-slate-400">{product.category?.name || '-'}</td>
-                                <td className="p-4 font-bold text-emerald-400">{product.price.toLocaleString()} DA</td>
-                                <td className="p-4 text-slate-300">{product.stock}</td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${product.active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                <td className="table-cell font-bold text-white tracking-wide">{product.name}</td>
+                                <td className="table-cell text-gray-400">{product.category?.name || '-'}</td>
+                                <td className="table-cell font-bold text-gray-200">{product.price.toLocaleString()} DA</td>
+                                <td className="table-cell text-gray-400">{product.stock}</td>
+                                <td className="table-cell">
+                                    <span className={`px-2 py-1 flex items-center w-max gap-1 rounded bg-opacity-10 text-xs font-bold uppercase ${product.active ? 'bg-green-500 text-green-400' : 'bg-red-500 text-red-500'}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${product.active ? 'bg-green-400 animate-pulse' : 'bg-red-500'}`}></div>
                                         {product.active ? 'Actif' : 'Caché'}
                                     </span>
                                 </td>
-                                <td className="p-4 flex gap-2">
-                                    <button onClick={() => openEditModal(product)} className="p-2 hover:bg-blue-500/10 text-blue-400 rounded transition-colors"><Pencil size={18} /></button>
-                                    <button onClick={() => handleDelete(product._id)} className="p-2 hover:bg-red-500/10 text-red-400 rounded transition-colors"><Trash2 size={18} /></button>
+                                <td className="table-cell text-right">
+                                    <div className="flex gap-2 justify-end opacity-50 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => openEditModal(product)} className="p-2 hover:bg-[#a855f7]/20 hover:text-[#a855f7] text-gray-400 rounded-lg transition-colors"><Pencil size={18} /></button>
+                                        <button onClick={() => handleDelete(product._id)} className="p-2 hover:bg-red-500/20 hover:text-red-400 text-gray-400 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

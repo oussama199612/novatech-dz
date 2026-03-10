@@ -9,7 +9,7 @@ const Layout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 flex pl-64">
+        <div className="min-h-screen flex pl-64">
             <Sidebar />
             <main className="flex-1 p-8 overflow-y-auto w-full">
                 <div className="max-w-6xl mx-auto">

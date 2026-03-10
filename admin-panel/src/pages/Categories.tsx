@@ -58,14 +58,14 @@ const Categories = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Formulaire Création */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit">
-                    <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                        <Plus size={20} className="text-blue-500" />
+                <div style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 shadow-xl shadow-purple-900/5 rounded-2xl p-6 h-fit">
+                    <h3 className="font-bold text-white mb-6 flex items-center gap-2 text-lg">
+                        <Plus size={20} className="text-[#a855f7]" />
                         Nouvelle Catégorie
                     </h3>
                     <form onSubmit={handleCreate} className="space-y-4">
                         <div>
-                            <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Nom</label>
+                            <label className="block text-xs uppercase text-gray-500 tracking-widest font-bold mb-1">Nom</label>
                             <input
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
@@ -75,7 +75,7 @@ const Categories = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Slug (URL)</label>
+                            <label className="block text-xs uppercase text-gray-500 tracking-widest font-bold mb-1">Slug (URL)</label>
                             <input
                                 value={newSlug}
                                 onChange={(e) => setNewSlug(e.target.value)}
@@ -85,7 +85,7 @@ const Categories = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Icône (Lucide Name)</label>
+                            <label className="block text-xs uppercase text-gray-500 tracking-widest font-bold mb-1">Icône (Lucide Name)</label>
                             <input
                                 value={newIcon}
                                 onChange={(e) => setNewIcon(e.target.value)}
@@ -94,7 +94,7 @@ const Categories = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs uppercase text-slate-500 font-bold mb-1">Catégorie Parente</label>
+                            <label className="block text-xs uppercase text-gray-500 tracking-widest font-bold mb-1">Catégorie Parente</label>
                             <select
                                 value={newParentCategory}
                                 onChange={(e) => setNewParentCategory(e.target.value)}
@@ -106,36 +106,36 @@ const Categories = () => {
                                 ))}
                             </select>
                         </div>
-                        <button type="submit" className="btn-primary w-full py-2">Ajouter</button>
+                        <button type="submit" className="btn-primary w-full py-3 mt-4">Ajouter</button>
                     </form>
                 </div>
 
                 {/* Liste */}
                 <div className="md:col-span-2 space-y-4">
                     {categories.map((cat) => (
-                        <div key={cat._id} className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center group hover:border-blue-500/50 transition-colors">
+                        <div key={cat._id} style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 p-4 rounded-2xl flex justify-between items-center group hover:border-[#a855f7]/50 shadow-md transition-colors">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center text-blue-400 group-hover:bg-blue-500/10 group-hover:text-blue-300">
+                                <div className="w-12 h-12 bg-[#110c18] border border-purple-900/30 rounded-xl flex items-center justify-center text-[#a855f7] group-hover:bg-[#a855f7]/10 group-hover:text-white transition-colors">
                                     <Layers size={24} />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white">
-                                        {cat.parentCategory && <span className="text-slate-500 mr-2 text-sm">↳ {cat.parentCategory.name} /</span>}
+                                    <h4 className="font-bold text-white text-lg tracking-wide">
+                                        {cat.parentCategory && <span className="text-gray-500 mr-2 text-sm">↳ {cat.parentCategory.name} /</span>}
                                         {cat.name}
                                     </h4>
-                                    <div className="text-sm text-slate-500 font-mono">/{cat.slug}</div>
+                                    <div className="text-sm text-gray-500 font-mono mt-1">/{cat.slug}</div>
                                 </div>
                             </div>
                             <button
                                 onClick={() => handleDelete(cat._id)}
-                                className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
+                                className="p-3 hover:bg-red-500/20 text-gray-500 hover:text-red-500 rounded-xl transition-colors opacity-50 group-hover:opacity-100"
                             >
                                 <Trash2 size={20} />
                             </button>
                         </div>
                     ))}
 
-                    {categories.length === 0 && <div className="text-slate-500 text-center">Aucune catégorie.</div>}
+                    {categories.length === 0 && <div className="text-gray-500 text-center py-12">Aucune catégorie.</div>}
                 </div>
             </div>
         </div>

@@ -65,33 +65,33 @@ const Settings = () => {
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-white">Paramètres de la Boutique</h1>
+                <h1 className="text-3xl font-bold text-white tracking-tight">Paramètres de la Boutique</h1>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-8 space-y-6">
+            <form onSubmit={handleSubmit} style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 shadow-xl shadow-purple-900/5 rounded-2xl p-8 space-y-8">
 
                 {/* General Info */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Informations Générales</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h3 className="text-lg font-bold text-[#a855f7] border-b border-purple-900/30 pb-2">Informations Générales</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Nom de la boutique</label>
+                            <label className="block text-xs uppercase text-gray-400 tracking-widest font-bold mb-1">Nom de la boutique</label>
                             <input name="shopName" value={settings.shopName || ''} onChange={handleChange} className="input-field w-full" />
                         </div>
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Devise (Suffixe)</label>
+                            <label className="block text-xs uppercase text-gray-400 tracking-widest font-bold mb-1">Devise (Suffixe)</label>
                             <input name="currency" value={settings.currency || ''} onChange={handleChange} className="input-field w-full" />
                         </div>
                     </div>
                 </div>
 
-                {/* General Info */}
+                {/* Logo Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Logo de la Marque</h3>
+                    <h3 className="text-lg font-bold text-[#a855f7] border-b border-purple-900/30 pb-2">Logo de la Marque</h3>
                     <div className="flex items-center gap-6">
-                        <div className="w-32 h-32 bg-slate-800 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center relative overflow-hidden group">
+                        <div className="w-32 h-32 bg-[#110c18] border-2 border-dashed border-purple-900/40 rounded-xl flex items-center justify-center relative overflow-hidden group hover:border-[#a855f7]/50 transition-colors">
                             {settings.logoUrl ? (
                                 <>
                                     <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${settings.logoUrl}`} alt="Logo" className="w-full h-full object-contain p-2" />
@@ -126,15 +126,15 @@ const Settings = () => {
 
                 {/* Feature Toggles */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-blue-400 border-b border-slate-800 pb-2">Fonctionnalités & Modules</h3>
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <h3 className="text-lg font-bold text-[#a855f7] border-b border-purple-900/30 pb-2">Fonctionnalités & Modules</h3>
+                    <div className="bg-[#110c18] p-5 rounded-xl border border-purple-900/30">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
                                 type="checkbox"
                                 name="enableMultiStore"
                                 checked={settings.enableMultiStore || false}
                                 onChange={handleChange}
-                                className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500/50"
+                                className="w-5 h-5 rounded border-purple-900/50 bg-[#1a1025] text-[#a855f7] focus:ring-[#a855f7]/50"
                             />
                             <div>
                                 <div className="text-white font-medium text-lg">Activer la Gestion Multi-Magasins</div>

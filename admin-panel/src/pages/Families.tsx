@@ -117,16 +117,16 @@ const Families = () => {
     if (loading) return <div className="flex items-center justify-center min-h-[400px]">Chargement...</div>;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-2xl font-bold text-gray-900">Familles de Produits (Marques)</h1>
+                <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Familles (Marques)</h1>
                 <button onClick={() => openModal()} className="btn-primary flex items-center gap-2">
                     <Plus size={20} /> Nouvelle Famille
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 border-b border-gray-100">
+            <div style={{ backgroundColor: '#1a1025' }} className="border border-purple-900/30 rounded-2xl overflow-hidden shadow-xl shadow-purple-900/5">
+                <div className="p-6 border-b border-purple-900/30">
                     <div className="relative max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
@@ -140,50 +140,51 @@ const Families = () => {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50/50">
+                    <table className="w-full text-left">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Image / Nom</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sur l'Accueil</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th className="table-header px-6">Image / Nom</th>
+                                <th className="table-header px-6">Slug</th>
+                                <th className="table-header px-6 border-none">Sur l'Accueil</th>
+                                <th className="table-header px-6 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-purple-900/20">
                             {filteredFamilies.map((family) => (
-                                <tr key={family._id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                <tr key={family._id} className="hover:bg-purple-900/10 transition-colors group">
+                                    <td className="table-cell px-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 flex-shrink-0 bg-gray-100 rounded overflow-hidden border border-gray-200">
+                                            <div className="h-10 w-10 flex-shrink-0 bg-[#110c18] rounded-xl overflow-hidden border border-purple-900/30 flex items-center justify-center">
                                                 {family.image ? (
-                                                    <img className="h-full w-full object-contain" src={getImageUrl(family.image)} alt="" />
+                                                    <img className="h-full w-full object-cover" src={getImageUrl(family.image)} alt="" />
                                                 ) : (
-                                                    <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">N/A</div>
+                                                    <div className="h-full w-full flex items-center justify-center text-gray-500 text-xs">N/A</div>
                                                 )}
                                             </div>
-                                            <div className="font-medium text-gray-900">{family.name}</div>
+                                            <div className="font-bold text-white tracking-wide">{family.name}</div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {family.slug}
+                                    <td className="table-cell px-6 text-gray-400 font-mono">
+                                        /{family.slug}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="table-cell px-6">
                                         {family.showInHomeBar ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            <span className="px-2 py-1 flex items-center w-max gap-1 rounded bg-opacity-10 text-xs font-bold uppercase bg-green-500 text-green-400">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
                                                 Oui
                                             </span>
                                         ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            <span className="px-2 py-1 flex items-center w-max gap-1 rounded bg-opacity-10 text-xs font-bold uppercase bg-gray-500 text-gray-400">
                                                 Non
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                        <div className="flex items-center justify-end gap-3">
-                                            <button onClick={() => openModal(family)} className="text-blue-600 hover:text-blue-900 transition-colors p-1">
+                                    <td className="table-cell px-6 text-right">
+                                        <div className="flex items-center justify-end gap-3 opacity-50 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => openModal(family)} className="p-2 hover:bg-[#a855f7]/20 hover:text-[#a855f7] text-gray-400 rounded-lg transition-colors">
                                                 <Edit2 size={18} />
                                             </button>
-                                            <button onClick={() => handleDelete(family._id)} className="text-red-600 hover:text-red-900 transition-colors p-1">
+                                            <button onClick={() => handleDelete(family._id)} className="p-2 hover:bg-red-500/20 hover:text-red-400 text-gray-400 rounded-lg transition-colors">
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>
@@ -192,7 +193,7 @@ const Families = () => {
                             ))}
                             {filteredFamilies.length === 0 && (
                                 <tr>
-                                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
                                         Aucune famille trouvée.
                                     </td>
                                 </tr>

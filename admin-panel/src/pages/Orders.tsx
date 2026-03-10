@@ -44,20 +44,20 @@ const Orders = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Orders List - Takes 1/3 width on desktop (sidebar style) */}
-                <div className="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden h-[80vh] flex flex-col print:hidden">
+                <div style={{ backgroundColor: '#1a1025' }} className="lg:col-span-1 border border-purple-900/30 rounded-2xl overflow-hidden shadow-xl shadow-purple-900/5 h-[80vh] flex flex-col print:hidden">
                     <div className="overflow-y-auto custom-scrollbar flex-1">
-                        <table className="w-full text-left text-slate-300">
-                            <thead className="bg-slate-950 text-slate-400 uppercase text-xs font-semibold sticky top-0 z-10">
+                        <table className="w-full text-left text-gray-300">
+                            <thead className="bg-[#110c18] text-gray-400 uppercase text-xs font-bold tracking-widest sticky top-0 z-10 border-b border-purple-900/30">
                                 <tr>
-                                    <th className="p-4">Info Commande</th>
+                                    <th className="p-4 px-6">Info Commande</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800">
+                            <tbody>
                                 {orders.map((order) => (
                                     <tr
                                         key={order._id}
                                         onClick={() => setSelectedOrder(order)}
-                                        className={`cursor-pointer transition-colors ${selectedOrder?._id === order._id ? 'bg-blue-900/20 border-l-4 border-blue-500' : 'hover:bg-slate-800/50 border-l-4 border-transparent'}`}
+                                        className={`cursor-pointer transition-all border-b border-purple-900/10 ${selectedOrder?._id === order._id ? 'bg-[#a855f7]/10 border-l-4 border-l-[#a855f7]' : 'hover:bg-purple-900/10 border-l-4 border-l-transparent'}`}
                                     >
                                         <td className="p-4">
                                             <div className="flex justify-between items-start mb-1">
@@ -97,18 +97,18 @@ const Orders = () => {
                 </div>
 
                 {/* Order Details Panel */}
-                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 h-fit sticky top-6">
+                <div style={{ backgroundColor: '#1a1025' }} className="lg:col-span-2 border border-purple-900/30 shadow-xl shadow-purple-900/5 rounded-2xl p-6 h-fit sticky top-6">
                     {selectedOrder ? (
                         <div className="space-y-6">
-                            <div className="border-b border-slate-800 pb-4 flex justify-between items-start">
+                            <div className="border-b border-purple-900/30 pb-4 flex justify-between items-start">
                                 <div>
                                     <h3 className="text-xl font-bold text-white mb-1">Détails de la commande</h3>
-                                    <p className="text-slate-400 text-sm font-mono">ID: {selectedOrder.orderId}</p>
+                                    <p className="text-gray-400 text-sm font-mono">ID: {selectedOrder.orderId}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-slate-400 text-sm">Date: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-gray-400 text-sm">Date: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
                                     {selectedOrder.store && (
-                                        <p className="text-indigo-400 font-medium text-sm flex items-center justify-end gap-1 mt-1">
+                                        <p className="text-[#a855f7] font-medium text-sm flex items-center justify-end gap-1 mt-1">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" /><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" /><path d="M2 7h20" /><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7" /></svg>
                                             Magasin: {selectedOrder.store.name}
                                         </p>
@@ -117,24 +117,24 @@ const Orders = () => {
                             </div>
 
                             {/* Customer Info */}
-                            <div className="grid grid-cols-2 gap-4 bg-slate-800/50 p-4 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4 bg-[#110c18] border border-purple-900/30 p-5 rounded-xl">
                                 <div>
-                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Client</p>
-                                    <p className="font-medium text-white">{selectedOrder.contactEmail}</p>
-                                    <p className="text-sm text-slate-400">{selectedOrder.contactPhone || 'N/A'}</p>
+                                    <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Client</p>
+                                    <p className="font-bold text-white text-lg">{selectedOrder.contactEmail}</p>
+                                    <p className="text-sm text-gray-400">{selectedOrder.contactPhone || 'N/A'}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Total</p>
-                                    <p className="text-xl font-bold text-emerald-400">{selectedOrder.totalAmount?.toLocaleString()} DA</p>
+                                    <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Total</p>
+                                    <p className="text-2xl font-bold text-green-400">{selectedOrder.totalAmount?.toLocaleString()} DA</p>
                                 </div>
                             </div>
 
                             {/* Simple Items List */}
                             <div>
-                                <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Produits</h4>
-                                <div className="bg-slate-800/30 rounded-lg overflow-hidden border border-slate-800">
+                                <h4 className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest">Produits Achetés</h4>
+                                <div className="bg-[#110c18] rounded-xl overflow-hidden border border-purple-900/30">
                                     {selectedOrder.items?.map((item: any, idx: number) => (
-                                        <div key={idx} className="p-4 flex items-center gap-4 border-b border-slate-800 last:border-0">
+                                        <div key={idx} className="p-4 flex items-center gap-4 border-b border-purple-900/30 last:border-0 hover:bg-purple-900/10 transition-colors">
                                             <div className="flex-1">
                                                 <p className="font-bold text-white mb-0.5">{item.productName}</p>
                                                 {item.variantTitle && (
