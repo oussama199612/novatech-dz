@@ -100,6 +100,8 @@ export default function BrandsSection() {
                                             src={getImageUrl(brand.logoUrl)}
                                             alt={brand.name}
                                             className="w-full h-full object-contain transition-all duration-500"
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     </Link>
                                     <span className="mt-4 text-xs font-medium text-gray-400 opacity-0 group-hover/brand:opacity-100 transform translate-y-2 group-hover/brand:translate-y-0 transition-all duration-300">

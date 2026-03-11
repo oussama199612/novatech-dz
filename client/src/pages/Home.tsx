@@ -126,6 +126,8 @@ const Home = () => {
                                                 alt={product.name}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                 src={getImageUrl(product.image)}
+                                                loading="lazy"
+                                                decoding="async"
                                             />
                                             <div className="absolute inset-0 bg-black/opacity-0 group-hover:bg-black/5 transition-colors duration-500"></div>
                                             <button

@@ -265,6 +265,8 @@ const ProductLanding = () => {
                                                 src={getImageUrl(img!)}
                                                 alt={`${product.name} - ${idx + 1}`}
                                                 className="w-full h-full object-contain"
+                                                loading={idx === 0 ? "eager" : "lazy"}
+                                                decoding="async"
                                             />
                                             {idx === 0 && product.compareAtPrice > (currentVariant?.price || product.price) && (
                                                 <div className="absolute top-4 left-4 bg-luxury-gold text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest shadow-lg">
@@ -295,7 +297,7 @@ const ProductLanding = () => {
                                         onClick={() => setActiveImage(img!)}
                                         className={`w-20 h-20 md:w-24 md:h-24 flex-shrink-0 transition-opacity duration-300 border bg-[#FAFAFA] ${activeImage === img ? 'opacity-100 border-black' : 'opacity-60 border-transparent hover:opacity-100'}`}
                                     >
-                                        <img src={getImageUrl(img!)} className="w-full h-full object-contain mix-blend-multiply" />
+                                        <img src={getImageUrl(img!)} className="w-full h-full object-contain mix-blend-multiply" loading="lazy" decoding="async" />
                                     </button>
                                 ))}
                             </div>
@@ -706,6 +708,8 @@ const ProductLanding = () => {
                                             alt={p.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             src={getImageUrl(p.image)}
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     </div>
                                     <h3 className="line-clamp-1 font-medium text-sm mb-1 group-hover:text-gray-500 transition-colors">{p.name}</h3>
@@ -725,6 +729,8 @@ const ProductLanding = () => {
                                             alt={p.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             src={getImageUrl(p.image)}
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     </div>
                                     <h3 className="line-clamp-1 font-medium text-sm mb-1 group-hover:text-gray-500 transition-colors">{p.name}</h3>
