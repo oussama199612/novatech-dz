@@ -7,6 +7,7 @@ const Settings = () => {
     const [settings, setSettings] = useState<any>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [gtmValidation, setGtmValidation] = useState({ checking: false, checked: false, valid: false, message: '' });
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -25,6 +26,10 @@ const Settings = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, type, checked, value } = e.target;
         setSettings((prev: any) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+
+        if (name === 'gtmId') {
+            setGtmValidation({ checking: false, checked: false, valid: false, message: '' });
+        }
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +71,21 @@ const Settings = () => {
         if (!id) return false;
         const trimmed = id.trim().toUpperCase();
         return /^GTM-[A-Z0-9]{4,}$/.test(trimmed) || /^G-[A-Z0-9]{4,}$/.test(trimmed);
+    };
+
+    const verifyGtmLive = async () => {
+        if (!settings.gtmId || !isValidGtm(settings.gtmId)) {
+            setGtmValidation({ checking: false, checked: true, valid: false, message: 'Veuillez saisir un format valide (GTM-XXXX ou G-XXXX).' });
+            return;
+        }
+
+        setGtmValidation({ checking: true, checked: false, valid: false, message: 'Vérification en cours...' });
+        try {
+            const { data } = await api.post('/settings/validate-gtm', { gtmId: settings.gtmId });
+            setGtmValidation({ checking: false, checked: true, valid: data.valid, message: data.message });
+        } catch (error) {
+            setGtmValidation({ checking: false, checked: true, valid: false, message: 'Erreur réseau.' });
+        }
     };
 
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
@@ -141,18 +161,43 @@ const Settings = () => {
                                 <label className="block text-white font-medium text-lg mb-1">Google Tag Manager / Analytics</label>
                                 <p className="text-sm text-slate-400">Insérez votre ID de conteneur GTM (commence par GTM-) ou Analytics (G-). Le script sera injecté automatiquement.</p>
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isValidGtm(settings.gtmId) ? 'bg-green-500/10 text-green-500 border border-green-500/20' : settings.gtmId?.trim() ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-gray-500/10 text-gray-500 border border-gray-500/20'}`}>
-                                <div className={`w-2 h-2 rounded-full ${isValidGtm(settings.gtmId) ? 'bg-green-500 animate-pulse' : settings.gtmId?.trim() ? 'bg-red-500' : 'bg-gray-500'}`} />
-                                {isValidGtm(settings.gtmId) ? 'Connecté' : settings.gtmId?.trim() ? 'Format Invalide' : 'Désactivé'}
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
+                                ${gtmValidation.checking ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+                                    gtmValidation.checked ? (gtmValidation.valid ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20') :
+                                        isValidGtm(settings.gtmId) ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                                            settings.gtmId?.trim() ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-gray-500/10 text-gray-500 border border-gray-500/20'}
+                            `}>
+                                <div className={`w-2 h-2 rounded-full 
+                                    ${gtmValidation.checking ? 'bg-yellow-500 animate-spin' :
+                                        gtmValidation.checked ? (gtmValidation.valid ? 'bg-green-500' : 'bg-red-500') :
+                                            isValidGtm(settings.gtmId) ? 'bg-blue-500' :
+                                                settings.gtmId?.trim() ? 'bg-red-500' : 'bg-gray-500'}
+                                `} />
+                                {gtmValidation.checking ? 'Vérification...' :
+                                    gtmValidation.checked ? gtmValidation.message :
+                                        isValidGtm(settings.gtmId) ? 'Non Vérifié (Cliquez sur Tester)' :
+                                            settings.gtmId?.trim() ? 'Format Invalide' : 'Désactivé'}
                             </div>
                         </div>
-                        <input
-                            name="gtmId"
-                            value={settings.gtmId || ''}
-                            onChange={handleChange}
-                            placeholder="Ex: GTM-XXXXXXX ou G-XXXXXXX"
-                            className="input-field w-full font-mono text-sm max-w-sm uppercase"
-                        />
+                        <div className="flex items-center gap-4">
+                            <input
+                                name="gtmId"
+                                value={settings.gtmId || ''}
+                                onChange={handleChange}
+                                placeholder="Ex: GTM-XXXXXXX ou G-XXXXXXX"
+                                className="input-field w-full font-mono text-sm max-w-sm uppercase"
+                            />
+                            {isValidGtm(settings.gtmId) && (
+                                <button
+                                    type="button"
+                                    onClick={verifyGtmLive}
+                                    disabled={gtmValidation.checking}
+                                    className="px-4 py-2 bg-[#1a1025] hover:bg-[#251835] border border-purple-900/50 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                    Tester la connexion
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="bg-[#110c18] p-5 rounded-xl border border-purple-900/30">
