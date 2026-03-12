@@ -44,6 +44,7 @@ router.put('/', protect, asyncHandler(async (req, res) => {
         if (req.body.aboutUs !== undefined) settings.aboutUs = req.body.aboutUs;
 
         if (req.body.brands !== undefined) settings.brands = req.body.brands;
+        if (req.body.gtmId !== undefined) settings.gtmId = req.body.gtmId;
 
         if (req.body.enableMultiStore !== undefined) {
             settings.enableMultiStore = req.body.enableMultiStore;

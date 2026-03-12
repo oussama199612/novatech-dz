@@ -31,6 +31,10 @@ function App() {
       }
     };
     fetchGlobalSettings();
+
+    // Poll every 30 seconds so if Admin changes it, Storefront adjusts silently
+    const interval = setInterval(fetchGlobalSettings, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
