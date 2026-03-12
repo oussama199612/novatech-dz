@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import GTMScript from './components/GTMScript';
+import api from './api';
 
 // Navigation pages are lazily loaded to drastically improve initial load time
 const Home = React.lazy(() => import('./pages/Home'));
@@ -16,10 +18,26 @@ const Profile = React.lazy(() => import('./pages/Profile'));
 const InfoPage = React.lazy(() => import('./pages/InfoPage'));
 
 function App() {
+  const [settings, setSettings] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    // Fetch settings on initial load to grab dynamic configurations like GTM ID
+    const fetchGlobalSettings = async () => {
+      try {
+        const { data } = await api.get('/settings');
+        setSettings(data || {});
+      } catch (error) {
+        console.error('Failed to load global settings:', error);
+      }
+    };
+    fetchGlobalSettings();
+  }, []);
+
   return (
     <AuthProvider>
       <CartProvider>
         <Router>
+          {settings?.gtmId && <GTMScript gtmId={settings.gtmId} />}
           <div className="min-h-screen bg-background-light text-slate-900 font-display selection:bg-primary selection:text-white flex flex-col">
             <Navbar />
             <main className="flex-grow">

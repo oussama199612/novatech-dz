@@ -24,6 +24,7 @@ const settingsSchema = mongoose.Schema({
         logoUrl: { type: String, required: true }
     }],
 
+    gtmId: { type: String, default: '' },
     enableMultiStore: { type: Boolean, default: false }, // Toggle for multi-store logic
 }, {
     timestamps: true

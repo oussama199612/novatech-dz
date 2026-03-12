@@ -127,6 +127,28 @@ const Settings = () => {
                 {/* Feature Toggles */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-bold text-[#a855f7] border-b border-purple-900/30 pb-2">Fonctionnalités & Modules</h3>
+
+                    {/* GTM Configuration */}
+                    <div className="bg-[#110c18] p-5 rounded-xl border border-purple-900/30 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <label className="block text-white font-medium text-lg mb-1">Google Tag Manager / Analytics</label>
+                                <p className="text-sm text-slate-400">Insérez votre ID de conteneur GTM (commence par GTM-) ou Analytics (G-). Le script sera injecté automatiquement.</p>
+                            </div>
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${settings.gtmId?.trim() ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                                <div className={`w-2 h-2 rounded-full ${settings.gtmId?.trim() ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                                {settings.gtmId?.trim() ? 'Connecté' : 'Désactivé'}
+                            </div>
+                        </div>
+                        <input
+                            name="gtmId"
+                            value={settings.gtmId || ''}
+                            onChange={handleChange}
+                            placeholder="Ex: GTM-XXXXXXX ou G-XXXXXXX"
+                            className="input-field w-full font-mono text-sm max-w-sm uppercase"
+                        />
+                    </div>
+
                     <div className="bg-[#110c18] p-5 rounded-xl border border-purple-900/30">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
