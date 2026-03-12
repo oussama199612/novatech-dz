@@ -74,7 +74,7 @@ router.post('/validate-gtm', protect, asyncHandler(async (req, res) => {
     // GA4 (G-) tags always return HTTP 200 from Google even if fake. We can only regex validate them.
     if (trimmed.startsWith('G-')) {
         const isFormatValid = /^G-[A-Z0-9]{4,}$/.test(trimmed);
-        return res.json({ valid: isFormatValid, type: 'GA4', message: isFormatValid ? 'Format GA4 OK' : 'Format GA4 Invalide' });
+        return res.json({ valid: isFormatValid, type: 'GA4', message: isFormatValid ? 'Format GA4 Valide (Connexion Google invérifiable)' : 'Format GA4 Invalide' });
     }
 
     // GTM (GTM-) tags return 404 if they don't exist. We can truly validate them.
