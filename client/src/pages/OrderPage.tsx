@@ -88,9 +88,9 @@ const OrderPage = () => {
             const { data: orderResponse } = await api.post('/orders', orderData);
 
             // GTM purchase event
-            const dataLayer = (window as any).dataLayer || [];
-            dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
-            dataLayer.push({
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
+            const purchaseEvent = {
                 event: 'purchase',
                 ecommerce: {
                     transaction_id: String(orderResponse.orderId),
@@ -107,7 +107,9 @@ const OrderPage = () => {
                         }
                     ]
                 }
-            });
+            };
+            window.dataLayer.push(purchaseEvent);
+            console.log('🛒 GTM Purchase Event Pushed:', purchaseEvent);
 
             // Brief pause to guarantee event dispatch before React unmounts
             setTimeout(() => {

@@ -174,9 +174,9 @@ const ProductLanding = () => {
             const { data: orderResponse } = await api.post('/orders', orderData);
 
             // GTM purchase event for direct checkout
-            const dataLayer = (window as any).dataLayer || [];
-            dataLayer.push({ ecommerce: null });
-            dataLayer.push({
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ ecommerce: null });
+            const purchaseEvent = {
                 event: 'purchase',
                 ecommerce: {
                     transaction_id: String(orderResponse.orderId),
@@ -193,7 +193,9 @@ const ProductLanding = () => {
                         }
                     ]
                 }
-            });
+            };
+            window.dataLayer.push(purchaseEvent);
+            console.log('🛒 GTM Purchase Event Pushed:', purchaseEvent);
 
             // Brief pause to guarantee event dispatch before React unmounts
             setTimeout(() => {
