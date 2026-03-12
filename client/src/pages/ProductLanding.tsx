@@ -115,6 +115,31 @@ const ProductLanding = () => {
         }
     }, [selectedOptions, product]);
 
+    // GTM view_item event hook
+    useEffect(() => {
+        if (product) {
+            const dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({ ecommerce: null });
+            dataLayer.push({
+                event: 'view_item',
+                ecommerce: {
+                    currency: 'DZD',
+                    value: Number(currentVariant?.price || product.price),
+                    items: [
+                        {
+                            item_name: String(product.name),
+                            item_id: String(product._id),
+                            price: Number(currentVariant?.price || product.price),
+                            item_category: String(product.category?.name || ''),
+                            item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                            quantity: 1
+                        }
+                    ]
+                }
+            });
+        }
+    }, [product, currentVariant]);
+
     const handleOptionChange = (option: string, value: string) => {
         setSelectedOptions(prev => ({ ...prev, [option]: value }));
     };
@@ -146,9 +171,31 @@ const ProductLanding = () => {
                 ...(settings?.enableMultiStore ? { storeId: selectedStoreId } : {})
             };
 
-            await api.post('/orders', orderData);
+            const { data: orderResponse } = await api.post('/orders', orderData);
 
-            // Brief pause to guarantee order processing before React unmounts
+            // GTM purchase event for direct checkout
+            const dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({ ecommerce: null });
+            dataLayer.push({
+                event: 'purchase',
+                ecommerce: {
+                    transaction_id: String(orderResponse.orderId),
+                    value: Number(orderData.orderItems[0].qty * (orderData.orderItems[0].variant?.price || product.price)),
+                    currency: 'DZD',
+                    items: [
+                        {
+                            item_name: String(product.name),
+                            item_id: String(product._id),
+                            price: Number(currentVariant?.price || product.price),
+                            item_category: String(product.category?.name || ''),
+                            item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                            quantity: Number(quantity)
+                        }
+                    ]
+                }
+            });
+
+            // Brief pause to guarantee event dispatch before React unmounts
             setTimeout(() => {
                 navigate('/success');
             }, 300);
@@ -161,6 +208,27 @@ const ProductLanding = () => {
     const handleAddToCart = () => {
         if (!product) return;
         addToCart(product, quantity, currentVariant, selectedOptions);
+
+        // GTM add_to_cart event
+        const dataLayer = (window as any).dataLayer || [];
+        dataLayer.push({ ecommerce: null });
+        dataLayer.push({
+            event: 'add_to_cart',
+            ecommerce: {
+                currency: 'DZD',
+                value: Number((currentVariant?.price || product.price) * quantity),
+                items: [
+                    {
+                        item_name: String(product.name),
+                        item_id: String(product._id),
+                        price: Number(currentVariant?.price || product.price),
+                        item_category: String(product.category?.name || ''),
+                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
+                        quantity: Number(quantity)
+                    }
+                ]
+            }
+        });
 
         alert('Produit ajouté au panier !');
     };

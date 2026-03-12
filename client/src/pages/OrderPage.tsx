@@ -85,9 +85,31 @@ const OrderPage = () => {
                 paymentMethodId: selectedMethodId
             };
 
-            await api.post('/orders', orderData);
+            const { data: orderResponse } = await api.post('/orders', orderData);
 
-            // Brief pause to guarantee order processing before React unmounts
+            // GTM purchase event
+            const dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
+            dataLayer.push({
+                event: 'purchase',
+                ecommerce: {
+                    transaction_id: String(orderResponse.orderId),
+                    value: Number(finalPrice),
+                    currency: 'DZD',
+                    items: [
+                        {
+                            item_name: String(product.name),
+                            item_id: String(product._id),
+                            price: Number(variant?.price || product.price),
+                            item_category: String(product.category?.name || ''),
+                            item_variant: variant?.title ? String(variant.title) : undefined,
+                            quantity: Number(quantity)
+                        }
+                    ]
+                }
+            });
+
+            // Brief pause to guarantee event dispatch before React unmounts
             setTimeout(() => {
                 navigate('/success');
             }, 300);
