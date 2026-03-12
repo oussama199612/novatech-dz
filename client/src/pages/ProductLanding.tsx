@@ -7,7 +7,6 @@ import { getImageUrl } from '../utils';
 import { type Product, type PaymentMethod } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import ReactGA from 'react-ga4';
 
 const ProductLanding = () => {
     const { productId } = useParams();
@@ -116,26 +115,6 @@ const ProductLanding = () => {
         }
     }, [selectedOptions, product]);
 
-    // GA4 view_item event hook
-    useEffect(() => {
-        if (product) {
-            ReactGA.event('view_item', {
-                currency: 'DZD',
-                value: Number(currentVariant?.price || product.price),
-                items: [
-                    {
-                        item_id: String(product._id),
-                        item_name: String(product.name),
-                        item_category: String(product.category?.name || ''),
-                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
-                        price: Number(currentVariant?.price || product.price),
-                        quantity: 1
-                    }
-                ]
-            });
-        }
-    }, [product, currentVariant]);
-
     const handleOptionChange = (option: string, value: string) => {
         setSelectedOptions(prev => ({ ...prev, [option]: value }));
     };
@@ -167,26 +146,9 @@ const ProductLanding = () => {
                 ...(settings?.enableMultiStore ? { storeId: selectedStoreId } : {})
             };
 
-            const { data: order } = await api.post('/orders', orderData);
+            await api.post('/orders', orderData);
 
-            // GA4 purchase event for direct checkout
-            ReactGA.event('purchase', {
-                transaction_id: String(order.orderId),
-                value: Number(orderData.orderItems[0].qty * (orderData.orderItems[0].variant?.price || product.price)),
-                currency: 'DZD',
-                items: [
-                    {
-                        item_id: String(product._id),
-                        item_name: String(product.name),
-                        item_category: String(product.category?.name || ''),
-                        item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
-                        price: Number(currentVariant?.price || product.price),
-                        quantity: Number(quantity)
-                    }
-                ]
-            });
-
-            // Brief pause to guarantee GA4 beacon dispatch before React unmounts
+            // Brief pause to guarantee order processing before React unmounts
             setTimeout(() => {
                 navigate('/success');
             }, 300);
@@ -199,22 +161,6 @@ const ProductLanding = () => {
     const handleAddToCart = () => {
         if (!product) return;
         addToCart(product, quantity, currentVariant, selectedOptions);
-
-        // GA4 add_to_cart event
-        ReactGA.event('add_to_cart', {
-            currency: 'DZD',
-            value: Number((currentVariant?.price || product.price) * quantity),
-            items: [
-                {
-                    item_id: String(product._id),
-                    item_name: String(product.name),
-                    item_category: String(product.category?.name || ''),
-                    item_variant: currentVariant?.title ? String(currentVariant.title) : undefined,
-                    price: Number(currentVariant?.price || product.price),
-                    quantity: Number(quantity)
-                }
-            ]
-        });
 
         alert('Produit ajouté au panier !');
     };

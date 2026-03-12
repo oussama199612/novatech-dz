@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Analytics from './components/Analytics';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext';
@@ -21,7 +20,6 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
-          <Analytics />
           <div className="min-h-screen bg-background-light text-slate-900 font-display selection:bg-primary selection:text-white flex flex-col">
             <Navbar />
             <main className="flex-grow">

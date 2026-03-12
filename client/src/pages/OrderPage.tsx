@@ -4,7 +4,6 @@ import { Copy, Check, ArrowRight, Wallet } from 'lucide-react';
 import api from '../api';
 import { type Product, type PaymentMethod } from '../types';
 import { getImageUrl } from '../utils';
-import ReactGA from 'react-ga4';
 
 const OrderPage = () => {
     const { productId } = useParams();
@@ -86,26 +85,9 @@ const OrderPage = () => {
                 paymentMethodId: selectedMethodId
             };
 
-            const { data: order } = await api.post('/orders', orderData);
+            await api.post('/orders', orderData);
 
-            // GA4 purchase event
-            ReactGA.event('purchase', {
-                transaction_id: String(order.orderId),
-                value: Number(finalPrice),
-                currency: 'DZD',
-                items: [
-                    {
-                        item_id: String(product._id),
-                        item_name: String(product.name),
-                        item_category: String(product.category?.name || ''),
-                        item_variant: variant?.title ? String(variant.title) : undefined,
-                        price: Number(variant?.price || product.price),
-                        quantity: Number(quantity)
-                    }
-                ]
-            });
-
-            // Brief pause to guarantee GA4 beacon dispatch before React unmounts
+            // Brief pause to guarantee order processing before React unmounts
             setTimeout(() => {
                 navigate('/success');
             }, 300);
