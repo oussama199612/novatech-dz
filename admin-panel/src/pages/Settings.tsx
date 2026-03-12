@@ -62,6 +62,12 @@ const Settings = () => {
         }
     };
 
+    const isValidGtm = (id?: string) => {
+        if (!id) return false;
+        const trimmed = id.trim().toUpperCase();
+        return /^GTM-[A-Z0-9]{4,}$/.test(trimmed) || /^G-[A-Z0-9]{4,}$/.test(trimmed);
+    };
+
     if (loading) return <div className="p-8 text-white">Chargement...</div>;
 
     return (
@@ -135,9 +141,9 @@ const Settings = () => {
                                 <label className="block text-white font-medium text-lg mb-1">Google Tag Manager / Analytics</label>
                                 <p className="text-sm text-slate-400">Insérez votre ID de conteneur GTM (commence par GTM-) ou Analytics (G-). Le script sera injecté automatiquement.</p>
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${settings.gtmId?.trim() ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
-                                <div className={`w-2 h-2 rounded-full ${settings.gtmId?.trim() ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                                {settings.gtmId?.trim() ? 'Connecté' : 'Désactivé'}
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isValidGtm(settings.gtmId) ? 'bg-green-500/10 text-green-500 border border-green-500/20' : settings.gtmId?.trim() ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-gray-500/10 text-gray-500 border border-gray-500/20'}`}>
+                                <div className={`w-2 h-2 rounded-full ${isValidGtm(settings.gtmId) ? 'bg-green-500 animate-pulse' : settings.gtmId?.trim() ? 'bg-red-500' : 'bg-gray-500'}`} />
+                                {isValidGtm(settings.gtmId) ? 'Connecté' : settings.gtmId?.trim() ? 'Format Invalide' : 'Désactivé'}
                             </div>
                         </div>
                         <input
